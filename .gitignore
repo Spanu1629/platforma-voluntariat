@@ -1,0 +1,12 @@
+# Keep shared agent skills and roles; ignore local settings and worktrees.
+.claude/*
+!.claude/skills/
+!.claude/agents/
+.claude/worktrees/
+.agents/*
+!.agents/skills/
+.codex/*
+!.codex/agents/
+.codex/worktrees/
+# Local credentials are never shared.
+.aws/
