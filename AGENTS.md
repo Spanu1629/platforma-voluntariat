@@ -92,13 +92,13 @@ A mandatory step without its required capability is blocked, never silently skip
 ## 1. What this repo is
 P16 - Coordonare voluntari (Volunteer Coordination Platform).
 A university web application for a real volunteer organization.
-It will support coordinators and volunteers through separate responsive interfaces.
-Planned scope is in `docs/agents/PROJECT-BRIEF.md`; exact rules await partner confirmation.
+It will support volunteers, coordinators and administrators through responsive interfaces.
+Approved project scope is in `docs/agents/PROJECT-BRIEF.md`; partner-specific details follow D-002.
 
 ## 2. Stack and commands
-Technology and architecture are undecided. Backend services and databases must run in Docker (D-001).
+The approved stack and architecture are in D-003 and D-005. Docker is required locally and for PostgreSQL integration tests. Managed PostgreSQL is permitted for public deployment under D-009.
 Install, build, run, test, lint, type-check and release: not run; no application or command definitions exist.
-Screenshot: not run; stack, renderer and supported viewport sizes are undecided (Q-007).
+Screenshot: not run; renderer and supported viewport sizes are undecided (Q-005, Q-007).
 Ledger check (run during setup):
 
 ```bash
@@ -116,17 +116,16 @@ python3 docs/agents/tools/ledger-lint.py
 No application source, dependencies, database definitions or Docker configuration exist yet.
 
 ## 4. Rules for this repo
-- During this setup only, skip Git synchronization: no remote exists; the user authorized this exception.
 - Team, ClickUp and Slack addons are declined. No ticket workflow is installed.
-- Use the planned scope as context; confirm exact requirements with the partner before implementation (D-002).
-- Initial datasets may come from the partner; their format and rules remain open (Q-009).
-- No stack, schema, API or deployment choice has been approved.
+- Use the approved scope; confirm requirements attributed to the partner before dependent implementation (D-002).
+- Historical aggregates, pilot records and synthetic test data stay separate (D-006).
+- The pilot is adults only. Registration of real minors requires verification of the legal conditions (Q-010).
 - UI work loads both `docs/design/DESIGN.md` and `docs/design/CODEX.md` in Codex.
 
 ## 5. Release
-Local branch: `main`, initially unborn. No remote, commits, tags or release configuration existed at detection.
+Default branch: `main`, tracking `origin/main`. No release configuration exists.
 Release workflow, version source and deployment target remain open (Q-004).
-Commit and local merge of this setup require the user's go. Never push without explicit authorization.
+Commit, merge and push require the user's authorization.
 
 ## 6. Definition of done
 - Applicable commands are defined and run; missing commands remain explicit open questions.

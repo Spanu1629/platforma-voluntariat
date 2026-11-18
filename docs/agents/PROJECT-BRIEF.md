@@ -1,37 +1,40 @@
-# Project brief — P16 - Coordonare voluntari
+# P16 — Coordonare voluntari: ture, check-in și ore
 
-## Source
-User instructions in this setup session, 2026-11-06.
-These facts are user supplied; they are not inferred from application code.
+Scope aprobat de responsabilul proiectului la 18.11.2026. Produsul deservește o singură organizație, Asociația „Mâini Mici, Suflete Mari”. Cerințele universitare provin din promptul proiectului. Datele comunicate de asociație sunt în [INTERVIEW.md](../../INTERVIEW.md) și [EVENT.md](../../EVENT.md). Regulile de produs stabilite în conversație nu sunt atribuite asociației. D-002 se aplică cerințelor atribuite partenerului.
 
-## Purpose
-Volunteer Coordination Platform is a university web application for a real volunteer organization.
-It will help coordinators manage events, shifts, volunteer registrations, attendance and volunteering hours.
+## Conturi, eligibilitate și planificare
 
-## Planned features
-- Volunteer profiles and training records.
-- Event and shift management.
-- Volunteer registration and waiting lists.
-- QR-based check-in and check-out.
-- Tracking volunteering hours.
-- Generating PDF volunteering certificates.
-- Separate interfaces for volunteers and coordinators.
+- Voluntarii se autentifică prin email și parolă, cu verificarea adresei și recuperare prin link temporar. Profilul cere nume, prenume, data nașterii, telefon și localitate. Un cont în așteptare poate completa profilul și consulta evenimentele publicate la care are acces. Înscrierea și lista de așteptare necesită aprobare.
+- Administratorii și coordonatorii delegați aprobă conturi și validează instruiri prin permisiuni distincte. Coordonatorii au acces la profiluri în limitele evenimentelor atribuite și ale delegării. Data nașterii are acces restrâns. Backend-ul autorizează fiecare operație.
+- Regulile de produs permit aplicarea de la 14 ani. Rolurile de organizare și supraveghere cer minimum 18 ani. Conturile de 14–17 ani ar urma aprobare manuală fără încărcarea documentelor. Înregistrarea minorilor reali rămâne dezactivată până la verificarea condițiilor legale, conform Q-010. Pilotul include exclusiv adulți. Regulile pentru minori se verifică numai cu date sintetice.
+- Limitele zilnice sunt configurabile, cu valori implicite de 6 ore pentru minori și 8 ore pentru adulți, cumulat pe organizație în fusul Europe/Bucharest. Se scad pauzele planificate la verificarea înscrierii și pauzele efective la pontaj. Nu sunt permise roluri principale suprapuse. Disponibilitatea săptămânală trebuie să acopere întreaga tură. Excepția pe dată înlocuiește complet programul zilei. Competențele sunt informative, iar instruirea obligatorie trebuie să fie valabilă pentru întreaga tură.
+- Administratorii și coordonatorii creează ciorne de eveniment. Coordonatorul creator este atribuit automat. Evenimentul devine vizibil după publicare. Coordonatorul stabilește locații, ture, roluri și capacități. Schimbările esențiale ale unei ture cu înscrieri, oferte sau persoane în așteptare cer anulare motivată, notificare și recreare. Capacitatea nu poate scădea sub înscrierile confirmate plus ofertele active.
 
-## Confirmed constraints
-- Responsive web interface for desktop and mobile devices.
-- Backend services and databases must run in Docker, following laboratory requirements.
-- Technology and architecture remain undecided.
-- Exact business rules and requirements must be confirmed with the partner organization.
-- Initial datasets may be structured from information supplied by the partner organization.
+## Înscrieri, prezență și ore
 
-## Setup choices
-- No team addon.
-- No ClickUp addon.
-- No Slack addon.
-- Keep the original Graffino workflow and its existing Codex compatibility layer.
-- Use Figma MCP for Codex design review, following the compatibility layer's gates.
-- Skip only the inapplicable initial fetch/pull step; no remote or commits exist.
+- Un loc disponibil se confirmă automat pentru un voluntar eligibil după respectarea priorității listei. Retragerea este disponibilă până la începutul turei. Repartizarea propusă de coordonator necesită acceptare și respectă eligibilitatea, capacitatea și prioritatea listei.
+- Lista este FIFO fără prioritizare manuală. La disponibilizarea unui loc, primul candidat eligibil primește o ofertă. Omiterea pentru neeligibilitate are motiv înregistrat și păstrează poziția pentru reevaluare la următoarea disponibilizare. Oferta rezervă locul în exclusivitate până la acceptare, refuz sau expirare. Termenul implicit configurabil este 12 ore, limitat de începutul turei. Eligibilitatea voluntarului se reverifică la acceptarea ofertei. Refuzul sau expirarea închide intrarea și permite reînscrierea explicită la finalul cozii. Un voluntar nu poate aștepta la poziții incompatibile. Dacă o înscriere confirmată devine neeligibilă, locul rămâne rezervat pentru verificare și check-in-ul este blocat până la remediere sau anulare.
+- Voluntarul autentificat scanează QR-ul comun semnat, rotit la 60 de secunde. Serverul verifică înscrierea, eligibilitatea și fereastra implicită configurabilă, de la 15 minute înainte până la 30 de minute după tură. Scanarea este idempotentă. Codul valid poate fi transmis unei persoane absente. În modul opțional per eveniment, primul check-in la tură se înregistrează imediat, dar rămâne nevalidat până la confirmarea vizuală a coordonatorului la locație. Confirmarea păstrează ora scanării și nu necesită geolocație. Fluxul implicit și revenirile din aceeași tură folosesc verificarea normală prin QR.
+- Minimum 20 de minute între ture consecutive. La o tură de cel puțin 4 ore, sistemul propune 20 de minute de pauză în jurul mijlocului, ajustabile de coordonator. Regulile sunt configurabile. Pauzele planificate și efectuate sunt distincte. Voluntarul marchează începutul și sfârșitul pauzei, iar check-out-ul închide și pauza deschisă. Sunt permise reveniri. Calculul automat însumează prezența din interiorul turei și scade pauzele efectuate fără dublă deducere. Pontajele incomplete și pauzele insuficiente necesită verificare înainte de emiterea PDF-ului. Corecțiile sunt auditate.
 
-## Scope limits
-Planned features do not define workflows, validation rules, permissions or interface contracts.
-Do not infer these from feature names. Obtain the missing requirements before implementing dependent behavior.
+## Comunicare, documente și statistici
+
+- Interfața și șabloanele de sistem sunt în română și engleză. Conținutul utilizatorilor rămâne în limba introdusă. Anunțurile în masă folosesc șabloane sau text propriu și se livrează în aplicație și prin email. Starea aplicației este referința pentru oferte și notificări. Emailurile restante se reiau prin joburi persistente.
+- Voluntarul poate răspunde privat sau iniția o conversație pentru un eveniment cu înscriere, ofertă sau intrare în așteptare. Firul este vizibil voluntarului, coordonatorilor atribuiți și administratorului. Mesageria este doar text, cu etichete accesibile pentru netrimis, trimis și văzut. Trimis înseamnă salvat pe server. Văzut înseamnă că partea destinatară a deschis conversația, inclusiv cel puțin un coordonator autorizat pentru mesajul voluntarului.
+- Coordonatorul atribuit sau administratorul emite explicit o adeverință pentru un voluntar și un eveniment, după validarea orelor. Modelul proiectului include număr unic, identitatea voluntarului, evenimentul, perioada, orele și data emiterii. Corecția după emitere cere anulare motivată și reemitere cu număr nou, legat de documentul anterior. Pilotul are serie distinctă și marcajul „DEMONSTRAȚIE — nu atestă activitate de voluntariat”.
+- Un voluntar activ are cel puțin o prezență validată în perioada selectată. O înscriere confirmată fără check-in la finalul turei este o neprezentare. Pragul implicit configurabil pentru neprezentări repetate este 3 în 90 de zile, fără sancțiuni automate.
+
+## Istoric, pilot și acceptare
+
+- Seed-ul istoric include evenimentul din 20.12.2025, totalul de 24 de voluntari, distribuția celor opt roluri și cele patru intervale. Alocările nominale, capacitățile pe rol și tură și pontajele individuale rămân necunoscute.
+- Cel puțin 15 colegi adulți, invitați și aprobați, își creează cont, se înscriu și parcurg cel puțin un scenariu distribuit. Evenimentul demonstrativ are propriile ture, capacități, înscrieri și rezultate. În cel puțin o tură activăm verificarea la locație și demonstrăm că o scanare la distanță rămâne nevalidată. Raportul agregă anonim rezultatele și feedbackul. Datele personale ale pilotului se șterg la 30 de zile după evaluare.
+- Minimum 10 teste automate, dintre care minimum 6 de eligibilitate. Verificăm concurența pentru ultimul loc și program, expirarea și preluarea joburilor, QR și autorizarea, reconectarea SSE, calculul orelor și numerotarea PDF. Un ceas controlat verifică exemplul de 5 ore minus 20 de minute, adică 4 ore și 40 de minute.
+- Pe hosting gratuit, repornim backend-ul cu aceeași bază și folosim două oferte pentru ture încă viitoare. Una rămâne activă cu termenul inițial, alta expiră cât procesul este oprit sau în repaus. După pornire, serverul respinge oferta expirată, recuperează jobul și oferă locul unui singur următor candidat eligibil. Repetăm pornirea pentru a exclude dublurile. Verificăm și pornirea la rece și resincronizarea dashboard-ului.
+- Predarea cere minimum 6 tabele relaționale reale, migrări și seed, autentificare și autorizare, OpenAPI, Docker Compose, CI, deploy public HTTPS, minimum 25 de commit-uri în minimum 8 zile distincte, 8 decizii aprobate și 10 intrări reale în AI_LOG.md.
+
+## Ordinea livrării
+
+1. Corectarea surselor istorice și actualizarea scope-ului și a registrului.
+2. Design Graffino cu prioritate DS-004, DS-005 și DS-010. Tokens și mock-uri se aprobă înainte de implementarea ecranelor. Se verifică temele deschisă și închisă, contrastul, tastatura și viewport-urile.
+3. După autorizarea implementării: fundație și acces, apoi eligibilitate și planificare, înscrieri și joburi, prezență și ore, documente, mesaje și statistici.
+4. Verificare pe hosting, pilot și predare. Expeditorul email, selecția furnizorilor și eventualele dovezi suplimentare cerute la evaluare rămân în lucru.

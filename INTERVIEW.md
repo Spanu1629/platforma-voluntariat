@@ -44,7 +44,7 @@ Aceste categorii reprezintă **cerințe propuse**, nu dovada existenței unui fo
 
 ## 5. Durata muncii și ture
 
-Durata depinde de eveniment, disponibilitate, vârstă și responsabilități. Pentru „Trenulețul Moșului” sunt menționate, ca **posibilitate**, ture de 2–4 ore și pauze. Programul concret oferit pentru 20.12.2026 conține patru intervale de **3, 2, 2 și 1 oră**; vezi [EVENT.md](EVENT.md).
+Durata depinde de eveniment, disponibilitate, vârstă și responsabilități. Pentru „Trenulețul Moșului” sunt menționate, ca **posibilitate**, ture de 2–4 ore și pauze. Programul ediției din 20.12.2025 conține patru intervale de **3, 2, 2 și 1 oră**; vezi [EVENT.md](EVENT.md) pentru proveniența corecturii de dată.
 
 **Nu sunt confirmate încă** limita maximă zilnică de ore și durata minimă a pauzei între ture. Aceste valori nu trebuie inventate în aplicație.
 

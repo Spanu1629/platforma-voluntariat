@@ -7,14 +7,14 @@
 | Organizație | Asociația „Mâini Mici, Suflete Mari” |
 | Eveniment | Trenulețul Moșului |
 | Ediția documentată | **2025** |
-| Data exactă | 20/12 |
+| Data exactă | **20.12.2025** |
 | Locație | Curtea Bistroteca Baum, Dumbrăveni, județul Sibiu |
 | Program pentru public | **16:00–20:00** |
 | Intervale de activitate pentru voluntari | **13:00–21:00**, incluzând pregătirea și strângerea |
 | Tip | Eveniment caritabil pentru copii și familii |
 | Organizare | Activități recreative, momente artistice și interacțiuni cu personaje de Crăciun |
 
-**Proveniența informațiilor:** documentul transmis de asociație, cu precizarea ulterioară că datele despre organizare, roluri și ture reprezintă ediția reală din **2025**. Nu sunt adăugate date nominale ale voluntarilor sau ale beneficiarilor.
+**Proveniența informațiilor:** documentul transmis de asociație. Responsabilul proiectului a clarificat în conversația de planificare că anul din documentul original era greșit și că data corectă este **20.12.2025**. Corectura provine din această clarificare, fără un nou interviu. Nu sunt adăugate date nominale ale voluntarilor sau ale beneficiarilor.
 
 ## 2. Scopul și cauzele caritabile ale ediției 2025
 
@@ -99,9 +99,10 @@ Intervalele sunt exprimate în ora locală (**Europe/Bucharest**). Voluntarii au
 
 ## 9. Utilizarea datelor în proiectul P16
 
-- **Seed real:** evenimentul din 2025, cele patru intervale orare, cele opt roluri și efectivele comunicate pentru fiecare rol.
-- **Date sintetice, etichetate ca atare:** conturile și înscrierile fictive necesare testelor și demonstrației, fără a le prezenta ca voluntari reali ai asociației.
-- **Neconfirmat:** data calendaristică exactă a ediției din 2025, alocarea persoanelor pe fiecare tură, capacitățile rol–tură și pontajele individuale.
-- **De verificat înaintea implementării:** reguli de eligibilitate pe rol, instruire, limite de ore, pauze și termen de confirmare pentru lista de așteptare; acestea nu se deduc din structura evenimentului.
+- **Seed real:** evenimentul din 20.12.2025, cele patru intervale orare, cele opt roluri și efectivele comunicate pentru fiecare rol.
+- **Pilot demonstrativ:** minimum 15 colegi adulți își creează conturi și se înscriu într-un eveniment separat. Participarea lor la pilot nu este atribuită ediției din 2025.
+- **Teste automate:** date sintetice separate, inclusiv pentru verificarea regulilor de eligibilitate aplicabile minorilor.
+- **Neconfirmat:** alocarea persoanelor pe fiecare tură, capacitățile rol–tură și pontajele individuale.
+- **Reguli ale proiectului:** eligibilitatea, instruirile, orele, pauzele și termenul ofertelor sunt descrise separat în [scope-ul P16](docs/agents/PROJECT-BRIEF.md). Aceste reguli nu se deduc din structura evenimentului istoric.
 
 Acest document descrie **evenimentul real al ediției 2025**, nu o ediție viitoare și nici un eveniment fictiv.

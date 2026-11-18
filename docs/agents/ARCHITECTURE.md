@@ -1,37 +1,42 @@
 # Architecture — platforma-voluntariat
 
 <!-- graffino-agentic:begin v1 -->
-> How this repo is built, generated from the code at backfill and kept current by
-> whoever changes the structure. The code wins: when this page is wrong, fix it.
+> This document distinguishes the current repository from the approved direction.
+> Once application code exists, update this page to match the code.
 <!-- graffino-agentic:end -->
 
-## Overview
-This repository contains the agentic setup only. No application has been implemented.
-The planned product is a responsive volunteer coordination web application.
-Architecture and technology choices remain open (Q-001).
+The repository contains project and design documentation. Application code, migrations, API contracts and runtime configuration have yet to be implemented.
 
-## Parts
-| Part | Path | Responsibility | Talks to |
-|---|---|---|---|
-| Agent setup | `AGENTS.md`, `docs/agents/` | Rules and project knowledge | No application services |
-| Design records | `docs/design/` | Design procedure and future artifacts | Future Figma review destination |
+The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 through D-009 describe the approved constraints. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
-## Data flow
-No application data flow exists. Feature workflows await partner confirmation (Q-002).
+| Module | Conceptual entities and responsibilities |
+|---|---|
+| Identity and organization | Account, session, volunteer profile, permission, coordinator assignment and organization policy |
+| Eligibility | Weekly availability, date exception, skill, training and training validation |
+| Planning | Event, location, shift, volunteer role and position with capacity |
+| Registration and waiting list | Registration, waiting-list entry, offer and persistent job |
+| Attendance and reporting | Attendance interval, on-site confirmation, planned break, actual break and audit entry |
+| Documents and communication | Certificate, template, announcement, conversation, message, notification and email delivery |
 
-## State and storage
-No database, schema or storage mechanism is selected.
-Partner dataset structure remains open (Q-009).
+REST governs authenticated actions. The backend enforces access by event and permission. Access roles and volunteer roles are separate concepts. Registration, capacity and offer changes use PostgreSQL transactions. Job state and deadlines persist in PostgreSQL. The dashboard receives SSE updates after commit and retrieves the current state through REST after reconnecting. Historical aggregates, pilot activity and synthetic data remain distinct.
 
-## Configuration
-No application environment variables or runtime configuration exist.
+D-009 requires Docker locally and PostgreSQL in Docker for integration tests. It permits managed PostgreSQL for public deployment while keeping the public backend containerized. Render and Neon are candidates pending hosted verification. A sleeping process cannot deliver the next offer until it resumes. Expired offers are rejected using the stored deadline. Email delivery requires a verified sender before the pilot.
 
-## Build, deploy, runtime
-Backend services and databases must run in Docker (D-001).
-No images, Dockerfiles, service topology or orchestration choice is approved.
-Commands and release flow remain open; see AGENTS.md sections 2 and 5.
+## Proposed screen inventory
 
-## Boundaries
-Separate volunteer and coordinator interfaces are planned.
-Authentication, authorization and trust boundaries remain unconfirmed in Q-001 and Q-002.
-No interface contracts exist; see CONTRACTS.md.
+These IDs are planning references. The design registry gains entries when the corresponding mocks are created under the Graffino procedure.
+
+| ID | Screen |
+|---|---|
+| DS-001 | Access and account recovery |
+| DS-002 | Profile, approval status, availability and training |
+| DS-003 | Available events |
+| DS-004 | Event detail and registration |
+| DS-005 | My schedule, offers, QR and breaks |
+| DS-006 | My hours and certificates |
+| DS-007 | Messages, notifications and announcements by permission |
+| DS-008 | Managed events, drafts, editing and capacity |
+| DS-009 | Registrations, waiting list and assignments |
+| DS-010 | Live attendance, on-site confirmation, corrections and certificate issuance |
+| DS-011 | Users, approvals, training, permissions and assignments |
+| DS-012 | Organization policies and statistics |
