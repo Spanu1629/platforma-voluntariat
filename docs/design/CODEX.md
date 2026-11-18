@@ -156,3 +156,13 @@ by the presence of this file alone. Missing capabilities block their steps.
 - No external file was created or changed during setup.
 - Verify Figma capabilities and mandatory guidance before the first publication.
 - Explicit approval follows visual comparison of the linked revision; never infer it from publication.
+
+### DS-003 local approval
+
+- Local mock: [DS-003](mocks/DS-003.html).
+- Approved local revision: SHA-256 `077ee0cc89dbd802c401c9b4322e4b9d4c1434dbfe0c7790120cfe805698281a`. Computed over the `sha256sum` output for `DESIGN.md`, the mock HTML and its referenced WebP and WOFF2 files, sorted by repository-relative path.
+- Local verification: Playwright and Chromium at 320 × 720 and 1440 × 900 in both themes, including the hover transition and reduced motion.
+- Reference captures: [desktop light](screens/DS-003.light.png), [desktop dark](screens/DS-003.dark.png), [mobile light](screens/DS-003.light.mobile.png), [mobile dark](screens/DS-003.dark.mobile.png).
+- Reviewed hover captures: [light](screens/DS-003.light.hover.png) and [dark](screens/DS-003.dark.hover.png).
+- Visual approval in chat (2026-11-19): “Aprob designul final al DS-003 pentru VolunTrack, inclusiv animațiile și bara laterală de hover.”
+- The project owner requested `approved` for this locally reviewed revision. Figma publication and comparison remain pending.
