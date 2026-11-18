@@ -13,8 +13,8 @@
 - Q-002 · What are the partner-confirmed workflows and business rules?
 - Q-003 · Which installation, run, build, test and quality commands will the selected stack provide?
 - Q-004 · How will deployment, versioning and releases work?
-- Q-005 · What visual tokens and supported viewport sizes should the application use?
-- Q-006 · Which screens and shared components should be designed first?
+- Q-005 · What visual tokens and supported viewport sizes should the application use? · _answered_
+- Q-006 · Which screens and shared components should be designed first? · _answered_
 - Q-007 · How will mocks and the running application be rendered and screenshotted?
 - Q-008 · Which Figma file will host Codex design review?
 - Q-009 · What partner dataset structure and handling rules are confirmed?
@@ -57,20 +57,20 @@
 - **Recorded as:** None.
 
 ## Q-005 · What visual tokens and supported viewport sizes should the application use?
-- **Status:** open
-- **Blocks:** Authoritative design tokens and responsive mocks.
+- **Status:** answered
+- **Blocks:** None.
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
-- **Proposed answer:** D-008 fixes the visual direction. Exact tokens, accessible color pairs and viewport sizes remain open.
-- **Answer:** Pending.
-- **Recorded as:** None.
+- **Answer:** 2026-11-18 — The project owner approved the light and dark palettes, Fraunces and DM Sans, the spacing and interaction tokens, the responsive breakpoints and the 320 × 720 and 1440 × 900 reference viewports.
+- **Recorded as:** [Design tokens and reference viewports](../design/DESIGN.md#tokens), under D-008.
+- **Confirmed:** 2026-11-18
 
 ## Q-006 · Which screens and shared components should be designed first?
-- **Status:** open
-- **Blocks:** Screen registry entries and initial mock scope.
+- **Status:** answered
+- **Blocks:** None.
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
-- **Proposed answer:** D-008 prioritizes DS-004, DS-005 and DS-010. Authenticated volunteer, coordinator and administrator screens are mapped in ARCHITECTURE.md. Shared component inventory awaits design.
-- **Answer:** Pending.
-- **Recorded as:** None.
+- **Answer:** 2026-11-18 — The project owner approved the shared component inventory and all twelve conceptual screens. The first mock sequence is DS-004, DS-005 and DS-010. Each screen enters the active registry as `draft` when its mock is created.
+- **Recorded as:** [Component inventory](../design/DESIGN.md#component-inventory) and [conceptual screen inventory](../design/registry.yaml), under D-008.
+- **Confirmed:** 2026-11-18
 
 ## Q-007 · How will mocks and the running application be rendered and screenshotted?
 - **Status:** open

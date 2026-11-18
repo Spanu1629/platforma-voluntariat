@@ -98,29 +98,105 @@ them; a ticket with UI has a design subtask instead (team addon).
 ## Source
 - Design board: none yet (published from `mocks/`, never pulled)
 - Figma: none (regenerated on request)
-- Token source in code: none; application code and tokens do not exist (Q-005)
+- Token source: the tables below. Application code has yet to be created.
+
+The project owner approved the tokens and reference viewports on 2026-11-18
+under [Q-005](../agents/OPEN-QUESTIONS.md#q-005--what-visual-tokens-and-supported-viewport-sizes-should-the-application-use).
 
 ## Tokens
 
 ### Color
 | Token | Light | Dark | Use |
 |---|---|---|---|
+| `background` | `#FAF6ED` | `#171D19` | Page background |
+| `surface` | `#FFFCF7` | `#202821` | Cards, forms and dialogs |
+| `surface-subtle` | `#F0E8DB` | `#2A342D` | Secondary groups and disabled controls |
+| `text` | `#272820` | `#F5EEE2` | Main text |
+| `text-muted` | `#5D6055` | `#C6C8BC` | Secondary text |
+| `border` | `#827A6D` | `#8A9588` | Field and control outlines |
+| `primary` | `#214B3E` | `#A7C9AF` | Primary actions |
+| `primary-hover` | `#193E32` | `#B8D5BF` | Primary action on hover |
+| `primary-active` | `#123126` | `#8DB59A` | Primary action while pressed |
+| `on-primary` | `#FFFCF7` | `#11251C` | Text on all three primary action states |
+| `accent` | `#A44B35` | `#EF9F83` | Underlined links |
+| `focus` | `accent` | `accent` | Keyboard focus ring |
+| `success` | `#286044` | `#A4D6AF` | Success text and icon |
+| `warning` | `#785317` | `#F2C880` | Warning text and icon |
+| `danger` | `#A12F37` | `#FFA3A9` | Error text and icon |
+
+Across `background`, `surface` and `surface-subtle`, the text, link and
+status colors have a minimum contrast of 4.75:1 in light and 6.12:1 in dark. Field
+borders reach 3.49:1 and 4.14:1 respectively. `on-primary` reaches 9.59:1 and
+7.06:1 across default, hover and active. Use the surrounding surface color in
+the focus ring gap so the ring has the expected contrast.
 
 ### Typography
 | Token | Family | Size / line height | Weight | Use |
 |---|---|---|---|---|
+| `type-page-title` | Fraunces | 32 / 40 px | 600 | One page title |
+| `type-section-title` | Fraunces | 24 / 32 px | 600 | Section headings |
+| `type-card-title` | DM Sans | 20 / 28 px | 600 | Card headings |
+| `type-body` | DM Sans | 16 / 24 px | 400 | Body text |
+| `type-label` | DM Sans | 14 / 20 px | 500–600 | Labels and controls |
+
+Use the Latin Extended subsets for Romanian diacritics.
 
 ### Spacing
 | Token | Value |
 |---|---|
+| `space-4` | 4 px |
+| `space-8` | 8 px |
+| `space-12` | 12 px |
+| `space-16` | 16 px |
+| `space-24` | 24 px |
+| `space-32` | 32 px |
+| `space-48` | 48 px |
+| `space-64` | 64 px |
+
+Page margins use `space-16` on mobile and `space-32` on desktop.
 
 ### Radius, shadow, motion
 | Token | Value | Use |
 |---|---|---|
+| `radius-control` | 8 px | Buttons and fields |
+| `radius-card` | 12 px | Cards |
+| `radius-dialog` | 16 px | Dialogs |
+| `focus-width` | 2 px | Visible keyboard focus ring |
+| `focus-gap` | 2 px | Gap between the control and focus ring |
+| `motion-control` | 120 ms | Control transitions |
+| `motion-panel` | 180 ms | Panel transitions |
+| `motion-reduced` | 0 ms | Transitions with reduced motion |
 
 ### Breakpoints / window sizes
 | Name | Min | Max |
 |---|---|---|
+| Mobile | 320 px | 767 px |
+| Tablet | 768 px | 1023 px |
+| Desktop | 1024 px | — |
+
+Use one column on mobile, add columns on tablet where the content fits and use
+side-by-side panels on desktop. Wrap dense list rows across multiple lines at
+narrow widths. The reference viewports for visual checks in both themes are
+**320 × 720 px** and **1440 × 900 px**.
+
+## Component inventory
+
+The project owner approved the inventory on 2026-11-18 under
+[Q-006](../agents/OPEN-QUESTIONS.md#q-006--which-screens-and-shared-components-should-be-designed-first).
+
+| Component | Use |
+|---|---|
+| Role-based navigation | Show the destinations available to volunteers, coordinators or administrators |
+| Buttons, fields and selectors | Use the same labels, action hierarchy and focus treatment across forms |
+| Event and shift cards | Group the name, time and available action on narrow screens |
+| Lists and tables with filters | Scan and filter registrations, attendance and related records |
+| Status labels and inline messages | Explain the current state and next action using text and an icon |
+| Confirmation dialogs | Confirm actions such as cancelling a shift |
+| Position and availability | Show a shift role's availability and the relevant registration or waiting-list action in DS-004 |
+| Offer and deadline | Show the offer's deadline and acceptance or refusal actions in DS-005 |
+| Attendance panel | Support the QR workflow and show on-site confirmation, when enabled, in DS-005 and DS-010 |
+
+The first mocks cover DS-004, DS-005 and DS-010 in that order. [Screen inventory](registry.yaml)
 
 ## Hard-coded values found (to migrate)
 | path:line | Value | Should be |

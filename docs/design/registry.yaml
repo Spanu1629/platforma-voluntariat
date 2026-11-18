@@ -1,4 +1,20 @@
 # docs/design/registry.yaml — every screen and shared component, by DS- ID.
 # Plans, commits, mocks and board files use the ID (tickets don't). kind: foundation | component | screen
 # status: draft (mock drawn) | approved (confirmed on the board) | implemented | deprecated (never delete an entry)
+
+# Inventar conceptual confirmat la 2026-11-18 (Q-006, docs/agents/ARCHITECTURE.md).
+# Prioritate pentru machete (D-008): DS-004 → DS-005 → DS-010.
+# DS-001 · Acces și recuperarea contului
+# DS-002 · Profil, stare de aprobare, disponibilitate și instruiri
+# DS-003 · Evenimente disponibile
+# DS-004 · Detalii eveniment și înscriere
+# DS-005 · Programul meu, oferte, QR și pauze
+# DS-006 · Orele și adeverințele mele
+# DS-007 · Mesaje, notificări și anunțuri, în funcție de permisiuni
+# DS-008 · Evenimente gestionate, ciorne, editare și capacități
+# DS-009 · Înscrieri, liste de așteptare și repartizări
+# DS-010 · Prezență în timp real, confirmare la locație, corecții și emitere de adeverințe
+# DS-011 · Utilizatori, aprobări, instruiri, permisiuni și atribuiri
+# DS-012 · Politicile organizației și statistici
+# Intrarea activă a unui ecran primește statusul draft la crearea machetei sale.
 designs: []

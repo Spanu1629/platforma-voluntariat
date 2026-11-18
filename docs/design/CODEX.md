@@ -98,7 +98,7 @@ them; a ticket with UI has a design subtask instead (team addon).
 ## Source
 - Design board: none yet (published from `mocks/`, never pulled)
 - Figma: none (regenerated on request)
-- Token source in code: none; application code and tokens do not exist (Q-005)
+- Token source: [shared design specification](DESIGN.md). Application code has yet to be created.
 
 ## Tokens
 
@@ -143,7 +143,7 @@ by the presence of this file alone. Missing capabilities block their steps.
 
 ## Repo-owned Codex review record
 - Figma review URL: pending (Q-008); distinct from the shared optional snapshot URL.
-- Tokens and viewports: not selected (Q-005).
+- Tokens and reference viewports: approved under Q-005. [Shared design specification](DESIGN.md#tokens)
 - Mock revision: none; no mocks exist.
 - File key, node IDs and variant mapping: none.
 - Publication, comparison and approval records: none.
