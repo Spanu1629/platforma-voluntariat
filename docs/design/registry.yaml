@@ -17,4 +17,10 @@
 # DS-011 · Utilizatori, aprobări, instruiri, permisiuni și atribuiri
 # DS-012 · Politicile organizației și statistici
 # Intrarea activă a unui ecran primește statusul draft la crearea machetei sale.
-designs: []
+designs:
+  - id: DS-004
+    name: Detalii eveniment și înscriere
+    kind: screen
+    # Local visual approval recorded in CODEX.md at the project owner's direction.
+    status: approved
+    mock: mocks/DS-004.html

@@ -98,7 +98,7 @@ Approved project scope is in `docs/agents/PROJECT-BRIEF.md`; partner-specific de
 ## 2. Stack and commands
 The approved stack and architecture are in D-003 and D-005. Docker is required locally and for PostgreSQL integration tests. Managed PostgreSQL is permitted for public deployment under D-009.
 Install, build, run, test, lint, type-check and release: not run; no application or command definitions exist.
-Screenshot: not run. Reference viewports are in [DESIGN.md](docs/design/DESIGN.md#breakpoints--window-sizes) (Q-005). The renderer remains undecided (Q-007).
+Mock screenshots use Playwright and Chromium for DS-004 at the [reference viewports](docs/design/DESIGN.md#breakpoints--window-sizes). The application screenshot procedure remains open (Q-007).
 Ledger check (run during setup):
 
 ```bash

@@ -144,9 +144,14 @@ by the presence of this file alone. Missing capabilities block their steps.
 ## Repo-owned Codex review record
 - Figma review URL: pending (Q-008); distinct from the shared optional snapshot URL.
 - Tokens and reference viewports: approved under Q-005. [Shared design specification](DESIGN.md#tokens)
-- Mock revision: none; no mocks exist.
+- Local mock: [DS-004](mocks/DS-004.html), with Playwright and Chromium verification at 320 × 720 and 1440 × 900 in both themes (Q-007).
+- Approved local revision: SHA-256 `d1aea04988fdb6a533b680f470b0570964a7251715d0bcf321ae91d01b63cdce`. Computed over the `sha256sum` output for `DESIGN.md`, the mock HTML and its asset directory files, sorted by repository-relative path.
+- Local captures: [desktop light](screens/DS-004.light.png), [desktop dark](screens/DS-004.dark.png), [mobile light](screens/DS-004.light.mobile.png), [mobile dark](screens/DS-004.dark.mobile.png).
+- Visual approval in chat (2026-11-19): “Aprob designul final și animațiile mock-ului DS-004 pentru VolunTrack.”
+- The project owner explicitly requested `approved` for this locally reviewed revision and deferred Figma publication. The status records this local approval.
+- Published mock revision: none.
 - File key, node IDs and variant mapping: none.
-- Publication, comparison and approval records: none.
+- Figma publication and comparison: deferred at the project owner's request.
 - Reviewer access: unverified.
 - No external file was created or changed during setup.
 - Verify Figma capabilities and mandatory guidance before the first publication.

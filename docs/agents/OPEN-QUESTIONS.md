@@ -74,11 +74,10 @@
 
 ## Q-007 · How will mocks and the running application be rendered and screenshotted?
 - **Status:** open
-- **Blocks:** Required visual comparison and implementation verification.
+- **Blocks:** The screenshot procedure for the running application.
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
-- **Proposed answer:** Use the approved frontend stack in D-003. Renderer and screenshot tooling remain open.
-- **Answer:** Pending.
-- **Recorded as:** None.
+- **Answer:** 2026-11-18 — The project owner approved Playwright and Chromium for local DS-004 mock verification. The screenshot procedure for the running application remains open.
+- **Recorded as:** [Local mock verification](../design/CODEX.md#repo-owned-codex-review-record).
 
 ## Q-008 · Which Figma file will host Codex design review?
 - **Status:** open
