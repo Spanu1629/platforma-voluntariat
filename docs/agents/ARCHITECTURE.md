@@ -1,4 +1,4 @@
-# Architecture — platforma-voluntariat
+# Architecture — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > This document distinguishes the current repository from the approved direction.

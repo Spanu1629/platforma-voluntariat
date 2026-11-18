@@ -1,4 +1,4 @@
-# Patterns superseded — platforma-voluntariat
+# Patterns superseded — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > Patterns that no longer apply. **Never obeyed**; read only to explain old code or a

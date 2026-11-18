@@ -87,7 +87,7 @@ Intervalele sunt exprimate în ora locală (**Europe/Bucharest**). Voluntarii au
 - Voluntarii primesc informații despre program și responsabilități.
 - Anulările sunt comunicate coordonatorului pentru a permite înlocuirea persoanei.
 
-**Delimitare:** mecanismul automat de listă de așteptare face parte din cerințele aplicației universitare P16; nu este prezentat aici ca sistem digital utilizat deja de asociație.
+Mecanismul automat de listă de așteptare este o cerință a proiectului universitar VolunTrack.
 
 ## 8. Etapele organizării evenimentului
 
@@ -97,12 +97,12 @@ Intervalele sunt exprimate în ora locală (**Europe/Bucharest**). Voluntarii au
 
 **După:** strângerea materialelor, verificarea prezenței, centralizarea orelor, evaluarea activităților, mesaje de mulțumire și pregătirea documentelor de voluntariat, după caz.
 
-## 9. Utilizarea datelor în proiectul P16
+## 9. Utilizarea datelor în VolunTrack
 
 - **Seed real:** evenimentul din 20.12.2025, cele patru intervale orare, cele opt roluri și efectivele comunicate pentru fiecare rol.
 - **Pilot demonstrativ:** minimum 15 colegi adulți își creează conturi și se înscriu într-un eveniment separat. Participarea lor la pilot nu este atribuită ediției din 2025.
 - **Teste automate:** date sintetice separate, inclusiv pentru verificarea regulilor de eligibilitate aplicabile minorilor.
 - **Neconfirmat:** alocarea persoanelor pe fiecare tură, capacitățile rol–tură și pontajele individuale.
-- **Reguli ale proiectului:** eligibilitatea, instruirile, orele, pauzele și termenul ofertelor sunt descrise separat în [scope-ul P16](docs/agents/PROJECT-BRIEF.md). Aceste reguli nu se deduc din structura evenimentului istoric.
+- **Reguli ale proiectului:** eligibilitatea, instruirile, orele, pauzele și termenul ofertelor sunt descrise separat în [scope-ul aprobat](docs/agents/PROJECT-BRIEF.md). Aceste reguli nu se deduc din structura evenimentului istoric.
 
 Acest document descrie **evenimentul real al ediției 2025**, nu o ediție viitoare și nici un eveniment fictiv.

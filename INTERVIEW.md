@@ -2,7 +2,7 @@
 
 ## Identificare
 
-- **Proiect universitar:** P16 — Coordonare voluntari: ture, check-in și ore.
+- **Proiect universitar:** VolunTrack – Platformă web pentru gestionarea voluntarilor și a evenimentelor caritabile
 - **Organizație:** Asociația „Mâini Mici, Suflete Mari”.
 - **Persoana din partea organizației:** Manu Roxana.
 - **Data informațiilor/interviului:** 13.11.2026.
@@ -84,7 +84,7 @@ Voluntarii contribuie la comunitate și dobândesc experiență în organizare, 
 
 **Confirmat prin informațiile organizației:** tipurile de activități, organizarea manuală actuală, principiile de repartizare, grupele de vârstă, importanța instruirii și dificultățile de organizare.
 
-**Solicitat separat de fișa universitară P16, neconfirmat ca practică existentă a asociației:** listă de așteptare cu expirare, QR pentru prezență, mesaje automate, tablou în timp real, reguli configurabile de ore și pauze, adeverințe PDF numerotate.
+**Solicitat separat de fișa universitară a proiectului, neconfirmat ca practică existentă a asociației:** listă de așteptare cu expirare, QR pentru prezență, mesaje automate, tablou în timp real, reguli configurabile de ore și pauze, adeverințe PDF numerotate.
 
 Întrebările despre regulile de eligibilitate și despre organizarea pe ture urmează să fie clarificate cu asociația înaintea implementării.
 

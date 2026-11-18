@@ -1,4 +1,4 @@
-# DESIGN — platforma-voluntariat
+# DESIGN — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > The design guardrails for this app. Every UI change follows them. A change to a

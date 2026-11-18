@@ -1,4 +1,4 @@
-# Rejected — platforma-voluntariat
+# Rejected — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > Proposals and backfill findings the user rejected, with the reason. **Do not
@@ -6,4 +6,4 @@
 > changed. Newest first.
 <!-- graffino-agentic:end -->
 
-No rejected proposals or backfill findings. Declined addons are recorded in PROJECT-BRIEF.md.
+No rejected proposals or backfill findings. Declined addons are recorded in the [setup report](SETUP-REPORT.md#addons-and-commit-gate).

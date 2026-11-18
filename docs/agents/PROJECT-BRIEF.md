@@ -1,4 +1,4 @@
-# P16 — Coordonare voluntari: ture, check-in și ore
+# VolunTrack – Platformă web pentru gestionarea voluntarilor și a evenimentelor caritabile
 
 Scope aprobat de responsabilul proiectului la 18.11.2026. Produsul deservește o singură organizație, Asociația „Mâini Mici, Suflete Mari”. Cerințele universitare provin din promptul proiectului. Datele comunicate de asociație sunt în [INTERVIEW.md](../../INTERVIEW.md) și [EVENT.md](../../EVENT.md). Regulile de produs stabilite în conversație nu sunt atribuite asociației. D-002 se aplică cerințelor atribuite partenerului.
 

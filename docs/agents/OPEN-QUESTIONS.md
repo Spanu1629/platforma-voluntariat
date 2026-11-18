@@ -1,4 +1,4 @@
-# Open questions — platforma-voluntariat
+# Open questions — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > Unknowns. Work that depends on an open question is out of scope until it is

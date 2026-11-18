@@ -1,4 +1,4 @@
-# Decisions superseded — platforma-voluntariat
+# Decisions superseded — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > Decisions that no longer apply. **Never obeyed**; read only to explain old code or a

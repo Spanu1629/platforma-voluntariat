@@ -1,4 +1,4 @@
-# Patterns — platforma-voluntariat
+# Patterns — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 > How we build things here. Copy only `approved` entries. `candidate` = seen once or

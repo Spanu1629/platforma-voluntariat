@@ -1,4 +1,4 @@
-# AGENTS.md — platforma-voluntariat
+# AGENTS.md — VolunTrack
 
 <!-- graffino-agentic:begin v1 -->
 ## How we work here
@@ -90,7 +90,7 @@ A mandatory step without its required capability is blocked, never silently skip
 
 
 ## 1. What this repo is
-P16 - Coordonare voluntari (Volunteer Coordination Platform).
+VolunTrack – Platformă web pentru gestionarea voluntarilor și a evenimentelor caritabile
 A university web application for a real volunteer organization.
 It will support volunteers, coordinators and administrators through responsive interfaces.
 Approved project scope is in `docs/agents/PROJECT-BRIEF.md`; partner-specific details follow D-002.
