@@ -29,5 +29,29 @@ services:
       DATABASE_URL: postgresql://voluntrack_migrator:${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}@db:5432/voluntrack
       SHADOW_DATABASE_URL: postgresql://voluntrack_migrator:${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}@db:5432/voluntrack_shadow
 
+  backend:
+    build:
+      context: ./backend
+      target: runtime
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://voluntrack_app:${APP_PASSWORD:?Set APP_PASSWORD}@db:5432/voluntrack
+    ports:
+      - "127.0.0.1:${VOLUNTRACK_PORT:-3000}:3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch('http://127.0.0.1:3000/health/ready', { signal: AbortSignal.timeout(3000) })
+          .then(response => process.exit(response.status === 200 ? 0 : 1), () => process.exit(1))
+      interval: 2s
+      timeout: 4s
+      retries: 15
+      start_period: 5s
+
 volumes:
   postgres-data:
