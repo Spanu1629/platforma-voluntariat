@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evenimente disponibile · VolunTrack</title>
+  <style>
+    @font-face {
+      font-family: Fraunces;
+      src: url("../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: Fraunces;
+      src: url("../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+      unicode-range: U+0100-024F, U+1E00-1EFF;
+    }
+    @font-face {
+      font-family: "DM Sans";
+      src: url("../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
+      font-weight: 100 1000;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "DM Sans";
+      src: url("../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
+      font-weight: 100 1000;
+      font-display: swap;
+      unicode-range: U+0100-024F, U+1E00-1EFF;
+    }
+    /* Values from DESIGN.md and its accessibility guardrails. */
+    :root {
+      color-scheme: light;
+      --background: #FAF6ED;
+      --surface: #FFFCF7;
+      --surface-subtle: #F0E8DB;
+      --text: #272820;
+      --text-muted: #5D6055;
+      --border: #827A6D;
+      --primary: #214B3E;
+      --primary-hover: #193E32;
+      --primary-active: #123126;
+      --on-primary: #FFFCF7;
+      --accent: #A44B35;
+      --success: #286044;
+      --warning: #785317;
+      --danger: #A12F37;
+      --focus: var(--accent);
+      --fraunces: Fraunces, Georgia, serif;
+      --dm-sans: "DM Sans", system-ui, sans-serif;
+      --type-page-title: 600 2rem/2.5rem var(--fraunces);
+      --type-section-title: 600 1.5rem/2rem var(--fraunces);
+      --type-card-title: 600 1.25rem/1.75rem var(--dm-sans);
+      --type-body: 400 1rem/1.5rem var(--dm-sans);
+      --type-label: 500 0.875rem/1.25rem var(--dm-sans);
+      --space-4: 0.25rem;
+      --space-8: 0.5rem;
+      --space-12: 0.75rem;
+      --space-16: 1rem;
+      --space-24: 1.5rem;
+      --space-32: 2rem;
+      --space-48: 3rem;
+      --space-64: 4rem;
+      --radius-control: 0.5rem;
+      --radius-card: 0.75rem;
+      --radius-dialog: 1rem;
+      --focus-width: 2px;
+      --focus-gap: 2px;
+      --motion-control: 120ms;
+      --motion-panel: 180ms;
+      --motion-reduced: 0ms;
+      --target-touch: 44px;
+      --desktop-reference-width: 1440px;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --background: #171D19;
+      --surface: #202821;
+      --surface-subtle: #2A342D;
+      --text: #F5EEE2;
+      --text-muted: #C6C8BC;
+      --border: #8A9588;
+      --primary: #A7C9AF;
+      --primary-hover: #B8D5BF;
+      --primary-active: #8DB59A;
+      --on-primary: #11251C;
+      --accent: #EF9F83;
+      --success: #A4D6AF;
+      --warning: #F2C880;
+      --danger: #FFA3A9;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      :root { --motion-control: var(--motion-reduced); --motion-panel: var(--motion-reduced); }
+    }
+    :root[data-motion="off"] { --motion-control: var(--motion-reduced); --motion-panel: var(--motion-reduced); }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; color: var(--text); background: var(--background); font: var(--type-body); }
+    h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; }
+    h1 { font: var(--type-page-title); }
+    h2 { font: var(--type-section-title); }
+    h3 { font: var(--type-card-title); }
+    :focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-gap); }
+    a { color: var(--accent); }
+    .layout { width: min(100%, var(--desktop-reference-width)); margin-inline: auto; padding-inline: var(--space-16); }
+    .icon-library { display: none; }
+    .icon {
+      flex: none;
+      inline-size: var(--space-16);
+      block-size: var(--space-16);
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .skip-link {
+      position: absolute;
+      z-index: 2;
+      inset-block-start: var(--space-8);
+      inset-inline-start: var(--space-16);
+      padding: var(--space-12);
+      background: var(--surface);
+      transform: translateY(-200%);
+    }
+    .skip-link:focus { transform: none; }
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-8);
+      padding-block: var(--space-12);
+    }
+    .brand { display: inline-flex; align-items: center; gap: var(--space-8); color: var(--primary); font: var(--type-section-title); }
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      padding: var(--space-8);
+      border-radius: var(--radius-control);
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .topbar-controls { display: flex; gap: var(--space-8); }
+    .control-label { display: none; }
+    .button, input, select {
+      min-block-size: var(--target-touch);
+      min-inline-size: var(--target-touch);
+      max-inline-size: 100%;
+      padding: var(--space-8) var(--space-12);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-control);
+      background: var(--surface);
+      color: var(--text);
+      font: var(--type-label);
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-8);
+      overflow-wrap: anywhere;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--motion-control) ease-out, border-color var(--motion-control) ease-out,
+        color var(--motion-control) ease-out, transform var(--motion-control) ease-out;
+    }
+    .button.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+    .button.primary:is(:active, [data-touch-pressed]) { background: var(--primary-active); border-color: var(--primary-active); }
+    .button[aria-pressed="true"], .button:disabled { background: var(--surface-subtle); }
+    .button:disabled { color: var(--text-muted); cursor: default; }
+    .hero { display: grid; align-items: center; gap: var(--space-24); padding-block: var(--space-16) var(--space-32); }
+    .hero-content { display: grid; justify-items: start; gap: var(--space-16); min-width: 0; }
+    .hero h1 span { display: block; color: var(--primary); }
+    .hero p { max-inline-size: 42ch; }
+    .demo-label, .status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-8);
+      padding: var(--space-4) var(--space-8);
+      border-radius: var(--radius-control);
+      background: var(--surface-subtle);
+      font: var(--type-label);
+      font-weight: 600;
+    }
+    .demo-label { color: var(--accent); }
+    .hero-media {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      border-radius: var(--radius-dialog) var(--radius-dialog) var(--radius-dialog) var(--radius-card);
+      background: var(--primary);
+    }
+    .hero-framing, .hero-art { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+    .hero-art { object-fit: cover; }
+    .wave { block-size: var(--space-32); overflow: hidden; background: var(--background); color: var(--surface-subtle); }
+    .wave-out { background: var(--surface-subtle); color: var(--background); }
+    .wave svg { display: block; inline-size: 100%; block-size: 100%; pointer-events: none; }
+    .wave path { fill: currentColor; }
+    .catalog { background: var(--surface-subtle); }
+    .catalog .layout { display: grid; gap: var(--space-24); padding-block: var(--space-32); }
+    .filter-form {
+      display: grid;
+      align-items: end;
+      gap: var(--space-12);
+      padding: var(--space-16);
+      border-radius: var(--radius-dialog);
+      background: var(--surface);
+    }
+    .filter-field { display: grid; min-width: 0; gap: var(--space-4); }
+    .filter-field label { font: var(--type-label); font-weight: 600; }
+    input, select { inline-size: 100%; color: var(--text); }
+    input::placeholder { color: var(--text-muted); opacity: 1; }
+    .hint, .location { color: var(--text-muted); font: var(--type-label); }
+    .result-area { display: grid; gap: var(--space-12); }
+    .event-grid { display: grid; gap: var(--space-16); margin: 0; padding: 0; list-style: none; }
+    .event-grid > li { min-width: 0; display: flex; }
+    .event-card {
+      position: relative;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+      border-radius: var(--radius-dialog);
+      background: var(--surface);
+    }
+    .event-card::before {
+      position: absolute;
+      inset-block: calc(var(--radius-dialog) + var(--space-4));
+      inset-inline-start: 0;
+      inline-size: var(--space-4);
+      background: var(--event-accent, var(--primary));
+      opacity: 0;
+      clip-path: inset(100% 0 0);
+      transition: opacity var(--motion-control) ease-out, clip-path var(--motion-panel) ease-out;
+      content: "";
+      pointer-events: none;
+    }
+    .event-card[data-availability="waiting"] { --event-accent: var(--warning); }
+    .event-card:focus-within::before { opacity: 1; clip-path: inset(0); }
+    .event-cover {
+      display: block;
+      inline-size: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: var(--radius-dialog) var(--radius-dialog) 0 0;
+      background: var(--surface-subtle);
+    }
+    .event-body { display: grid; align-content: start; justify-items: start; gap: var(--space-12); padding: var(--space-16); }
+    .event-date, .location { display: flex; align-items: start; gap: var(--space-8); }
+    .event-date { color: var(--accent); font: var(--type-label); font-weight: 600; }
+    .location .icon { color: var(--primary); }
+    .status { color: var(--success); }
+    .status.waiting { color: var(--warning); }
+    .event-action { margin: auto var(--space-16) var(--space-16); align-self: start; }
+    .event-action .icon { transition: transform var(--motion-control) ease-out; }
+    .notice { display: grid; justify-items: start; gap: var(--space-8); padding: var(--space-24); border-radius: var(--radius-dialog); background: var(--surface); }
+    .error h3 { color: var(--danger); }
+    .skeleton-line { inline-size: 72%; block-size: var(--space-12); border-radius: var(--radius-control); background: var(--surface-subtle); }
+    .skeleton-line + .skeleton-line { inline-size: 45%; }
+    .preview { padding-block: var(--space-24) var(--space-32); }
+    .preview summary { min-block-size: var(--target-touch); padding-block: var(--space-12); max-inline-size: fit-content; cursor: pointer; color: var(--accent); font: var(--type-label); }
+    .preview-field { max-inline-size: 32ch; }
+    @media (min-width: 768px) {
+      .control-label { display: inline; }
+      .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-block: var(--space-24) var(--space-48); }
+      .filter-form { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); }
+      .filter-form .button { justify-self: start; }
+      .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .layout { padding-inline: var(--space-32); }
+      .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-48); padding-block: var(--space-24) var(--space-64); }
+      .hero-content { padding-inline: var(--space-24); gap: var(--space-24); }
+      .hero-media { aspect-ratio: 16 / 9; }
+      .catalog .layout { gap: var(--space-32); padding-block: var(--space-48) var(--space-64); }
+      .wave { block-size: var(--space-48); }
+      .filter-form { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; padding: var(--space-24); }
+      .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-24); }
+      .event-body { padding: var(--space-24); }
+      .event-action { margin-inline: var(--space-24); margin-block-end: var(--space-24); }
+    }
+    @keyframes enter {
+      from { opacity: 0.42; transform: translateY(var(--space-24)); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes image-enter { from { opacity: 0.5; } to { opacity: 1; } }
+    @keyframes cinema { from { transform: scale(1); } to { transform: scale(1.065); } }
+    @keyframes availability {
+      0% { opacity: 0.7; transform: scale(0.85); }
+      60% { opacity: 1; transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      [data-motion="on"] .hero.is-entering .hero-content > :is(h1, p) { animation: enter calc(3 * var(--motion-panel)) ease-out backwards; }
+      [data-motion="on"] .hero.is-entering .hero-content > p { animation-delay: var(--motion-control); }
+      [data-motion="on"] .hero.is-entering .hero-media { animation: image-enter calc(3 * var(--motion-panel)) ease-out; }
+      .hero-framing { animation: cinema var(--cinematic-duration, 0ms) ease-in-out infinite alternate paused; }
+      [data-motion="on"] .hero-media.is-visible .hero-framing { animation-play-state: running; }
+      [data-motion="on"] .hero-art { transform: translateY(var(--parallax, 0px)) scale(1.12); }
+      [data-motion="on"] .reveal.has-entered { animation: enter calc(2.5 * var(--motion-panel)) ease-out; }
+      [data-motion="on"] .result-area.visible-status .status .icon { animation: availability calc(3 * var(--motion-panel)) ease-out; }
+      [data-motion="on"] .button:not(:disabled):is(:active, [data-touch-pressed]) { transform: translateY(var(--focus-width)) scale(0.96); }
+    }
+    @media (pointer: fine) and (hover: hover) {
+      .button:not(:disabled):hover { background: var(--surface-subtle); }
+      .button.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+      .button.primary:active { background: var(--primary-active); border-color: var(--primary-active); }
+      .event-card:hover::before { opacity: 1; clip-path: inset(0); }
+    }
+    @media (pointer: fine) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+      [data-motion="on"] .event-card { transition: transform var(--motion-panel) ease-out; }
+      [data-motion="on"] .event-card:hover { transform: translateY(calc(-1 * var(--space-4))); }
+      [data-motion="on"] .event-action:hover .icon { transform: translateX(var(--space-4)); }
+    }
+  </style>
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="heart" viewBox="0 0 24 24"><path d="M20.5 8.5c0 4-4.8 7.4-8.5 10.5C8.3 15.9 3.5 12.5 3.5 8.5a4.5 4.5 0 0 1 8.5-2 4.5 4.5 0 0 1 8.5 2Z"/></symbol>
+    <symbol id="pause" viewBox="0 0 24 24"><path d="M9 5v14m6-14v14"/></symbol>
+    <symbol id="play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+    <symbol id="moon" viewBox="0 0 24 24"><path d="M20.5 15.5A9 9 0 0 1 8.5 3.5a9 9 0 1 0 12 12Z"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="spark" viewBox="0 0 24 24"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2Zm7 13v6m-3-3h6"/></symbol>
+    <symbol id="arrow-down" viewBox="0 0 24 24"><path d="M12 4v15m-6-6 6 6 6-6"/></symbol>
+    <symbol id="arrow-right" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18m-13 4h2m4 0h2m-8 4h2"/></symbol>
+    <symbol id="pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+    <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#event-list-title">Sari la lista de evenimente</a>
+  <header class="layout topbar">
+    <span class="brand"><span class="brand-icon"><svg class="icon" aria-hidden="true"><use href="#heart"/></svg></span>VolunTrack</span>
+    <div class="topbar-controls">
+      <button class="button" type="button" id="motion" aria-label="Pauză animații" aria-pressed="false">
+        <svg class="icon" aria-hidden="true"><use href="#pause"/></svg><span class="control-label">Pauză animații</span>
+      </button>
+      <button class="button" type="button" id="theme" aria-label="Temă întunecată">
+        <svg class="icon" aria-hidden="true"><use href="#moon"/></svg><span class="control-label">Temă întunecată</span>
+      </button>
+    </div>
+  </header>
+  <main>
+    <section class="layout hero" aria-labelledby="page-title">
+      <div class="hero-content">
+        <span class="demo-label"><svg class="icon" aria-hidden="true"><use href="#spark"/></svg>Evenimente demonstrative · Date fictive</span>
+        <h1 id="page-title">Găsește un loc <span>unde poți ajuta.</span></h1>
+        <p>Alege un eveniment și descoperă cum poți contribui, de la pregătirea atelierelor la întâmpinarea familiilor.</p>
+        <a class="button primary" href="#event-list-title">Explorează evenimentele <svg class="icon" aria-hidden="true"><use href="#arrow-down"/></svg></a>
+      </div>
+      <div class="hero-media"><div class="hero-framing"><img class="hero-art" src="../DS-003-assets/community-hero.webp" alt=""></div></div>
+    </section>
+
+    <div class="wave" aria-hidden="true"><svg viewBox="0 0 1440 64" preserveAspectRatio="none" focusable="false"><path d="M0 24 C140 12 248 39 390 40 S630 16 750 20 968 44 1100 37 1310 13 1440 26 V64 H0 Z"/></svg></div>
+    <section class="catalog" aria-labelledby="event-list-title">
+      <div class="layout">
+        <h2 class="reveal" id="event-list-title" tabindex="-1">Evenimente disponibile</h2>
+        <form class="filter-form" id="filters" role="search" aria-label="Caută și filtrează evenimente">
+          <div class="filter-field"><label for="search">Caută după nume sau localitate</label><input id="search" type="search" placeholder="De exemplu, Sibiu"></div>
+          <div class="filter-field"><label for="locality">Localitate</label><select id="locality"><option value="">Toate localitățile</option></select></div>
+          <div class="filter-field">
+            <label for="availability">Disponibilitate</label>
+            <select id="availability"><option value="">Orice disponibilitate</option><option value="available">Cu locuri libere</option><option value="waiting">Listă de așteptare</option></select>
+          </div>
+          <button class="button" type="reset">Resetează filtrele</button>
+        </form>
+        <div class="result-area reveal" id="results">
+          <p class="hint" role="status" id="result-count"></p>
+          <div id="result-content"></div>
+        </div>
+      </div>
+    </section>
+    <div class="wave wave-out" aria-hidden="true"><svg viewBox="0 0 1440 64" preserveAspectRatio="none" focusable="false"><path d="M0 37 C166 46 265 17 430 19 S669 44 808 39 1034 14 1161 18 1351 44 1440 30 V64 H0 Z"/></svg></div>
+    <div class="layout">
+      <details class="preview">
+        <summary>Verifică stările machetei</summary>
+        <div class="filter-field preview-field">
+          <label for="preview-state">Stare demonstrativă</label>
+          <select id="preview-state">
+            <option value="default">Trei evenimente</option>
+            <option value="single">Un singur eveniment</option>
+            <option value="empty">Fără evenimente</option>
+            <option value="loading">Încărcare</option>
+            <option value="error">Eroare de încărcare</option>
+            <option value="long">Titlu și descriere lungi</option>
+          </select>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <template id="event-template">
+    <li><article class="event-card">
+      <img class="event-cover" alt="">
+      <div class="event-body">
+        <p class="event-date"><svg class="icon" aria-hidden="true"><use href="#calendar"/></svg><time></time></p>
+        <h3></h3>
+        <p class="description"></p>
+        <p class="location"><svg class="icon" aria-hidden="true"><use href="#pin"/></svg><span></span></p>
+        <p class="status"><svg class="icon" aria-hidden="true"><use href="#check"/></svg><span></span></p>
+      </div>
+      <a class="button primary event-action" href="DS-004.html" hidden>Vezi detalii <svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+    </article></li>
+  </template>
+  <template id="loading-template">
+    <li aria-hidden="true"><div class="event-card">
+      <div class="event-cover"></div>
+      <div class="event-body"><span class="skeleton-line"></span><span class="skeleton-line"></span></div>
+    </div></li>
+  </template>
+
+  <script>
+    const events = [
+      {
+        title: 'Trenulețul de iarnă', day: '2026-12-19', date: '19 decembrie 2026', locality: 'Sibiu', venue: 'Sala comunitară Nord',
+        description: 'Pregătește atelierele de iarnă sau întâmpină familiile înaintea călătoriei festive.',
+        availability: 'available', image: '../DS-004-assets/winter-train.webp', details: true
+      },
+      {
+        title: 'Pachete pentru comunitate', day: '2026-12-20', date: '20 decembrie 2026', locality: 'Mediaș', venue: 'Atelierul Stejarului',
+        description: 'Sortează donațiile și pregătește pachete de iarnă alături de ceilalți voluntari.',
+        availability: 'waiting', image: '../DS-003-assets/community-packs.webp'
+      },
+      {
+        title: 'Atelier de povești', day: '2027-01-09', date: '9 ianuarie 2027', locality: 'Dumbrăveni', venue: 'Casa cu povești',
+        description: 'Aranjează colțul de lectură și materialele pentru un atelier de povești.',
+        availability: 'available', image: '../DS-003-assets/story-workshop.webp'
+      }
+    ];
+    const catalogStates = {
+      default: events,
+      single: events.slice(0, 1),
+      empty: [],
+      long: [{ ...events[0], title: 'Trenulețul de iarnă și atelierele festive de pregătire a activităților pentru copii și familii',
+        description: 'Ajută la pregătirea materialelor pentru ateliere, organizează colțul cu activități și întâmpină familiile care se alătură călătoriei festive. Turele și condițiile se găsesc în detaliile evenimentului.' }]
+    };
+
+    const params = new URLSearchParams(location.search);
+    const filters = document.querySelector('#filters');
+    const search = document.querySelector('#search');
+    const locality = document.querySelector('#locality');
+    const availability = document.querySelector('#availability');
+    const preview = document.querySelector('#preview-state');
+    const count = document.querySelector('#result-count');
+    const resultArea = document.querySelector('#results');
+    const content = document.querySelector('#result-content');
+    const eventTemplate = document.querySelector('#event-template');
+    const loadingTemplate = document.querySelector('#loading-template');
+    const themeButton = document.querySelector('#theme');
+
+    for (const name of [...new Set(events.map(event => event.locality))].sort((a, b) => a.localeCompare(b, 'ro'))) {
+      locality.add(new Option(name, name));
+    }
+
+    function setTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      const dark = theme === 'dark';
+      const label = dark ? 'Temă luminoasă' : 'Temă întunecată';
+      themeButton.setAttribute('aria-label', label);
+      themeButton.querySelector('.control-label').textContent = label;
+      themeButton.querySelector('use').setAttribute('href', dark ? '#sun' : '#moon');
+      content.querySelectorAll('.event-action:not([hidden])').forEach(link => { link.href = `DS-004.html?theme=${theme}`; });
+    }
+
+    function normalize(text) {
+      return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase('ro').trim();
+    }
+
+    function renderCard(event) {
+      const item = eventTemplate.content.firstElementChild.cloneNode(true);
+      item.querySelector('article').dataset.availability = event.availability;
+      item.querySelector('.event-cover').src = event.image;
+      const date = item.querySelector('time');
+      date.dateTime = event.day;
+      date.textContent = event.date;
+      item.querySelector('h3').textContent = event.title;
+      item.querySelector('.description').textContent = event.description;
+      item.querySelector('.location span').textContent = `${event.venue} · ${event.locality}`;
+      const status = item.querySelector('.status');
+      const waiting = event.availability === 'waiting';
+      status.classList.toggle('waiting', waiting);
+      status.querySelector('use').setAttribute('href', waiting ? '#clock' : '#check');
+      status.querySelector('span').textContent = waiting ? 'Listă de așteptare' : 'Locuri la unele ture';
+      if (event.details) {
+        const link = item.querySelector('.event-action');
+        link.hidden = false;
+        link.href = `DS-004.html?theme=${document.documentElement.dataset.theme}`;
+        link.setAttribute('aria-label', `Vezi detalii despre ${event.title}`);
+      }
+      return item;
+    }
+
+    function createGrid() {
+      const list = document.createElement('ul');
+      list.className = 'event-grid';
+      list.setAttribute('role', 'list');
+      return list;
+    }
+
+    function renderNotice({ heading, detail, action, onAction, error }) {
+      const notice = document.createElement('div');
+      notice.className = error ? 'notice error' : 'notice';
+      const title = document.createElement('h3');
+      const description = document.createElement('p');
+      title.textContent = heading;
+      description.textContent = detail;
+      notice.append(title, description);
+      if (action) {
+        const button = document.createElement('button');
+        button.className = 'button';
+        button.type = 'button';
+        button.textContent = action;
+        button.addEventListener('click', onAction);
+        notice.append(button);
+      }
+      content.append(notice);
+    }
+
+    function render() {
+      const state = preview.value;
+      content.replaceChildren();
+      content.setAttribute('aria-busy', String(state === 'loading'));
+      if (state === 'loading') {
+        count.textContent = 'Se încarcă evenimentele…';
+        const list = createGrid();
+        list.setAttribute('aria-hidden', 'true');
+        events.forEach(() => list.append(loadingTemplate.content.cloneNode(true)));
+        content.append(list);
+        return;
+      }
+      if (state === 'error') {
+        count.textContent = 'Lista de evenimente este indisponibilă.';
+        renderNotice({ heading: 'Evenimentele nu s-au încărcat', detail: 'Încearcă din nou pentru a relua căutarea.', error: true,
+          action: 'Încearcă din nou', onAction: () => { preview.value = 'default'; render(); search.focus(); } });
+        return;
+      }
+
+      const terms = normalize(search.value).split(/\s+/).filter(Boolean);
+      const matches = catalogStates[state].filter(event => {
+        const text = normalize(`${event.title} ${event.locality}`);
+        return terms.every(term => text.includes(term))
+          && (!locality.value || event.locality === locality.value)
+          && (!availability.value || event.availability === availability.value);
+      });
+
+      count.textContent = matches.length === 1 ? '1 eveniment afișat' : `${matches.length} evenimente afișate`;
+      if (!matches.length) {
+        if (state === 'empty') {
+          renderNotice({ heading: 'Momentan nu sunt evenimente', detail: 'Revino pentru a vedea evenimentele publicate.' });
+        } else {
+          renderNotice({ heading: 'Niciun eveniment găsit', detail: 'Încearcă alt nume sau resetează filtrele pentru a vedea toate evenimentele.',
+            action: 'Resetează căutarea', onAction: () => { filters.reset(); search.focus(); } });
+        }
+        return;
+      }
+      const list = createGrid();
+      matches.forEach(event => list.append(renderCard(event)));
+      content.append(list);
+    }
+
+    const requestedTheme = params.get('theme');
+    const preferredTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    setTheme(['light', 'dark'].includes(requestedTheme) ? requestedTheme : preferredTheme);
+    themeButton.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+    const requestedState = params.get('state');
+    if (Array.from(preview.options).some(option => option.value === requestedState)) preview.value = requestedState;
+    preview.addEventListener('change', render);
+    search.addEventListener('input', render);
+    locality.addEventListener('change', render);
+    availability.addEventListener('change', render);
+    filters.addEventListener('submit', event => event.preventDefault());
+    filters.addEventListener('reset', event => {
+      event.preventDefault();
+      search.value = '';
+      locality.value = '';
+      availability.value = '';
+      render();
+    });
+    render();
+
+    const touchPresses = new Map();
+    document.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch') return;
+      const button = event.target.closest('.button:not(:disabled)');
+      if (!button) return;
+      button.setAttribute('data-touch-pressed', '');
+      touchPresses.set(event.pointerId, button);
+    }, { passive: true });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      document.addEventListener(type, event => {
+        touchPresses.get(event.pointerId)?.removeAttribute('data-touch-pressed');
+        touchPresses.delete(event.pointerId);
+      }, { passive: true });
+    }
+
+    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    const hoverPreference = matchMedia('(pointer: fine) and (hover: hover)');
+    const motionButton = document.querySelector('#motion');
+    const hero = document.querySelector('.hero');
+    const heroMedia = document.querySelector('.hero-media');
+    const waves = Array.from(document.querySelectorAll('.wave'), (element, index) => {
+      const path = element.querySelector('path');
+      return {
+        element, path, restingPath: path.getAttribute('d'), phase: index * 1.8,
+        x: 0.5, targetX: 0.5, y: 0, targetY: 0, strength: 0, hovered: false
+      };
+    });
+    const visible = new Set();
+    let paused = false;
+    let frame = 0;
+    let previousFrame = 0;
+    let elapsed = 0;
+    let panelDuration = 0;
+    let parallaxDirty = true;
+
+    function motionEnabled() {
+      return !paused && !motionPreference.matches;
+    }
+
+    function drawWave(wave, phase, easing) {
+      wave.x += (wave.targetX - wave.x) * easing;
+      wave.y += (wave.targetY - wave.y) * easing;
+      const targetStrength = wave.hovered && hoverPreference.matches ? 1 : 0;
+      wave.strength += (targetStrength - wave.strength) * easing;
+
+      const amplitude = 11 + 9 * wave.strength;
+      const travelling = phase + wave.phase + (wave.x - 0.5) * 2.4 * wave.strength;
+      const points = Array.from({ length: 25 }, (_, index) => {
+        const x = index / 24;
+        const nearCursor = Math.max(0, 1 - Math.abs(x - wave.x) * 3) ** 2;
+        const bend = nearCursor * (wave.y * 8 - 5) * wave.strength;
+        const y = 32 + Math.sin(x * 10.5 - travelling) * amplitude
+          + Math.cos(x * 17 + travelling * 0.66) * 3.6 + bend;
+        return Math.max(2, Math.min(62, y));
+      });
+
+      let shape = `M0 ${points[0].toFixed(1)}`;
+      for (let index = 1; index < points.length - 1; index += 1) {
+        const midpoint = (points[index] + points[index + 1]) / 2;
+        shape += ` Q${index * 60} ${points[index].toFixed(1)} ${index * 60 + 30} ${midpoint.toFixed(1)}`;
+      }
+      shape += ` T1440 ${points.at(-1).toFixed(1)} V64 H0 Z`;
+      wave.path.setAttribute('d', shape);
+    }
+
+    function scheduleMotion() {
+      if (frame || !motionEnabled() || document.hidden) return;
+      if (!waves.some(wave => visible.has(wave.element)) && !(parallaxDirty && visible.has(heroMedia))) return;
+
+      frame = requestAnimationFrame(time => {
+        frame = 0;
+        if (!motionEnabled() || document.hidden) return;
+        const delta = previousFrame ? Math.min(time - previousFrame, 50) : 0;
+        previousFrame = time;
+        elapsed += delta;
+
+        if (parallaxDirty && visible.has(heroMedia)) {
+          const bounds = heroMedia.getBoundingClientRect();
+          const offset = Math.min(bounds.height * 0.05, Math.max(0, -bounds.top) * 0.1);
+          heroMedia.style.setProperty('--parallax', offset.toFixed(1) + 'px');
+          parallaxDirty = false;
+        }
+        const phase = (elapsed / (panelDuration * 22)) * 2 * Math.PI;
+        const easing = 1 - Math.exp(-delta / (panelDuration * 0.56));
+        for (const wave of waves) {
+          if (visible.has(wave.element)) drawWave(wave, phase, easing);
+        }
+        scheduleMotion();
+        if (!frame) previousFrame = 0;
+      });
+    }
+
+    function updateMotion() {
+      const enabled = motionEnabled();
+      document.documentElement.dataset.motion = enabled ? 'on' : 'off';
+      motionButton.disabled = motionPreference.matches;
+      motionButton.setAttribute('aria-pressed', String(!enabled));
+      motionButton.querySelector('use').setAttribute('href', enabled ? '#pause' : '#play');
+      if (enabled) {
+        panelDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--motion-panel'));
+        heroMedia.style.setProperty('--cinematic-duration', 150 * panelDuration + 'ms');
+        parallaxDirty = true;
+        scheduleMotion();
+        return;
+      }
+      cancelAnimationFrame(frame);
+      frame = 0;
+      previousFrame = 0;
+      hero.classList.remove('is-entering');
+      heroMedia.style.removeProperty('--parallax');
+      document.querySelectorAll('.reveal.has-entered').forEach(section => section.classList.remove('has-entered'));
+      for (const wave of waves) {
+        wave.hovered = false;
+        if (motionPreference.matches) wave.path.setAttribute('d', wave.restingPath);
+      }
+    }
+
+    for (const wave of waves) {
+      wave.element.addEventListener('pointermove', event => {
+        if (!motionEnabled() || !hoverPreference.matches || event.pointerType === 'touch') return;
+        const bounds = wave.element.getBoundingClientRect();
+        wave.targetX = (event.clientX - bounds.left) / bounds.width;
+        wave.targetY = 2 * (event.clientY - bounds.top) / bounds.height - 1;
+        wave.hovered = true;
+      }, { passive: true });
+      wave.element.addEventListener('pointerleave', () => { wave.hovered = false; });
+    }
+
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const section = entry.target;
+          if (section === resultArea) resultArea.classList.add('visible-status');
+          if (motionEnabled() && !section.contains(document.activeElement)) section.classList.add('has-entered');
+          revealObserver.unobserve(section);
+        }
+      }, { rootMargin: '0px 0px -5% 0px' });
+
+      document.querySelectorAll('.reveal').forEach(section => {
+        revealObserver.observe(section);
+        section.addEventListener('animationend', event => {
+          if (event.target === section) section.classList.remove('has-entered');
+        });
+      });
+
+      const visibilityObserver = new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+          if (entry.target === heroMedia) heroMedia.classList.toggle('is-visible', entry.isIntersecting && !document.hidden);
+        }
+        parallaxDirty = true;
+        scheduleMotion();
+      });
+      visibilityObserver.observe(heroMedia);
+      waves.forEach(({element}) => visibilityObserver.observe(element));
+    }
+
+    function invalidateParallax() {
+      parallaxDirty = true;
+      scheduleMotion();
+    }
+
+    window.addEventListener('scroll', invalidateParallax, { passive: true });
+    window.addEventListener('resize', invalidateParallax, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      heroMedia.classList.toggle('is-visible', !document.hidden && visible.has(heroMedia));
+      if (document.hidden) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        previousFrame = 0;
+      } else {
+        invalidateParallax();
+      }
+    });
+    motionPreference.addEventListener('change', updateMotion);
+    motionButton.addEventListener('click', () => { paused = !paused; updateMotion(); });
+    if (motionEnabled()) hero.classList.add('is-entering');
+    hero.querySelector('.hero-content > p').addEventListener('animationend', () => hero.classList.remove('is-entering'));
+    updateMotion();
+  </script>
+</body>
+</html>

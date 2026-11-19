@@ -144,9 +144,9 @@ by the presence of this file alone. Missing capabilities block their steps.
 ## Repo-owned Codex review record
 - Figma review URL: pending (Q-008); distinct from the shared optional snapshot URL.
 - Tokens and reference viewports: approved under Q-005. [Shared design specification](DESIGN.md#tokens)
-- Local mock: [DS-004](mocks/DS-004.html), with Playwright and Chromium verification at 320 × 720 and 1440 × 900 in both themes (Q-007).
+- Local mock: [DS-004](mocks/archive/DS-004.html), with Playwright and Chromium verification at 320 × 720 and 1440 × 900 in both themes (Q-007).
 - Approved local revision: SHA-256 `d1aea04988fdb6a533b680f470b0570964a7251715d0bcf321ae91d01b63cdce`. Computed over the `sha256sum` output for `DESIGN.md`, the mock HTML and its asset directory files, sorted by repository-relative path.
-- Local captures: [desktop light](screens/DS-004.light.png), [desktop dark](screens/DS-004.dark.png), [mobile light](screens/DS-004.light.mobile.png), [mobile dark](screens/DS-004.dark.mobile.png).
+- Local captures: [desktop light](screens/archive/DS-004.light.png), [desktop dark](screens/archive/DS-004.dark.png), [mobile light](screens/archive/DS-004.light.mobile.png), [mobile dark](screens/archive/DS-004.dark.mobile.png).
 - Visual approval in chat (2026-11-19): “Aprob designul final și animațiile mock-ului DS-004 pentru VolunTrack.”
 - The project owner explicitly requested `approved` for this locally reviewed revision and deferred Figma publication. The status records this local approval.
 - Published mock revision: none.
@@ -159,11 +159,11 @@ by the presence of this file alone. Missing capabilities block their steps.
 
 ### DS-003 local approval
 
-- Local mock: [DS-003](mocks/DS-003.html).
+- Local mock: [DS-003](mocks/archive/DS-003.html).
 - Approved local revision: SHA-256 `077ee0cc89dbd802c401c9b4322e4b9d4c1434dbfe0c7790120cfe805698281a`. Computed over the `sha256sum` output for `DESIGN.md`, the mock HTML and its referenced WebP and WOFF2 files, sorted by repository-relative path.
 - Local verification: Playwright and Chromium at 320 × 720 and 1440 × 900 in both themes, including the hover transition and reduced motion.
-- Reference captures: [desktop light](screens/DS-003.light.png), [desktop dark](screens/DS-003.dark.png), [mobile light](screens/DS-003.light.mobile.png), [mobile dark](screens/DS-003.dark.mobile.png).
-- Reviewed hover captures: [light](screens/DS-003.light.hover.png) and [dark](screens/DS-003.dark.hover.png).
+- Reference captures: [desktop light](screens/archive/DS-003.light.png), [desktop dark](screens/archive/DS-003.dark.png), [mobile light](screens/archive/DS-003.light.mobile.png), [mobile dark](screens/archive/DS-003.dark.mobile.png).
+- Reviewed hover captures: [light](screens/archive/DS-003.light.hover.png) and [dark](screens/archive/DS-003.dark.hover.png).
 - Visual approval in chat (2026-11-19): “Aprob designul final al DS-003 pentru VolunTrack, inclusiv animațiile și bara laterală de hover.”
 - The project owner requested `approved` for this locally reviewed revision. Figma publication and comparison remain pending.
 
@@ -173,15 +173,42 @@ Aprobare vizuală în conversație, 2026-11-19. „Aprob versiunile actuale ale 
 
 Tema luminoasă implicită este aprobată prin [D-010](../agents/DECISIONS.md#d-010--temă-luminoasă-implicită-în-ds-003-și-ds-004).
 
-| Ecran | Machetă aprobată | SHA-256 la revizuire | SHA-256 la calea din registru |
+| Ecran | Machetă aprobată | SHA-256 la revizuire | SHA-256 la calea din registru la aprobarea inițială |
 |---|---|---|---|
-| DS-003 | [Evenimente disponibile](mocks/2026-11-19/DS-003.html) | `fa53967ceaba76ba845418754c0ba70c0b7f42100ed01b96d0aa977dfbadefd1` | `9074a30d3c687c1825f5bb12566109f2e8ece40c5cf45de6e334a7d87bb9a4ea` |
-| DS-004 | [Detalii eveniment și înscriere](mocks/2026-11-19/DS-004.html) | `890bf82cf0aca380b90eb049dde623ce7b3a07368446c207fbfde26ad80c7221` | `a5bcdeab2b4a92f612f02ecb91816e60654be2d5fd8a1230c0d80b531094f371` |
+| DS-003 | [Evenimente disponibile](mocks/approved/DS-003.html) | `fa53967ceaba76ba845418754c0ba70c0b7f42100ed01b96d0aa977dfbadefd1` | `9074a30d3c687c1825f5bb12566109f2e8ece40c5cf45de6e334a7d87bb9a4ea` |
+| DS-004 | [Detalii eveniment și înscriere](mocks/approved/DS-004.html) | `890bf82cf0aca380b90eb049dde623ce7b3a07368446c207fbfde26ad80c7221` | `a5bcdeab2b4a92f612f02ecb91816e60654be2d5fd8a1230c0d80b531094f371` |
 
-Amprentele de revizie se calculează din ieșirea `sha256sum` pentru `DESIGN.md`, machetă, imaginile WebP și fonturile WOFF2 folosite, ordonate după calea relativă la rădăcina repo-ului. Trecerea din `mocks/drafts/` în `mocks/2026-11-19/` a schimbat calea din manifest. Fișierele HTML, imaginile, fonturile și capturile au fost verificate după mutare. Registrul indică reviziile finale, iar machetele și capturile aprobate anterior sunt păstrate la căile înregistrate mai sus.
+Amprentele de revizie se calculează din ieșirea `sha256sum` pentru `DESIGN.md`, machetă, imaginile WebP și fonturile WOFF2 folosite, ordonate după calea relativă la rădăcina repo-ului. Trecerea din `mocks/drafts/` în `mocks/2026-11-19/` a schimbat calea din manifest. Fișierele HTML, imaginile, fonturile și capturile au fost verificate după mutare. Registrul indică locația curentă a reviziilor finale.
 
-[Comparația reviziilor aprobate](screens/2026-11-19/comparatie.html) include opt perechi de capturi integrale, două perechi pentru hover în DS-003 și capturile panoului de filtre deschis. Verificarea a rulat cu Playwright 1.65.1 și Chromium 159.0.8154.6 la 1440 × 900 și 320 × 720, în ambele teme. Publicarea în Figma rămâne amânată la cererea responsabilului de proiect.
+[Comparația reviziilor aprobate](screens/review/2026-11-19/comparatie.html) include opt perechi de capturi integrale, două perechi pentru hover în DS-003 și capturile panoului de filtre deschis. Verificarea a rulat cu Playwright 1.65.1 și Chromium 159.0.8154.6 la 1440 × 900 și 320 × 720, în ambele teme. La data acestei verificări, publicarea în Figma era amânată.
 
 Au fost verificate căutarea și filtrele combinate în DS-003, resetarea, indicatorul de filtre active, închiderea cu Escape, legătura spre DS-004, înscrierea demonstrativă și lista de așteptare. Verificarea accesibilității a acoperit tastatura, focusul, contrastul, dimensiunea controalelor și mișcarea redusă.
 
-Verificarea animațiilor a acoperit dezvăluirea unică la intrarea în viewport, revenirea prin scroll, filtrarea, zoomul de 1,03× pe cardul interactiv, gradientul la hover și pauza animațiilor. [DS-003 pe desktop](screens/2026-11-19/DS-003.motion.desktop.light.webm) · [DS-004 pe mobil](screens/2026-11-19/DS-004.motion.mobile.dark.webm)
+Verificarea animațiilor a acoperit dezvăluirea unică la intrarea în viewport, revenirea prin scroll, filtrarea, zoomul de 1,03× pe cardul interactiv, gradientul la hover și pauza animațiilor. [DS-003 pe desktop](screens/review/2026-11-19/DS-003.motion.desktop.light.webm) · [DS-004 pe mobil](screens/review/2026-11-19/DS-004.motion.mobile.dark.webm)
+
+### DS-005 · Programul meu, 2026-11-19
+
+- Statut `approved`. Aprobare vizuală în conversație, 2026-11-19. „Aprob designul actual al DS-005. Toate cele trei mock-uri, DS-003, DS-004 și DS-005, sunt aprobate pentru această etapă.” Planul și [D-011](../agents/DECISIONS.md#d-011--temă-luminoasă-implicită-în-ds-005) sunt aprobate. [Macheta HTML interactivă](mocks/approved/DS-005.html)
+- Revizia locală are SHA-256 `2cf092a5a0b42606d998f1362f2598119e1a5aca30b9070898eec33975df6222`, calculat din ieșirea `sha256sum` pentru `DESIGN.md`, machetă și fonturile WOFF2 folosite, în ordinea căilor relative.
+- Inventarul aprobat acoperă cardurile de tură, selectorul de perioadă, etichetele de stare, oferta cu termen, dialogurile de confirmare și panoul de prezență. DS-005 compune aceste elemente într-o agendă verticală și afișează acțiunile turei curente înaintea detaliilor de pontaj.
+- Antetul, controalele, cardurile și regulile de mișcare sunt preluate din DS-004. Machetele aprobate definesc aceste reguli în HTML, iar DS-005 folosește aceleași fișiere de font. Comparația în browser a verificat antetul și cardul față de DS-004, precum și tokenurile, controalele și etichetele de stare față de DS-003 și DS-004.
+- Verificare locală cu Playwright 1.65.1 și Chromium 159.0.8154.6 la 320 × 720 și 1440 × 900 în ambele teme, plus șase lățimi intermediare. Scenariile folosesc date fictive și un ceas controlat din „Verifică stările machetei”.
+- Verificările au acoperit ofertele, inclusiv expirarea în timpul acceptării, repartizarea, retragerea, QR-ul simulat pentru sosire, plecare și revenire, repetarea scanării, confirmarea la locație, închiderea pauzei la check-out, orele efectuate și stările pontajului. Au fost verificate tastatura, focusul, contrastul, dimensiunile tactile, mișcarea redusă și stările empty, loading, error, success, text lung, una și mai multe ture.
+- Previzualizări integrale. [Desktop light](screens/DS-005.light.png) · [Desktop dark](screens/DS-005.dark.png) · [Mobil light](screens/DS-005.light.mobile.png) · [Mobil dark](screens/DS-005.dark.mobile.png)
+- Scenarii. [Ofertă de răspuns](screens/review/2026-11-19/DS-005.light.offer.png) · [Istoric și pontaje](screens/review/2026-11-19/DS-005.light.history.png) · [Pauză în curs](screens/review/2026-11-19/DS-005.dark.mobile.break.png) · [Dialog QR](screens/review/2026-11-19/DS-005.dark.mobile.qr.png) · [Confirmare la locație](screens/review/2026-11-19/DS-005.light.mobile.confirmation.png)
+- Aprobarea acoperă macheta locală. Publicarea în Figma este o etapă separată.
+
+
+### Organizarea reviziilor finale
+
+Machetele curente sunt în `mocks/approved/`. Fișierele WebP, WOFF2 și licențele comune rămân în directoarele de resurse din `mocks/`. Reviziile anterioare sunt în `mocks/archive/`, inclusiv [draftul DS-003 dinaintea filtrelor compacte](mocks/archive/DS-003.before-filters.html). Capturile finale păstrează căile standard `screens/<DS-id>.<light|dark>.png`. Capturile istorice sunt în `screens/archive/`, iar comparația și materialele de verificare sunt în `screens/review/2026-11-19/`.
+
+Amprentele de mai sus păstrează căile și conținutul din momentul aprobării locale. Următoarele amprente folosesc manifestul ordonat la noile căi. Modificările în machete se limitează la referințele relative necesare mutării.
+
+| Ecran | SHA-256 la calea curentă |
+|---|---|
+| [DS-003](mocks/approved/DS-003.html) | `cef0a5d5eff2948ccaf16109f7b34297a55c7335e825e03ba392daaaaf264b38` |
+| [DS-004](mocks/approved/DS-004.html) | `881a6aac8484b860df0308d33b1efefdb6e93b98e61bd65d2b203662bbe03516` |
+| [DS-005](mocks/approved/DS-005.html) | `47bc53374cb869a4d65d9757eaa5504105a154c0ee5af2cf2ecae5e8829c5290` |
+
+După reorganizare, Playwright 1.65.1 și Chromium 159.0.8154.6 au verificat traseul DS-005 → DS-003 → DS-004 cu păstrarea temei, resursele, stările interactive, animațiile, tastatura, focusul, contrastul și dimensiunile tactile. Cele 12 capturi regenerate la 320 × 720 și 1440 × 900, în light și dark, au aceleași dimensiuni ca referințele și diferă pe cel mult 0,064% dintre pixeli. Inspecția vizuală a confirmat aspectul. Cele 20 de imagini din comparație și cele două clipuri WebM se încarcă. Capturile păstrate, clipurile, resursele și tokenurile au trecut verificarea de integritate.

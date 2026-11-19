@@ -16,6 +16,7 @@
 - D-008 · Direcție vizuală pentru VolunTrack
 - D-009 · Docker local și PostgreSQL administrat permis la deploy
 - D-010 · Temă luminoasă implicită în DS-003 și DS-004
+- D-011 · Temă luminoasă implicită în DS-005
 
 ---
 
@@ -106,4 +107,13 @@
 - **Why:** Voluntarii intră în experiența luminoasă inclusiv când sistemul lor preferă tema întunecată.
 - **Rejected:** Inițializarea pe baza preferinței de sistem poate deschide macheta în tema întunecată fără o alegere în VolunTrack.
 - **Evidence:** Aprobarea deciziei D-010 în conversația de revizuire a DS-003 și DS-004 la 2026-11-19.
+- **Source:** user · confidence high
+
+## D-011 · Temă luminoasă implicită în DS-005
+- **Status:** approved
+- **Date:** 2026-11-19
+- **Confirmed:** 2026-11-19
+- **Rule:** În DS-005, pornește în tema luminoasă în lipsa unei alegeri explicite și oferă comutare în tema întunecată.
+- **Why:** Programul voluntarului pornește în aceeași temă ca ecranele aprobate de evenimente.
+- **Evidence:** Aprobarea planului Graffino pentru DS-005 și a propunerii D-011 în conversația de proiect.
 - **Source:** user · confidence high

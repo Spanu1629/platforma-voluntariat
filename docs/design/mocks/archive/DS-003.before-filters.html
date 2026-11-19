@@ -7,26 +7,26 @@
   <style>
     @font-face {
       font-family: Fraunces;
-      src: url("DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
+      src: url("../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
       font-weight: 100 900;
       font-display: swap;
     }
     @font-face {
       font-family: Fraunces;
-      src: url("DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
+      src: url("../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
       font-weight: 100 900;
       font-display: swap;
       unicode-range: U+0100-024F, U+1E00-1EFF;
     }
     @font-face {
       font-family: "DM Sans";
-      src: url("DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
+      src: url("../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
       font-weight: 100 1000;
       font-display: swap;
     }
     @font-face {
       font-family: "DM Sans";
-      src: url("DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
+      src: url("../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
       font-weight: 100 1000;
       font-display: swap;
       unicode-range: U+0100-024F, U+1E00-1EFF;
@@ -98,7 +98,7 @@
     :root[data-motion="off"] { --motion-control: var(--motion-reduced); --motion-panel: var(--motion-reduced); }
     *, *::before, *::after { box-sizing: border-box; }
     [hidden] { display: none !important; }
-    body { margin: 0; color: var(--text); background: var(--background); font: var(--type-body); }
+    body { margin: 0; color: var(--text); background: var(--surface); font: var(--type-body); }
     h1, h2, h3, p { margin: 0; overflow-wrap: anywhere; }
     h1 { font: var(--type-page-title); }
     h2 { font: var(--type-section-title); }
@@ -174,7 +174,7 @@
     .button.primary:is(:active, [data-touch-pressed]) { background: var(--primary-active); border-color: var(--primary-active); }
     .button[aria-pressed="true"], .button:disabled { background: var(--surface-subtle); }
     .button:disabled { color: var(--text-muted); cursor: default; }
-    .hero { display: grid; align-items: center; gap: var(--space-24); padding-block: var(--space-16) var(--space-32); }
+    .hero { display: grid; align-items: center; gap: var(--space-24); padding-block: var(--space-24) var(--space-32); }
     .hero-content { display: grid; justify-items: start; gap: var(--space-16); min-width: 0; }
     .hero h1 span { display: block; color: var(--primary); }
     .hero p { max-inline-size: 42ch; }
@@ -194,21 +194,21 @@
       overflow: hidden;
       aspect-ratio: 16 / 10;
       border-radius: var(--radius-dialog) var(--radius-dialog) var(--radius-dialog) var(--radius-card);
-      background: var(--primary);
+      background: var(--surface-subtle);
     }
-    .hero-framing, .hero-art { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
-    .hero-art { object-fit: cover; }
-    .wave { block-size: var(--space-32); overflow: hidden; background: var(--background); color: var(--surface-subtle); }
-    .wave-out { background: var(--surface-subtle); color: var(--background); }
+    .hero-art, .event-cover { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+    .wave { block-size: var(--space-32); overflow: hidden; background: var(--surface); color: var(--background); }
+    .wave-out { background: var(--background); color: var(--surface); }
     .wave svg { display: block; inline-size: 100%; block-size: 100%; pointer-events: none; }
     .wave path { fill: currentColor; }
-    .catalog { background: var(--surface-subtle); }
-    .catalog .layout { display: grid; gap: var(--space-24); padding-block: var(--space-32); }
+    .catalog { background: var(--background); }
+    .catalog .layout { display: grid; gap: var(--space-24); padding-block: var(--space-32) var(--space-48); }
     .filter-form {
       display: grid;
       align-items: end;
       gap: var(--space-12);
       padding: var(--space-16);
+      border: 1px solid var(--surface-subtle);
       border-radius: var(--radius-dialog);
       background: var(--surface);
     }
@@ -217,8 +217,8 @@
     input, select { inline-size: 100%; color: var(--text); }
     input::placeholder { color: var(--text-muted); opacity: 1; }
     .hint, .location { color: var(--text-muted); font: var(--type-label); }
-    .result-area { display: grid; gap: var(--space-12); }
-    .event-grid { display: grid; gap: var(--space-16); margin: 0; padding: 0; list-style: none; }
+    .result-area { display: grid; gap: var(--space-16); }
+    .event-grid { display: grid; gap: var(--space-24); margin: 0; padding: 0; list-style: none; }
     .event-grid > li { min-width: 0; display: flex; }
     .event-card {
       position: relative;
@@ -226,38 +226,43 @@
       flex: 1;
       flex-direction: column;
       min-width: 0;
+      border: 1px solid var(--surface-subtle);
       border-radius: var(--radius-dialog);
       background: var(--surface);
     }
     .event-card::before {
       position: absolute;
-      inset-block: calc(var(--radius-dialog) + var(--space-4));
+      inset-block: var(--space-24);
       inset-inline-start: 0;
       inline-size: var(--space-4);
+      border-radius: 0 var(--radius-control) var(--radius-control) 0;
       background: var(--event-accent, var(--primary));
       opacity: 0;
-      clip-path: inset(100% 0 0);
-      transition: opacity var(--motion-control) ease-out, clip-path var(--motion-panel) ease-out;
+      transform: scaleY(0);
+      transform-origin: center top;
+      transition: opacity var(--motion-control) ease-out, transform var(--motion-panel) ease-out;
       content: "";
       pointer-events: none;
     }
     .event-card[data-availability="waiting"] { --event-accent: var(--warning); }
-    .event-card:focus-within::before { opacity: 1; clip-path: inset(0); }
-    .event-cover {
-      display: block;
-      inline-size: 100%;
+    .event-card:focus-within::before { opacity: 1; transform: scaleY(1); }
+    .event-media {
+      position: relative;
+      overflow: hidden;
+      inline-size: calc(100% - 2 * var(--space-8));
+      margin: var(--space-8) auto 0;
       aspect-ratio: 16 / 9;
-      object-fit: cover;
-      border-radius: var(--radius-dialog) var(--radius-dialog) 0 0;
+      border-radius: var(--radius-card);
       background: var(--surface-subtle);
     }
-    .event-body { display: grid; align-content: start; justify-items: start; gap: var(--space-12); padding: var(--space-16); }
+    .event-body { display: grid; align-content: start; justify-items: start; gap: var(--space-12); padding: var(--space-24); }
+    .event-meta { display: grid; gap: var(--space-8); }
     .event-date, .location { display: flex; align-items: start; gap: var(--space-8); }
     .event-date { color: var(--accent); font: var(--type-label); font-weight: 600; }
     .location .icon { color: var(--primary); }
     .status { color: var(--success); }
     .status.waiting { color: var(--warning); }
-    .event-action { margin: auto var(--space-16) var(--space-16); align-self: start; }
+    .event-action { margin: auto var(--space-24) var(--space-24); align-self: start; }
     .event-action .icon { transition: transform var(--motion-control) ease-out; }
     .notice { display: grid; justify-items: start; gap: var(--space-8); padding: var(--space-24); border-radius: var(--radius-dialog); background: var(--surface); }
     .error h3 { color: var(--danger); }
@@ -274,35 +279,51 @@
       .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (min-width: 1024px) {
-      .layout { padding-inline: var(--space-32); }
-      .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-48); padding-block: var(--space-24) var(--space-64); }
-      .hero-content { padding-inline: var(--space-24); gap: var(--space-24); }
+      .layout {
+        width: min(100%, calc(var(--desktop-reference-width) - 2 * var(--space-64)));
+        padding-inline: var(--space-32);
+      }
+      .hero { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-64); padding-block: var(--space-48) var(--space-32); }
+      .hero-content { gap: var(--space-24); }
       .hero-media { aspect-ratio: 16 / 9; }
-      .catalog .layout { gap: var(--space-32); padding-block: var(--space-48) var(--space-64); }
+      .hero-media::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, var(--surface), transparent 30%);
+        pointer-events: none;
+      }
+      .catalog .layout { gap: var(--space-24); padding-block: var(--space-48) var(--space-64); }
       .wave { block-size: var(--space-48); }
-      .filter-form { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; padding: var(--space-24); }
-      .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-24); }
-      .event-body { padding: var(--space-24); }
-      .event-action { margin-inline: var(--space-24); margin-block-end: var(--space-24); }
+      .filter-form { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: var(--space-16); padding: var(--space-24); }
+      .event-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-32); }
+      .event-media { inline-size: calc(100% - 2 * var(--space-12)); margin-block-start: var(--space-12); }
     }
     @keyframes enter {
       from { opacity: 0.42; transform: translateY(var(--space-24)); }
       to { opacity: 1; transform: none; }
     }
-    @keyframes image-enter { from { opacity: 0.5; } to { opacity: 1; } }
-    @keyframes cinema { from { transform: scale(1); } to { transform: scale(1.065); } }
+    @keyframes image-reveal { from { transform: scaleX(1); } to { transform: scaleX(0); } }
     @keyframes availability {
       0% { opacity: 0.7; transform: scale(0.85); }
       60% { opacity: 1; transform: scale(1.12); }
       100% { transform: scale(1); }
     }
     @media (prefers-reduced-motion: no-preference) {
+      [data-motion="on"] [data-image-reveal]::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        background: var(--surface);
+        transform-origin: right;
+        pointer-events: none;
+      }
+      [data-motion="on"] [data-image-reveal="revealing"]::before {
+        animation: image-reveal calc(3 * var(--motion-panel)) cubic-bezier(0.22, 0.65, 0.28, 1) both;
+      }
       [data-motion="on"] .hero.is-entering .hero-content > :is(h1, p) { animation: enter calc(3 * var(--motion-panel)) ease-out backwards; }
       [data-motion="on"] .hero.is-entering .hero-content > p { animation-delay: var(--motion-control); }
-      [data-motion="on"] .hero.is-entering .hero-media { animation: image-enter calc(3 * var(--motion-panel)) ease-out; }
-      .hero-framing { animation: cinema var(--cinematic-duration, 0ms) ease-in-out infinite alternate paused; }
-      [data-motion="on"] .hero-media.is-visible .hero-framing { animation-play-state: running; }
-      [data-motion="on"] .hero-art { transform: translateY(var(--parallax, 0px)) scale(1.12); }
       [data-motion="on"] .reveal.has-entered { animation: enter calc(2.5 * var(--motion-panel)) ease-out; }
       [data-motion="on"] .result-area.visible-status .status .icon { animation: availability calc(3 * var(--motion-panel)) ease-out; }
       [data-motion="on"] .button:not(:disabled):is(:active, [data-touch-pressed]) { transform: translateY(var(--focus-width)) scale(0.96); }
@@ -311,12 +332,18 @@
       .button:not(:disabled):hover { background: var(--surface-subtle); }
       .button.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
       .button.primary:active { background: var(--primary-active); border-color: var(--primary-active); }
-      .event-card:hover::before { opacity: 1; clip-path: inset(0); }
+      .event-card:hover::before { opacity: 1; transform: scaleY(1); }
     }
     @media (pointer: fine) and (hover: hover) and (prefers-reduced-motion: no-preference) {
       [data-motion="on"] .event-card { transition: transform var(--motion-panel) ease-out; }
       [data-motion="on"] .event-card:hover { transform: translateY(calc(-1 * var(--space-4))); }
       [data-motion="on"] .event-action:hover .icon { transform: translateX(var(--space-4)); }
+      [data-motion="on"] .hero-media::after { transition: opacity var(--motion-panel) ease-out; }
+      [data-motion="on"] .hero-media:not([data-image-reveal]):hover::after { opacity: 0.84; }
+      [data-motion="on"] .event-cover { transition: transform calc(2 * var(--motion-panel)) ease-out; }
+      [data-motion="on"] .event-card:has(.event-action:not([hidden])):hover .event-media:not([data-image-reveal]) .event-cover {
+        transform: scale(1.03);
+      }
     }
   </style>
 </head>
@@ -356,7 +383,7 @@
         <p>Alege un eveniment și descoperă cum poți contribui, de la pregătirea atelierelor la întâmpinarea familiilor.</p>
         <a class="button primary" href="#event-list-title">Explorează evenimentele <svg class="icon" aria-hidden="true"><use href="#arrow-down"/></svg></a>
       </div>
-      <div class="hero-media"><div class="hero-framing"><img class="hero-art" src="DS-003-assets/community-hero.webp" alt=""></div></div>
+      <div class="hero-media"><img class="hero-art" src="../DS-003-assets/community-hero.webp" alt=""></div>
     </section>
 
     <div class="wave" aria-hidden="true"><svg viewBox="0 0 1440 64" preserveAspectRatio="none" focusable="false"><path d="M0 24 C140 12 248 39 390 40 S630 16 750 20 968 44 1100 37 1310 13 1440 26 V64 H0 Z"/></svg></div>
@@ -399,20 +426,22 @@
 
   <template id="event-template">
     <li><article class="event-card">
-      <img class="event-cover" alt="">
+      <div class="event-media"><img class="event-cover" alt=""></div>
       <div class="event-body">
-        <p class="event-date"><svg class="icon" aria-hidden="true"><use href="#calendar"/></svg><time></time></p>
         <h3></h3>
+        <div class="event-meta">
+          <p class="event-date"><svg class="icon" aria-hidden="true"><use href="#calendar"/></svg><time></time></p>
+          <p class="location"><svg class="icon" aria-hidden="true"><use href="#pin"/></svg><span></span></p>
+        </div>
         <p class="description"></p>
-        <p class="location"><svg class="icon" aria-hidden="true"><use href="#pin"/></svg><span></span></p>
         <p class="status"><svg class="icon" aria-hidden="true"><use href="#check"/></svg><span></span></p>
       </div>
-      <a class="button primary event-action" href="DS-004.html" hidden>Vezi detalii <svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+      <a class="button primary event-action" href="../approved/DS-004.html" hidden>Vezi detalii <svg class="icon" aria-hidden="true"><use href="#arrow-right"/></svg></a>
     </article></li>
   </template>
   <template id="loading-template">
     <li aria-hidden="true"><div class="event-card">
-      <div class="event-cover"></div>
+      <div class="event-media"></div>
       <div class="event-body"><span class="skeleton-line"></span><span class="skeleton-line"></span></div>
     </div></li>
   </template>
@@ -422,17 +451,17 @@
       {
         title: 'Trenulețul de iarnă', day: '2026-12-19', date: '19 decembrie 2026', locality: 'Sibiu', venue: 'Sala comunitară Nord',
         description: 'Pregătește atelierele de iarnă sau întâmpină familiile înaintea călătoriei festive.',
-        availability: 'available', image: 'DS-004-assets/winter-train.webp', details: true
+        availability: 'available', image: '../DS-004-assets/winter-train.webp', details: true
       },
       {
         title: 'Pachete pentru comunitate', day: '2026-12-20', date: '20 decembrie 2026', locality: 'Mediaș', venue: 'Atelierul Stejarului',
         description: 'Sortează donațiile și pregătește pachete de iarnă alături de ceilalți voluntari.',
-        availability: 'waiting', image: 'DS-003-assets/community-packs.webp'
+        availability: 'waiting', image: '../DS-003-assets/community-packs.webp'
       },
       {
         title: 'Atelier de povești', day: '2027-01-09', date: '9 ianuarie 2027', locality: 'Dumbrăveni', venue: 'Casa cu povești',
         description: 'Aranjează colțul de lectură și materialele pentru un atelier de povești.',
-        availability: 'available', image: 'DS-003-assets/story-workshop.webp'
+        availability: 'available', image: '../DS-003-assets/story-workshop.webp'
       }
     ];
     const catalogStates = {
@@ -455,6 +484,28 @@
     const eventTemplate = document.querySelector('#event-template');
     const loadingTemplate = document.querySelector('#loading-template');
     const themeButton = document.querySelector('#theme');
+    const revealedImages = new Set();
+    const imageObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries, observer) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const media = entry.target;
+        observer.unobserve(media);
+        if (!media.isConnected) continue;
+        revealedImages.add(media.querySelector('img').src);
+        if (motionEnabled()) media.dataset.imageReveal = 'revealing';
+        else delete media.dataset.imageReveal;
+      }
+    }, { rootMargin: '0px 0px -8% 0px' }) : null;
+
+    function observeImage(media) {
+      if (!imageObserver || revealedImages.has(media.querySelector('img').src)) return;
+      media.dataset.imageReveal = 'pending';
+      imageObserver.observe(media);
+    }
+
+    document.addEventListener('animationend', event => {
+      if (event.animationName === 'image-reveal') delete event.target.dataset.imageReveal;
+    });
 
     for (const name of [...new Set(events.map(event => event.locality))].sort((a, b) => a.localeCompare(b, 'ro'))) {
       locality.add(new Option(name, name));
@@ -467,7 +518,7 @@
       themeButton.setAttribute('aria-label', label);
       themeButton.querySelector('.control-label').textContent = label;
       themeButton.querySelector('use').setAttribute('href', dark ? '#sun' : '#moon');
-      content.querySelectorAll('.event-action:not([hidden])').forEach(link => { link.href = `DS-004.html?theme=${theme}`; });
+      content.querySelectorAll('.event-action:not([hidden])').forEach(link => { link.href = `../approved/DS-004.html?theme=${theme}`; });
     }
 
     function normalize(text) {
@@ -492,7 +543,7 @@
       if (event.details) {
         const link = item.querySelector('.event-action');
         link.hidden = false;
-        link.href = `DS-004.html?theme=${document.documentElement.dataset.theme}`;
+        link.href = `../approved/DS-004.html?theme=${document.documentElement.dataset.theme}`;
         link.setAttribute('aria-label', `Vezi detalii despre ${event.title}`);
       }
       return item;
@@ -526,6 +577,7 @@
 
     function render() {
       const state = preview.value;
+      content.querySelectorAll('[data-image-reveal="pending"]').forEach(media => imageObserver?.unobserve(media));
       content.replaceChildren();
       content.setAttribute('aria-busy', String(state === 'loading'));
       if (state === 'loading') {
@@ -564,11 +616,11 @@
       const list = createGrid();
       matches.forEach(event => list.append(renderCard(event)));
       content.append(list);
+      list.querySelectorAll('.event-media').forEach(observeImage);
     }
 
     const requestedTheme = params.get('theme');
-    const preferredTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    setTheme(['light', 'dark'].includes(requestedTheme) ? requestedTheme : preferredTheme);
+    setTheme(requestedTheme === 'dark' ? 'dark' : 'light');
     themeButton.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
     const requestedState = params.get('state');
     if (Array.from(preview.options).some(option => option.value === requestedState)) preview.value = requestedState;
@@ -619,7 +671,6 @@
     let previousFrame = 0;
     let elapsed = 0;
     let panelDuration = 0;
-    let parallaxDirty = true;
 
     function motionEnabled() {
       return !paused && !motionPreference.matches;
@@ -652,8 +703,7 @@
     }
 
     function scheduleMotion() {
-      if (frame || !motionEnabled() || document.hidden) return;
-      if (!waves.some(wave => visible.has(wave.element)) && !(parallaxDirty && visible.has(heroMedia))) return;
+      if (frame || !motionEnabled() || document.hidden || !visible.size) return;
 
       frame = requestAnimationFrame(time => {
         frame = 0;
@@ -662,12 +712,6 @@
         previousFrame = time;
         elapsed += delta;
 
-        if (parallaxDirty && visible.has(heroMedia)) {
-          const bounds = heroMedia.getBoundingClientRect();
-          const offset = Math.min(bounds.height * 0.05, Math.max(0, -bounds.top) * 0.1);
-          heroMedia.style.setProperty('--parallax', offset.toFixed(1) + 'px');
-          parallaxDirty = false;
-        }
         const phase = (elapsed / (panelDuration * 22)) * 2 * Math.PI;
         const easing = 1 - Math.exp(-delta / (panelDuration * 0.56));
         for (const wave of waves) {
@@ -686,8 +730,6 @@
       motionButton.querySelector('use').setAttribute('href', enabled ? '#pause' : '#play');
       if (enabled) {
         panelDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--motion-panel'));
-        heroMedia.style.setProperty('--cinematic-duration', 150 * panelDuration + 'ms');
-        parallaxDirty = true;
         scheduleMotion();
         return;
       }
@@ -695,7 +737,7 @@
       frame = 0;
       previousFrame = 0;
       hero.classList.remove('is-entering');
-      heroMedia.style.removeProperty('--parallax');
+      document.querySelectorAll('[data-image-reveal="revealing"]').forEach(media => { delete media.dataset.imageReveal; });
       document.querySelectorAll('.reveal.has-entered').forEach(section => section.classList.remove('has-entered'));
       for (const wave of waves) {
         wave.hovered = false;
@@ -736,30 +778,19 @@
         for (const entry of entries) {
           if (entry.isIntersecting) visible.add(entry.target);
           else visible.delete(entry.target);
-          if (entry.target === heroMedia) heroMedia.classList.toggle('is-visible', entry.isIntersecting && !document.hidden);
         }
-        parallaxDirty = true;
         scheduleMotion();
       });
-      visibilityObserver.observe(heroMedia);
       waves.forEach(({element}) => visibilityObserver.observe(element));
     }
 
-    function invalidateParallax() {
-      parallaxDirty = true;
-      scheduleMotion();
-    }
-
-    window.addEventListener('scroll', invalidateParallax, { passive: true });
-    window.addEventListener('resize', invalidateParallax, { passive: true });
     document.addEventListener('visibilitychange', () => {
-      heroMedia.classList.toggle('is-visible', !document.hidden && visible.has(heroMedia));
       if (document.hidden) {
         cancelAnimationFrame(frame);
         frame = 0;
         previousFrame = 0;
       } else {
-        invalidateParallax();
+        scheduleMotion();
       }
     });
     motionPreference.addEventListener('change', updateMotion);
@@ -767,6 +798,7 @@
     if (motionEnabled()) hero.classList.add('is-entering');
     hero.querySelector('.hero-content > p').addEventListener('animationend', () => hero.classList.remove('is-entering'));
     updateMotion();
+    observeImage(heroMedia);
   </script>
 </body>
 </html>
