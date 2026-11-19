@@ -7,26 +7,26 @@
   <style>
     @font-face {
       font-family: Fraunces;
-      src: url("../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
       font-weight: 100 900;
       font-display: swap;
     }
     @font-face {
       font-family: Fraunces;
-      src: url("../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
       font-weight: 100 900;
       font-display: swap;
       unicode-range: U+0100-024F, U+1E00-1EFF;
     }
     @font-face {
       font-family: "DM Sans";
-      src: url("../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
       font-weight: 100 1000;
       font-display: swap;
     }
     @font-face {
       font-family: "DM Sans";
-      src: url("../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
       font-weight: 100 1000;
       font-display: swap;
       unicode-range: U+0100-024F, U+1E00-1EFF;
@@ -35,7 +35,6 @@
     :root {
       color-scheme: light;
       --background: #FAF6ED;
-      --section-background: #F4EADB;
       --surface: #FFFCF7;
       --surface-subtle: #F0E8DB;
       --text: #272820;
@@ -79,7 +78,6 @@
     :root[data-theme="dark"] {
       color-scheme: dark;
       --background: #171D19;
-      --section-background: var(--background);
       --surface: #202821;
       --surface-subtle: #2A342D;
       --text: #F5EEE2;
@@ -128,11 +126,11 @@
     .hero-copy { display: grid; justify-items: start; gap: var(--space-16); min-width: 0; }
     .hero-title { display: grid; gap: var(--space-12); }
     .hero-title p, .hero-copy > .hint { text-wrap: pretty; }
-    .section-wave { block-size: var(--space-32); overflow: hidden; background: var(--surface); color: var(--section-background); }
+    .section-wave { block-size: var(--space-32); overflow: hidden; background: var(--surface); color: var(--background); }
     .section-wave, .section-wave svg { border: 0; outline: none; }
     .section-wave svg { display: block; inline-size: 100%; block-size: 100%; pointer-events: none; }
     .section-wave path { fill: currentColor; }
-    .section-wave.from-opportunities { background: var(--section-background); color: var(--surface); }
+    .section-wave.from-opportunities { background: var(--background); color: var(--surface); }
     .demo { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); border-radius: var(--radius-control); background: var(--surface-subtle); color: var(--accent); font: var(--type-label); font-weight: 600; }
     .hint, dt { color: var(--text-muted); }
     .event-meta { display: flex; flex-wrap: wrap; gap: var(--space-12) var(--space-32); }
@@ -141,7 +139,7 @@
     .event-meta .icon { color: var(--accent); }
     dt, .hint { font: var(--type-label); }
     dd { font-weight: 600; }
-    .opportunities { background: var(--section-background); }
+    .opportunities { background: var(--background); }
     .shift-list { display: grid; gap: var(--space-24); padding: 0; margin: 0; list-style: none; }
     .card {
       background: var(--surface);
@@ -303,10 +301,6 @@
     .schedule-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-16); }
     .button-group { display: flex; flex-wrap: wrap; gap: var(--space-8); }
     .schedule-heading .button[aria-pressed="true"] { background: var(--surface-subtle); }
-    :root[data-theme="light"] .schedule-heading .button[aria-pressed="true"] {
-      text-decoration: underline;
-      text-underline-offset: var(--space-4);
-    }
     .date-group { display: grid; gap: var(--space-12); }
     .date-title { font: var(--type-label); font-weight: 600; color: var(--text-muted); }
     .shift-meta { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-24); }
@@ -343,7 +337,6 @@
       .agenda-content { gap: var(--space-48); }
     }
   </style>
-  <link rel="stylesheet" href="../carousel.css">
 </head>
 <body>
   <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -439,7 +432,6 @@
           <select id="preview-state">
             <option value="default">Program viitor</option>
             <option value="urgent">Ofertă din lista de așteptare</option>
-            <option value="multiple-offers">Mai multe oferte de răspuns</option>
             <option value="live-offer">Tură în curs și ofertă de răspuns</option>
             <option value="offer-race">Oferta expiră în timpul răspunsului</option>
             <option value="offer-ineligible">Eligibilitate reevaluată la acceptare</option>
@@ -530,7 +522,6 @@
     </div>
   </template>
 
-  <script src="../carousel.js"></script>
   <script>
     // The clock, signups and scans below are in-memory fixtures for design review.
     const params = new URLSearchParams(location.search);
@@ -633,7 +624,6 @@
       if (scenario === 'single') state.shifts = [upcoming[0]];
       if (scenario === 'many') {
         state.shifts.push(
-          fixture('decor', '19', '17:00', '18:30', 'Strângerea decorațiunilor'),
           fixture('setup', '21', '10:00', '12:00', 'Amenajarea sălii'),
           fixture('supplies', '22', '14:00', '16:00', 'Distribuirea materialelor'),
           fixture('tidy', '23', '17:00', '19:00', 'Strângerea materialelor')
@@ -644,18 +634,13 @@
           'Pregătirea materialelor pentru atelierele creative și întâmpinarea grupurilor de voluntari', 'confirmed', {
             event: 'Trenulețul de iarnă pentru copii, familii și voluntarii din comunitate',
             place: 'Centrul comunitar de activități pentru familii și voluntari din Dumbrăveni'
-          }), upcoming[1]];
+          })];
       }
-      if (['urgent', 'multiple-offers', 'live-offer', 'offer-race', 'offer-ineligible', 'success'].includes(scenario)) {
+      if (['urgent', 'live-offer', 'offer-race', 'offer-ineligible', 'success'].includes(scenario)) {
         const offered = upcoming[1];
         offered.status = scenario === 'success' ? 'confirmed' : 'offer';
         offered.deadline = Math.min(at('19', '00:50') + 12 * 60 * minute, offered.start);
         offered.justConfirmed = scenario === 'success';
-      }
-      if (scenario === 'multiple-offers') {
-        state.shifts.push(fixture('second-offer', '21', '16:00', '18:00', 'Sortarea donațiilor', 'offer', {
-          deadline: at('19', '13:20')
-        }));
       }
       if (['scan', 'on-site', 'waiting-on-site', 'present', 'live-offer', 'break', 'reentry', 'outside'].includes(scenario)) {
         const shift = fixture('live-shift', '19', '10:00', '15:00', 'Sprijin logistic', 'confirmed', {
@@ -892,7 +877,7 @@
       content.append(card);
     }
 
-    function displayGroups(shifts, history, visibleCards) {
+    function displayGroups(shifts) {
       const days = new Map();
       for (const shift of shifts) {
         const day = date(shift.start);
@@ -915,20 +900,10 @@
         list.append(...entries.map(shift => buildCard(shift)));
         group.append(label, list);
         content.append(group);
-        if (!history && !entries.some(shift => ['proposed', 'review'].includes(shift.status))) {
-          const initialCard = Array.from(list.children).find(card => visibleCards.has(card.dataset.shiftId));
-          addCardCarousel(list, label.id, initialCard);
-        }
       }
     }
 
-    function render(preservePosition = true) {
-      const visibleCards = new Set();
-      if (preservePosition && cardCarouselMobile.matches) {
-        for (const list of content.querySelectorAll('.card-carousel-list')) {
-          visibleCards.add(activeCarouselCard(list).dataset.shiftId);
-        }
-      }
+    function render() {
       refreshStatuses();
       const current = model.shifts.filter(shift => shift.status === 'confirmed' && inWindow(shift))
         .sort((left, right) => left.start - right.start);
@@ -970,7 +945,7 @@
         (history === (past.includes(shift.status) || shift.end < model.now)))
         .sort((left, right) => history ? right.start - left.start : left.start - right.start);
       if (shifts.length) {
-        displayGroups(shifts, history, visibleCards);
+        displayGroups(shifts);
       } else if (history) {
         showNotice('Istoricul este gol', 'Aici vor apărea turele după încheiere.',
           action('Vezi turele viitoare', () => setView('upcoming', true)));
@@ -997,14 +972,13 @@
       preview.value = scenario;
       feedback.hidden = true;
       announcement.textContent = '';
-      render(false);
+      render();
       if (scenario === 'success') notify('Oferta a fost acceptată. Înscrierea este confirmată.');
     }
 
     function setView(view, focus) {
-      const sameView = model.view === view;
       model.view = view;
-      render(sameView);
+      render();
       if (focus) document.querySelector('[data-view="' + view + '"]').focus();
     }
 

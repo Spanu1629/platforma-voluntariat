@@ -167,7 +167,7 @@ by the presence of this file alone. Missing capabilities block their steps.
 - Visual approval in chat (2026-11-19): “Aprob designul final al DS-003 pentru VolunTrack, inclusiv animațiile și bara laterală de hover.”
 - The project owner requested `approved` for this locally reviewed revision. Figma publication and comparison remain pending.
 
-### DS-003 și DS-004 · revizii finale aprobate, 2026-11-19
+### DS-003 și DS-004 · reviziile aprobate înaintea caruselelor, 2026-11-19
 
 Aprobare vizuală în conversație, 2026-11-19. „Aprob versiunile actuale ale DS-003 și DS-004, inclusiv noul sistem de filtre, animațiile și designul aerisit.”
 
@@ -175,8 +175,8 @@ Tema luminoasă implicită este aprobată prin [D-010](../agents/DECISIONS.md#d-
 
 | Ecran | Machetă aprobată | SHA-256 la revizuire | SHA-256 la calea din registru la aprobarea inițială |
 |---|---|---|---|
-| DS-003 | [Evenimente disponibile](mocks/approved/DS-003.html) | `fa53967ceaba76ba845418754c0ba70c0b7f42100ed01b96d0aa977dfbadefd1` | `9074a30d3c687c1825f5bb12566109f2e8ece40c5cf45de6e334a7d87bb9a4ea` |
-| DS-004 | [Detalii eveniment și înscriere](mocks/approved/DS-004.html) | `890bf82cf0aca380b90eb049dde623ce7b3a07368446c207fbfde26ad80c7221` | `a5bcdeab2b4a92f612f02ecb91816e60654be2d5fd8a1230c0d80b531094f371` |
+| DS-003 | [Evenimente disponibile](mocks/archive/pre-mobile-carousels/DS-003.html) | `fa53967ceaba76ba845418754c0ba70c0b7f42100ed01b96d0aa977dfbadefd1` | `9074a30d3c687c1825f5bb12566109f2e8ece40c5cf45de6e334a7d87bb9a4ea` |
+| DS-004 | [Detalii eveniment și înscriere](mocks/archive/pre-mobile-carousels/DS-004.html) | `890bf82cf0aca380b90eb049dde623ce7b3a07368446c207fbfde26ad80c7221` | `a5bcdeab2b4a92f612f02ecb91816e60654be2d5fd8a1230c0d80b531094f371` |
 
 Amprentele de revizie se calculează din ieșirea `sha256sum` pentru `DESIGN.md`, machetă, imaginile WebP și fonturile WOFF2 folosite, ordonate după calea relativă la rădăcina repo-ului. Trecerea din `mocks/drafts/` în `mocks/2026-11-19/` a schimbat calea din manifest. Fișierele HTML, imaginile, fonturile și capturile au fost verificate după mutare. Registrul indică locația curentă a reviziilor finale.
 
@@ -186,30 +186,30 @@ Au fost verificate căutarea și filtrele combinate în DS-003, resetarea, indic
 
 Verificarea animațiilor a acoperit dezvăluirea unică la intrarea în viewport, revenirea prin scroll, filtrarea, zoomul de 1,03× pe cardul interactiv, gradientul la hover și pauza animațiilor. [DS-003 pe desktop](screens/review/2026-11-19/DS-003.motion.desktop.light.webm) · [DS-004 pe mobil](screens/review/2026-11-19/DS-004.motion.mobile.dark.webm)
 
-### DS-005 · Programul meu, 2026-11-19
+### DS-005 · Programul meu înaintea caruselelor, 2026-11-19
 
-- Statut `approved`. Aprobare vizuală în conversație, 2026-11-19. „Aprob designul actual al DS-005. Toate cele trei mock-uri, DS-003, DS-004 și DS-005, sunt aprobate pentru această etapă.” Planul și [D-011](../agents/DECISIONS.md#d-011--temă-luminoasă-implicită-în-ds-005) sunt aprobate. [Macheta HTML interactivă](mocks/approved/DS-005.html)
+- Statut `approved`. Aprobare vizuală în conversație, 2026-11-19. „Aprob designul actual al DS-005. Toate cele trei mock-uri, DS-003, DS-004 și DS-005, sunt aprobate pentru această etapă.” Planul și [D-011](../agents/DECISIONS.md#d-011--temă-luminoasă-implicită-în-ds-005) sunt aprobate. [Macheta HTML interactivă](mocks/archive/pre-mobile-carousels/DS-005.html)
 - Revizia locală are SHA-256 `2cf092a5a0b42606d998f1362f2598119e1a5aca30b9070898eec33975df6222`, calculat din ieșirea `sha256sum` pentru `DESIGN.md`, machetă și fonturile WOFF2 folosite, în ordinea căilor relative.
 - Inventarul aprobat acoperă cardurile de tură, selectorul de perioadă, etichetele de stare, oferta cu termen, dialogurile de confirmare și panoul de prezență. DS-005 compune aceste elemente într-o agendă verticală și afișează acțiunile turei curente înaintea detaliilor de pontaj.
 - Antetul, controalele, cardurile și regulile de mișcare sunt preluate din DS-004. Machetele aprobate definesc aceste reguli în HTML, iar DS-005 folosește aceleași fișiere de font. Comparația în browser a verificat antetul și cardul față de DS-004, precum și tokenurile, controalele și etichetele de stare față de DS-003 și DS-004.
 - Verificare locală cu Playwright 1.65.1 și Chromium 159.0.8154.6 la 320 × 720 și 1440 × 900 în ambele teme, plus șase lățimi intermediare. Scenariile folosesc date fictive și un ceas controlat din „Verifică stările machetei”.
 - Verificările au acoperit ofertele, inclusiv expirarea în timpul acceptării, repartizarea, retragerea, QR-ul simulat pentru sosire, plecare și revenire, repetarea scanării, confirmarea la locație, închiderea pauzei la check-out, orele efectuate și stările pontajului. Au fost verificate tastatura, focusul, contrastul, dimensiunile tactile, mișcarea redusă și stările empty, loading, error, success, text lung, una și mai multe ture.
-- Previzualizări integrale. [Desktop light](screens/DS-005.light.png) · [Desktop dark](screens/DS-005.dark.png) · [Mobil light](screens/DS-005.light.mobile.png) · [Mobil dark](screens/DS-005.dark.mobile.png)
+- Previzualizări integrale. [Desktop light](screens/archive/pre-mobile-carousels/DS-005.light.png) · [Desktop dark](screens/archive/pre-mobile-carousels/DS-005.dark.png) · [Mobil light](screens/archive/pre-mobile-carousels/DS-005.light.mobile.png) · [Mobil dark](screens/archive/pre-mobile-carousels/DS-005.dark.mobile.png)
 - Scenarii. [Ofertă de răspuns](screens/review/2026-11-19/DS-005.light.offer.png) · [Istoric și pontaje](screens/review/2026-11-19/DS-005.light.history.png) · [Pauză în curs](screens/review/2026-11-19/DS-005.dark.mobile.break.png) · [Dialog QR](screens/review/2026-11-19/DS-005.dark.mobile.qr.png) · [Confirmare la locație](screens/review/2026-11-19/DS-005.light.mobile.confirmation.png)
 - Aprobarea acoperă macheta locală. Publicarea în Figma este o etapă separată.
 
 
-### Organizarea reviziilor finale
+### Organizarea reviziilor anterioare
 
-Machetele curente sunt în `mocks/approved/`. Fișierele WebP, WOFF2 și licențele comune rămân în directoarele de resurse din `mocks/`. Reviziile anterioare sunt în `mocks/archive/`, inclusiv [draftul DS-003 dinaintea filtrelor compacte](mocks/archive/DS-003.before-filters.html). Capturile finale păstrează căile standard `screens/<DS-id>.<light|dark>.png`. Capturile istorice sunt în `screens/archive/`, iar comparația și materialele de verificare sunt în `screens/review/2026-11-19/`.
+Machetele și capturile imediat anterioare caruselelor sunt în subdirectoarele `archive/pre-mobile-carousels/`. Fișierele WebP, WOFF2 și licențele comune rămân în directoarele de resurse din `mocks/`. Reviziile mai vechi sunt în `mocks/archive/`, inclusiv [draftul DS-003 dinaintea filtrelor compacte](mocks/archive/DS-003.before-filters.html). Capturile finale păstrează căile standard `screens/<DS-id>.<light|dark>.png`. Capturile istorice sunt în `screens/archive/`, iar comparația și materialele de verificare sunt în `screens/review/2026-11-19/`.
 
-Amprentele de mai sus păstrează căile și conținutul din momentul aprobării locale. Următoarele amprente folosesc manifestul ordonat la noile căi. Modificările în machete se limitează la referințele relative necesare mutării.
+Amprentele de mai sus păstrează căile și conținutul din momentul aprobării locale. Următoarele amprente folosesc căile din `mocks/approved/` de dinainte de arhivare. La arhivare s-au adaptat doar referințele relative către resurse.
 
-| Ecran | SHA-256 la calea curentă |
+| Ecran | SHA-256 la calea dinainte de arhivare |
 |---|---|
-| [DS-003](mocks/approved/DS-003.html) | `cef0a5d5eff2948ccaf16109f7b34297a55c7335e825e03ba392daaaaf264b38` |
-| [DS-004](mocks/approved/DS-004.html) | `881a6aac8484b860df0308d33b1efefdb6e93b98e61bd65d2b203662bbe03516` |
-| [DS-005](mocks/approved/DS-005.html) | `47bc53374cb869a4d65d9757eaa5504105a154c0ee5af2cf2ecae5e8829c5290` |
+| [DS-003](mocks/archive/pre-mobile-carousels/DS-003.html) | `cef0a5d5eff2948ccaf16109f7b34297a55c7335e825e03ba392daaaaf264b38` |
+| [DS-004](mocks/archive/pre-mobile-carousels/DS-004.html) | `881a6aac8484b860df0308d33b1efefdb6e93b98e61bd65d2b203662bbe03516` |
+| [DS-005](mocks/archive/pre-mobile-carousels/DS-005.html) | `47bc53374cb869a4d65d9757eaa5504105a154c0ee5af2cf2ecae5e8829c5290` |
 
 După reorganizare, Playwright 1.65.1 și Chromium 159.0.8154.6 au verificat traseul DS-005 → DS-003 → DS-004 cu păstrarea temei, resursele, stările interactive, animațiile, tastatura, focusul, contrastul și dimensiunile tactile. Cele 12 capturi regenerate la 320 × 720 și 1440 × 900, în light și dark, au aceleași dimensiuni ca referințele și diferă pe cel mult 0,064% dintre pixeli. Inspecția vizuală a confirmat aspectul. Cele 20 de imagini din comparație și cele două clipuri WebM se încarcă. Capturile păstrate, clipurile, resursele și tokenurile au trecut verificarea de integritate.
 
@@ -220,18 +220,23 @@ Aprobările locale de mai sus consemnează reviziile vizuale descrise în aceast
 
 Înainte de implementarea fluxurilor, revizuirile viitoare trebuie să alinieze catalogul și detaliile la solicitarea de participare și repartizarea propusă de coordonator. DS-004 demonstrează înscrierea directă din locul liber și intrarea directă pe lista de așteptare. Revizia viitoare trebuie să arate solicitarea la nivel de eveniment și faptul că acceptarea unei propuneri pentru o poziție ocupată înscrie voluntarul eligibil în coada FIFO a combinației exacte rol–tură. DS-005 trebuie să prezinte oferta ca repartizare deja autorizată și să alinieze retragerea la pragul de o oră și validarea pontajelor complete la fluxul automat. Trebuie actualizate și scenariile de instruire fără expirare automată, intervalul dintre ture și pauzele. Revizuirile vor urma procedura de aprobare vizuală. [Brief-ul funcțional](../agents/PROJECT-BRIEF.md) · [Q-014](../agents/OPEN-QUESTIONS.md#q-014--cum-se-leagă-lista-de-așteptare-fifo-de-repartizarea-decisă-de-coordonator)
 
-### Carusele mobile și contrast light · draft pentru review local, 2026-11-19
+### Carusele mobile și contrast light · aprobare vizuală locală, 2026-11-19
 
-Registrul indică drafturile pentru review. Fișierele și capturile aprobate anterior
-se păstrează la căile lor, cu amprentele istorice raportate la versiunea specificației
-din momentul aprobării. D-018 și D-019 consemnează regulile aprobate pentru
-carusele și pentru `section-background`. [Deciziile](../agents/DECISIONS.md#d-018--carusele-pentru-colecții-de-carduri-pe-mobil)
+Aprobare vizuală în conversație, 2026-11-19. „Aprob vizual reviziile DS-003,
+DS-004 și DS-005 din commitul `0e05e41`, inclusiv caruselele mobile și noul
+fundal crem.”
 
-| Draft interactiv | SHA-256 al reviziei | Mobil 320 × 720 | Desktop 1440 × 900 |
+La cererea responsabilului proiectului, registrul marchează aceste revizii
+locale drept `approved`. Machetele promovate sunt identice octet cu octet cu
+drafturile din `0e05e41`. Amprentele de mai jos includ căile noi din
+`mocks/approved/`. Capturile aprobate au fost mutate la căile standard.
+[D-018 și D-019](../agents/DECISIONS.md#d-018--carusele-pentru-colecții-de-carduri-pe-mobil)
+
+| Machetă aprobată | SHA-256 la calea aprobată | Mobil 320 × 720 | Desktop 1440 × 900 |
 |---|---|---|---|
-| [DS-003](mocks/drafts/DS-003.html) | `8f31f66392dfee2714246781c0dba6de980a7f18459e350352766ea00eda128e` | [Light](screens/review/mobile-carousels/DS-003.light.mobile.png) · [Dark](screens/review/mobile-carousels/DS-003.dark.mobile.png) | [Light](screens/review/mobile-carousels/DS-003.light.png) · [Dark](screens/review/mobile-carousels/DS-003.dark.png) |
-| [DS-004](mocks/drafts/DS-004.html) | `392caadc55efdcac31a6fbd9e44a3da0905c2e85e2958588b9e9a0ce12e49fd6` | [Light](screens/review/mobile-carousels/DS-004.light.mobile.png) · [Dark](screens/review/mobile-carousels/DS-004.dark.mobile.png) | [Light](screens/review/mobile-carousels/DS-004.light.png) · [Dark](screens/review/mobile-carousels/DS-004.dark.png) |
-| [DS-005](mocks/drafts/DS-005.html) | `b0d0eb019819194aa643b753cb8111f290bcef1409578ec74c7f3d38e135a1b4` | [Light](screens/review/mobile-carousels/DS-005.light.mobile.png) · [Dark](screens/review/mobile-carousels/DS-005.dark.mobile.png) | [Light](screens/review/mobile-carousels/DS-005.light.png) · [Dark](screens/review/mobile-carousels/DS-005.dark.png) |
+| [DS-003](mocks/approved/DS-003.html) | `fed5842e3ed38d7a9720a5a762d834972e0ca92f62572bfb023fd8a0e0fb0fcc` | [Light](screens/DS-003.light.mobile.png) · [Dark](screens/DS-003.dark.mobile.png) | [Light](screens/DS-003.light.png) · [Dark](screens/DS-003.dark.png) |
+| [DS-004](mocks/approved/DS-004.html) | `f4707de4e4c7c5d6fc6be4639ab7cd7ce35001ab87944dc3c4a798b340e814ea` | [Light](screens/DS-004.light.mobile.png) · [Dark](screens/DS-004.dark.mobile.png) | [Light](screens/DS-004.light.png) · [Dark](screens/DS-004.dark.png) |
+| [DS-005](mocks/approved/DS-005.html) | `e6b36eae58fd92fcfcb8c952ada10dc6152a128999f4518cf1c81f302080861a` | [Light](screens/DS-005.light.mobile.png) · [Dark](screens/DS-005.dark.mobile.png) | [Light](screens/DS-005.light.png) · [Dark](screens/DS-005.dark.png) |
 
 Amprentele folosesc ieșirea `sha256sum` pentru `DESIGN.md`, HTML, CSS și JS
 comune și resursele referite, sortate după calea relativă la rădăcina repo-ului.
@@ -252,5 +257,33 @@ Capturi de scenariu. [Filtre și focus în DS-003](screens/review/mobile-carouse
 [Oferte multiple](screens/review/mobile-carousels/DS-005.light.mobile.multiple-offers.png) ·
 [Istoric vertical](screens/review/mobile-carousels/DS-005.dark.mobile.history.png)
 
-Aprobarea vizuală locală este în așteptare. Publicarea și verificarea în Figma
-au fost amânate la cererea responsabilului proiectului.
+### Pregătirea publicării în Figma
+
+Sursa publicării este revizia locală aprobată din tabel. Destinația de review
+este fișierul existent din Q-008, cheia `QAC75bztvLOiXcU7oKRHEe`. Registrul local
+consemnează doar aprobarea repo-ului. Accesul reviewerilor, nodurile și
+publicarea sunt de verificat după autorizarea explicită.
+[Destinația de review](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe)
+
+Pentru fiecare ecran, folosește câte un cadru pentru light și dark la
+320 × 720 și 1440 × 900. Numește cadrele
+`<DS-id> · <ecran> · <temă> · <viewport> · <stare>`.
+Stările folosesc scenariile existente din machete și aceleași tokenuri.
+Pentru starea implicită sunt pregătite local 12 fișiere HTML autonome, cu
+CSS, imagini și fonturi integrate. Randarea fiecăruia în Chromium este
+identică pixel cu pixel cu captura aprobată. Acesta este un rezultat local
+de verificare, iar cadrele Figma se verifică după import.
+
+| Ecran | Stări de conținut | Stări interactive și prioritare |
+|---|---|---|
+| DS-003 | `default` (inclusiv mai multe carduri), `single`, `empty`, `loading`, `error`, `long` | Hover pe cardul interactiv, focus și apăsare în navigare, control la limită, filtre deschise și căutare cu rezultate |
+| DS-004 | `default`, `single`, `many`, `empty`, `loading`, `error`, `long`, `confirmed`, `queued` | Hover, focus și apăsare pe acțiunea cardului, poziție indisponibilă și acordeon deschis |
+| DS-005 | `default`, `single`, `many`, `empty`, `loading`, `error`, `long`, `success` | Hover, focus, apăsare, control la limită, `live-offer`, `multiple-offers`, `history` și dialogul QR |
+
+Pregătește și celelalte stări din DOM-ul randat al machetei, cu CSS, imagini
+WebP și fonturi WOFF2 integrate pentru import static. După autorizare, verifică
+accesul și capabilitățile pe destinația confirmată, publică variantele și
+înregistrează pentru fiecare cadrul, legătura, data și amprenta repo.
+Compară capturile Figma cu cele Chromium la aceleași dimensiuni și cere
+confirmarea reviziei publicate după inspecție.
+[Procedura Codex](../agents/CODEX.md#publish-review-approve-implement-republish)

@@ -23,17 +23,17 @@
 ## PATTERN-002 · Dezvăluirea imaginii o singură dată la intrarea în viewport
 - **Status:** candidate
 - **How:** Observă cadrul cu `IntersectionObserver` și oprește observarea la prima intrare. Retrage masca printr-o transformare CSS și păstrează imaginea fixă în cadru. Afișează direct imaginea când mișcarea este redusă.
-- **Example:** [Revizia DS-003](../design/mocks/approved/DS-003.html) și [revizia DS-004](../design/mocks/approved/DS-004.html).
+- **Example:** [Revizia DS-003](../design/mocks/archive/pre-mobile-carousels/DS-003.html) și [revizia DS-004](../design/mocks/archive/pre-mobile-carousels/DS-004.html).
 
 ## PATTERN-003 · Panou de filtre pliabil cu focus gestionat
 - **Status:** candidate
 - **How:** Folosește un buton cu `aria-expanded` și `aria-controls`. La închidere, mută focusul din panou înapoi pe buton și scoate imediat controalele din navigare cu `inert`, în timp ce panoul se restrânge.
-- **Example:** [Filtrele din revizia DS-003](../design/mocks/approved/DS-003.html).
+- **Example:** [Filtrele din revizia DS-003](../design/mocks/archive/pre-mobile-carousels/DS-003.html).
 
 ## PATTERN-004 · Ceas controlat pentru stările temporizate ale machetelor
 - **Status:** candidate
 - **How:** Fixează ora în fiecare scenariu fictiv și oferă un control de avansare în zona de revizuire. Folosește același ceas pentru termene, intervalele de prezență și pauze, astfel încât verificarea vizuală și cea de interacțiune să fie repetabile.
-- **Example:** [Programul și scenariile DS-005](../design/mocks/approved/DS-005.html).
+- **Example:** [Programul și scenariile DS-005](../design/mocks/archive/pre-mobile-carousels/DS-005.html).
 
 ## PATTERN-005 · Proiect Compose temporar pentru testele de integrare
 - **Status:** candidate

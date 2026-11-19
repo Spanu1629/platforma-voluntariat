@@ -7,26 +7,26 @@
   <style>
     @font-face {
       font-family: Fraunces;
-      src: url("../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
       font-weight: 100 900;
       font-display: swap;
     }
     @font-face {
       font-family: Fraunces;
-      src: url("../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
       font-weight: 100 900;
       font-display: swap;
       unicode-range: U+0100-024F, U+1E00-1EFF;
     }
     @font-face {
       font-family: "DM Sans";
-      src: url("../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
       font-weight: 100 1000;
       font-display: swap;
     }
     @font-face {
       font-family: "DM Sans";
-      src: url("../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
+      src: url("../../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
       font-weight: 100 1000;
       font-display: swap;
       unicode-range: U+0100-024F, U+1E00-1EFF;
@@ -35,7 +35,6 @@
     :root {
       color-scheme: light;
       --background: #FAF6ED;
-      --section-background: #F4EADB;
       --surface: #FFFCF7;
       --surface-subtle: #F0E8DB;
       --text: #272820;
@@ -79,7 +78,6 @@
     :root[data-theme="dark"] {
       color-scheme: dark;
       --background: #171D19;
-      --section-background: var(--background);
       --surface: #202821;
       --surface-subtle: #2A342D;
       --text: #F5EEE2;
@@ -144,11 +142,11 @@
     .hero-title { display: grid; gap: var(--space-12); }
     .hero-title h1 span { color: var(--primary); }
     .hero-title p, .hero-copy > .hint { text-wrap: pretty; }
-    .section-wave { block-size: var(--space-32); overflow: hidden; background: var(--surface); color: var(--section-background); }
+    .section-wave { block-size: var(--space-32); overflow: hidden; background: var(--surface); color: var(--background); }
     .section-wave, .section-wave svg { border: 0; outline: none; }
     .section-wave svg { display: block; inline-size: 100%; block-size: 100%; pointer-events: none; }
     .section-wave path { fill: currentColor; }
-    .section-wave.from-opportunities { background: var(--section-background); color: var(--surface); }
+    .section-wave.from-opportunities { background: var(--background); color: var(--surface); }
     .demo { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); border-radius: var(--radius-control); background: var(--surface-subtle); color: var(--accent); font: var(--type-label); font-weight: 600; }
     .hint, dt { color: var(--text-muted); }
     .event-meta { display: flex; flex-wrap: wrap; gap: var(--space-12) var(--space-32); }
@@ -157,7 +155,7 @@
     .event-meta .icon { color: var(--accent); }
     dt, .hint { font: var(--type-label); }
     dd { font-weight: 600; }
-    .opportunities { background: var(--section-background); }
+    .opportunities { background: var(--background); }
     .opportunities .frame, .participation { display: grid; gap: var(--space-24); padding-block: var(--space-32) var(--space-48); }
     #shift-results, .section-heading { display: grid; gap: var(--space-8); }
     .shift-list { display: grid; gap: var(--space-24); padding: 0; margin: 0; list-style: none; }
@@ -408,7 +406,6 @@
       .steps { --steps-gap: var(--space-32); }
     }
   </style>
-  <link rel="stylesheet" href="../carousel.css">
 </head>
 <body>
   <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -461,7 +458,7 @@
           <a class="button primary hero-link" href="#shifts-title">Vezi turele <svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"/></svg></a>
           <p class="hint">Inspirat de „Trenulețul Moșului”. Datele fictive sunt separate de ediția reală din 2025.</p>
         </div>
-        <div class="hero-media"><img class="hero-art" src="../DS-004-assets/winter-train.webp" alt=""></div>
+        <div class="hero-media"><img class="hero-art" src="../../DS-004-assets/winter-train.webp" alt=""></div>
       </div>
     </section>
 
@@ -571,7 +568,6 @@
     </div>
   </template>
 
-  <script src="../carousel.js"></script>
   <script>
     // The controls swap local fixtures and simulate outcomes for visual review.
     const params = new URLSearchParams(location.search);
@@ -670,9 +666,7 @@
         const placeholders = document.createElement('div');
         placeholders.className = 'shift-list';
         shifts.forEach(() => placeholders.append(placeholder.content.cloneNode(true)));
-        placeholders.setAttribute('aria-hidden', 'true');
         results.append(message, placeholders);
-        wrapCarouselList(placeholders);
         return;
       }
       const notice = document.createElement('div');
@@ -682,7 +676,7 @@
         notice.querySelector('button').addEventListener('click', () => {
           preview.value = 'default';
           render('default');
-          results.querySelector('.shift-card button:not(:disabled)').focus();
+          results.querySelector('button').focus();
         });
       } else {
         notice.innerHTML = '<h3>Încă nu sunt ture publicate</h3><p>Revino la acest eveniment pentru a vedea programul după publicare.</p>';
@@ -704,7 +698,7 @@
       const samples = {
         single: [extraShifts[1]],
         many: [...shifts, ...extraShifts],
-        long: [{ ...shifts[0], role: 'Pregătirea materialelor pentru atelierele creative de iarnă și întâmpinarea grupurilor de copii' }, ...shifts.slice(1)],
+        long: [{ ...shifts[0], role: 'Pregătirea materialelor pentru atelierele creative de iarnă și întâmpinarea grupurilor de copii' }],
         confirmed: [{ ...shifts[0], status: 'confirmed' }, ...shifts.slice(1)],
         queued: [shifts[0], { ...shifts[1], status: 'queued' }, shifts[2]]
       };
@@ -713,7 +707,6 @@
       list.setAttribute('role', 'list');
       (samples[state] ?? shifts).forEach((shift, index) => list.append(createShift(shift, index)));
       results.append(list);
-      addCardCarousel(list, 'shifts-title');
     }
 
     const requestedTheme = params.get('theme');
