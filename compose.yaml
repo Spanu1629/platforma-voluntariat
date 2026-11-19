@@ -17,5 +17,17 @@ services:
       retries: 15
       start_period: 10s
 
+  migrate:
+    build:
+      context: ./backend
+      target: migrate
+    command: ["npm", "run", "db:migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://voluntrack_migrator:${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}@db:5432/voluntrack
+      SHADOW_DATABASE_URL: postgresql://voluntrack_migrator:${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}@db:5432/voluntrack_shadow
+
 volumes:
   postgres-data:
