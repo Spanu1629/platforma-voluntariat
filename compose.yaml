@@ -41,6 +41,7 @@ services:
     ports:
       - "127.0.0.1:${VOLUNTRACK_PORT:-3000}:3000"
     healthcheck:
+      # C-001 in docs/agents/CONTRACTS.md
       test:
         - CMD
         - node

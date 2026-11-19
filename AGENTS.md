@@ -97,7 +97,7 @@ Approved project scope is in `docs/agents/PROJECT-BRIEF.md`; partner-specific de
 
 ## 2. Stack and commands
 The approved stack and architecture are in D-003 and D-005. Docker is required locally and for PostgreSQL integration tests. Managed PostgreSQL is permitted for public deployment under D-009.
-The backend scaffold uses Node.js 24. From `backend/`, run `npm ci`, `npm run prisma:generate`, `npm run build` (generation and TypeScript compilation), and `npm start` (compiled NestJS bootstrap). Application test and lint commands remain open under Q-003, and release commands under Q-004.
+The backend uses Node.js 24. Run `npm ci`, `npm run prisma:generate` and `npm run build` from `backend/`. Run `docker compose config --quiet`, `docker compose up -d --build --wait` and `bash backend/test/run-integration.sh` from the repo root. See the [README](README.md#pornirea-backendului) for environment setup and the explicit historical seed command. Frontend and standalone lint commands remain open under Q-003, and release commands under Q-004.
 Mock screenshots use Playwright and Chromium for DS-004 at the [reference viewports](docs/design/DESIGN.md#breakpoints--window-sizes). The application screenshot procedure remains open (Q-007).
 Ledger check (run during setup):
 
@@ -107,14 +107,15 @@ python3 docs/agents/tools/ledger-lint.py
 ```
 
 ## 3. Layout
-- `backend/`: NestJS entry point, npm lockfile, TypeScript configuration and Prisma generator.
+- `backend/`: NestJS and Prisma source, migrations, historical seed and integration tests.
+- `compose.yaml`: local PostgreSQL, one-shot migrator and backend.
+- `.github/workflows/backend-ci.yml`: backend build and integration checks.
 - `.claude/`: Claude plan/build skills and planner/builder roles.
 - `.agents/skills/`: Codex plan/build skills.
 - `.codex/agents/`: Codex planner/builder roles.
 - `docs/agents/`: knowledge ledger, project brief, runtime mapping and setup report.
 - `docs/design/`: design rules, Codex companion, registry, mocks and screenshot directories.
 - `CONTEXT.md`: project vocabulary.
-The backend scaffold is in place. Database models, migrations and Docker configuration are planned.
 
 ## 4. Rules for this repo
 - Team, ClickUp and Slack addons are declined. No ticket workflow is installed.

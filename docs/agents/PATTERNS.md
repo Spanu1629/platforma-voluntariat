@@ -10,6 +10,7 @@
 - PATTERN-002 · Dezvăluirea imaginii o singură dată la intrarea în viewport · candidate
 - PATTERN-003 · Panou de filtre pliabil cu focus gestionat · candidate
 - PATTERN-004 · Ceas controlat pentru stările temporizate ale machetelor · candidate
+- PATTERN-005 · Proiect Compose temporar pentru testele de integrare · candidate
 
 ---
 
@@ -32,3 +33,8 @@
 - **Status:** candidate
 - **How:** Fixează ora în fiecare scenariu fictiv și oferă un control de avansare în zona de revizuire. Folosește același ceas pentru termene, intervalele de prezență și pauze, astfel încât verificarea vizuală și cea de interacțiune să fie repetabile.
 - **Example:** [Programul și scenariile DS-005](../design/mocks/approved/DS-005.html).
+
+## PATTERN-005 · Proiect Compose temporar pentru testele de integrare
+- **Status:** candidate
+- **How:** Pornește serviciile într-un proiect Compose cu nume unic, credențiale temporare și volum propriu. Rulează migrările și testele cu date sintetice în acel proiect și elimină la final doar containerele și volumul lui.
+- **Example:** [Verificările fundației backend](../../backend/test/run-integration.sh).
