@@ -30,6 +30,7 @@
 ## D-002 · Confirm exact requirements with the partner
 - **Status:** approved
 - **Date:** 2026-11-06
+- **Confirmed:** 2026-11-19
 - **Rule:** Confirm exact business rules and requirements with the partner organization before implementing dependent behavior.
 - **Why:** The application serves a real volunteer organization; its exact business rules are not yet confirmed.
 - **Rejected:** No alternatives were supplied or evaluated.

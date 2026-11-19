@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: voluntrack_bootstrap
+      POSTGRES_DB: voluntrack
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      MIGRATOR_PASSWORD: ${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}
+      APP_PASSWORD: ${APP_PASSWORD:?Set APP_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/docker/postgres/init.sh:/docker-entrypoint-initdb.d/10-voluntrack.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
+
+  migrate:
+    build:
+      context: ./backend
+      target: migrate
+    command: ["npm", "run", "db:migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://voluntrack_migrator:${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}@db:5432/voluntrack
+      SHADOW_DATABASE_URL: postgresql://voluntrack_migrator:${MIGRATOR_PASSWORD:?Set MIGRATOR_PASSWORD}@db:5432/voluntrack_shadow
+
+  backend:
+    build:
+      context: ./backend
+      target: runtime
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://voluntrack_app:${APP_PASSWORD:?Set APP_PASSWORD}@db:5432/voluntrack
+    ports:
+      - "127.0.0.1:${VOLUNTRACK_PORT:-3000}:3000"
+    healthcheck:
+      # C-001 in docs/agents/CONTRACTS.md
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch('http://127.0.0.1:3000/health/ready', { signal: AbortSignal.timeout(3000) })
+          .then(response => process.exit(response.status === 200 ? 0 : 1), () => process.exit(1))
+      interval: 2s
+      timeout: 4s
+      retries: 15
+      start_period: 5s
+
+volumes:
+  postgres-data:

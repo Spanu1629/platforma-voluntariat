@@ -11,7 +11,7 @@
 ## Index
 - Q-001 · Which technologies and architecture will the application use? · _answered_
 - Q-002 · Ce reguli organizatorice de bază au fost confirmate? · _answered_
-- Q-003 · Which installation, run, build, test and quality commands will the selected stack provide?
+- Q-003 · Which installation, run, build, test and quality commands will the selected stack provide? · _investigating_
 - Q-004 · How will deployment, versioning and releases work?
 - Q-005 · What visual tokens and supported viewport sizes should the application use? · _answered_
 - Q-006 · Which screens and shared components should be designed first? · _answered_
@@ -33,6 +33,7 @@
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
 - **Answer:** 2026-11-18 — Separate React frontend and modular NestJS backend, PostgreSQL and Prisma, REST/OpenAPI, SSE, persistent PostgreSQL jobs, Jest, GitHub Actions and Docker Compose.
 - **Recorded as:** D-003, D-005 and D-009.
+- **Confirmed:** 2026-11-19
 
 ## Q-002 · Ce reguli organizatorice de bază au fost confirmate?
 - **Status:** answered
@@ -40,14 +41,15 @@
 - **Who answers:** Responsabilul proiectului.
 - **Answer:** 2026-11-19 — Responsabilul proiectului a confirmat vârstele și rolurile, programul și pauzele, instruirile, fluxul de repartizare, retragerile, prezența și pontajul, evidența documentelor și emiterea adeverințelor. Confirmarea privește regulile funcționale. D-002 rămâne aplicabil cerințelor atribuite partenerului care mai necesită confirmare.
 - **Recorded as:** [D-012–D-017](decisions/reguli-organizatorice.md) și [brief-ul actualizat](PROJECT-BRIEF.md).
+- **Confirmed:** 2026-11-19
 
 ## Q-003 · Which installation, run, build, test and quality commands will the selected stack provide?
-- **Status:** open
-- **Blocks:** Executable application checks and application definition of done.
+- **Status:** investigating
+- **Blocks:** Frontend commands, standalone application lint and the full application definition of done.
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
-- **Proposed answer:** None. No package manifests, source files or test runner exist.
+- **Proposed answer:** Use `npm ci`, `npm run prisma:generate` and `npm run build` from `backend/` under Node.js 24. Use `docker compose up -d --build --wait` to build, migrate and start the local backend, `docker compose run --rm migrate npm run db:seed` for the historical seed and `bash backend/test/run-integration.sh` for the isolated Jest and Compose checks. Frontend commands and standalone application lint are pending.
 - **Answer:** Pending.
-- **Recorded as:** None.
+- **Recorded as:** [Backend commands](../../backend/package.json) and [verification instructions](../../README.md#verificarea-backendului).
 
 ## Q-004 · How will deployment, versioning and releases work?
 - **Status:** open
@@ -101,6 +103,7 @@
 - **Who answers:** Responsabilul proiectului.
 - **Answer:** 2026-11-19 — Asociația întocmește și păstrează manual contractele, acordurile parentale unde sunt necesare și celelalte acte obligatorii. Coordonatorul le verifică înainte de participare și înregistrează în VolunTrack rezultatul, data și persoana responsabilă. Actele justificative nu se încarcă. Documentele neconfirmate sau condițiile legale neîndeplinite blochează participarea efectivă și check-in-ul. Responsabilul proiectului declară că organizația îndeplinește condițiile aplicabile. Declarația consemnează poziția sa.
 - **Recorded as:** [D-012 și D-016](decisions/reguli-organizatorice.md) · [Criterii de acceptare înainte de folosirea datelor reale](../privacy/GDPR.md#verificări-obligatorii-înainte-de-activarea-cu-date-reale).
+- **Confirmed:** 2026-11-19
 
 ## Q-011 · Ce expeditor va livra emailurile reale ale pilotului?
 - **Status:** open
@@ -124,9 +127,11 @@
 - **Who answers:** Responsabilul proiectului.
 - **Answer:** 2026-11-19 — Voluntarul solicită participarea și declară disponibilitatea. Coordonatorul propune rolul și tura. La acceptare, un voluntar eligibil este confirmat automat dacă are loc sau intră în coada FIFO a combinației exacte rol–tură dacă locul lipsește. La eliberarea unui loc, sistemul oferă poziția primului candidat eligibil din acea coadă. Acceptarea ofertei confirmă repartizarea deja autorizată, fără altă aprobare, după reverificarea tranzacțională a eligibilității și capacității. Refuzul sau expirarea eliberează rezervarea și permite procesarea următorului candidat. Termenul configurabil este implicit 12 ore și cel târziu până la începutul turei. Retragerea individuală este permisă cu minimum o oră înainte, iar schimbarea rolului sau turei cere accept.
 - **Recorded as:** [D-014](decisions/reguli-organizatorice.md#d-014--repartizare-propusă-de-coordonator-și-rezervări-tranzacționale) · [Fluxul din brief](PROJECT-BRIEF.md#înscrieri-prezență-și-ore).
+- **Confirmed:** 2026-11-19
 
 ## Q-015 · Cum se încarcă, verifică și șterge fotografia actului?
 - **Status:** answered
 - **Who answers:** Responsabilul proiectului.
 - **Answer:** 2026-11-19 — Încărcarea în VolunTrack este aprobată pentru verificarea identității și vârstei. Fotografia se transmite privat prin HTTPS și este accesibilă exclusiv coordonatorului autorizat pentru verificare. După aprobare sau respingere se șterge imediat, iar încărcările abandonate expiră automat. Rămân rezultatul, data și coordonatorul responsabil. Fotografia este exclusă din backupuri, loguri, exporturi, notificări și rapoarte. Accesul și operațiunile sunt auditate fără conținutul actului.
 - **Recorded as:** [D-016](decisions/reguli-organizatorice.md#d-016--verificarea-identității-și-evidența-documentelor) · [Politica de prelucrare și evaluarea temeiului propus](../privacy/GDPR.md) · [Verificări obligatorii înainte de activarea cu date reale](../privacy/GDPR.md#verificări-obligatorii-înainte-de-activarea-cu-date-reale).
+- **Confirmed:** 2026-11-19

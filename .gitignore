@@ -10,3 +10,10 @@
 .codex/worktrees/
 # Local credentials are never shared.
 .aws/
+/.env
+
+# Backend build artifacts and local configuration.
+/backend/node_modules/
+/backend/dist/
+/backend/src/generated/prisma/
+/backend/.env

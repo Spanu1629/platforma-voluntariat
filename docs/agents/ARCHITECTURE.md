@@ -5,7 +5,9 @@
 > Once application code exists, update this page to match the code.
 <!-- graffino-agentic:end -->
 
-The repository contains project and design documentation. Application code, migrations, API contracts and runtime configuration have yet to be implemented.
+The backend foundation in `backend/` uses NestJS 11 on Node.js 24 LTS. The build generates the Prisma 7 client before TypeScript 5.9 compiles the application and client to CommonJS. Docker Compose uses PostgreSQL 17 on a named volume and starts the compiled backend after the one-shot migrator exits successfully. The backend connects with the application role. The bootstrap account creates the roles, and the migrator owns the application and local shadow databases and runs the explicit seed. [Readiness contract](CONTRACTS.md#c-001--readiness-ul-backendului)
+
+The initial migration creates only the three historical relations. Q-009 supplies their seed. The application role can read the historical tables. Jest runs against a separate Compose volume with synthetic data, through the same command locally and in GitHub Actions. [Local commands](../../README.md#pornirea-backendului)
 
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 

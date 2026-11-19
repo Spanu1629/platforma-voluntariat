@@ -2,7 +2,7 @@
 
 VolunTrack este un proiect universitar pentru coordonarea voluntarilor Asociației „Mâini Mici, Suflete Mari”. Aplicația web va acoperi planificarea turelor, înscrierea voluntarilor, evidența prezenței și validarea orelor pentru o singură organizație. Asociația organizează evenimente caritabile și activități pentru copii și familii în Dumbrăveni, Mediaș și Sibiu. La data documentării, organizatorii comunicau direct programul și responsabilitățile. [Informații furnizate de asociație](INTERVIEW.md)
 
-**Stadiu:** repository-ul conține documentația proiectului, regulile Graffino și trei machete aprobate local, DS-003, DS-004 și DS-005. Aplicația, schema bazei de date, migrările, seed-ul, configurația Docker și CI, testele aplicației și deploy-ul public sunt planificate. Demonstrația aplicației și pilotul urmează în etapele de livrare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
+**Stadiu.** Fundația backendului include NestJS, PostgreSQL și Prisma în Docker Compose, migrarea inițială, seed-ul istoric și verificările de integrare. Repository-ul conține și trei machete aprobate local, DS-003, DS-004 și DS-005. Funcționalitățile de produs și deploy-ul public sunt etape ulterioare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
 
 ## Funcționalități planificate
 
@@ -36,9 +36,37 @@ VolunTrack este un proiect universitar pentru coordonarea voluntarilor Asociați
 
 Backend-ul va grupa modulele pentru identitate și organizație, eligibilitate, planificare, înscrieri și listă de așteptare, prezență și raportare, documente și comunicare. Joburile își păstrează termenele și progresul la restart și se reiau idempotent. Actualizările SSE se publică după commit, iar interfața recitește starea prin REST după reconectare. [Arhitectură propusă](docs/agents/ARCHITECTURE.md), [decizii aprobate](docs/agents/DECISIONS.md)
 
+## Pornirea backendului
+
+Din rădăcina repository-ului, pornește Docker Engine și setează în mediu trei valori distincte pentru `POSTGRES_PASSWORD`, `MIGRATOR_PASSWORD` și `APP_PASSWORD`. Poți genera fiecare valoare cu `openssl rand -hex 32`. Folosește numai caractere nerezervate în URL. Bootstrapul configurează rolurile pe un volum gol. Pentru un volum existent, folosește aceleași credențiale. [Variabilele necesare](.env.example)
+
+```bash
+docker compose config --quiet
+docker compose up -d --build --wait
+curl -i http://127.0.0.1:3000/health/ready
+```
+
+Backendul este disponibil local pe portul 3000, cu opțiunea `VOLUNTRACK_PORT` pentru un alt port pe host. PostgreSQL rulează în rețeaua Compose. `docker compose down` oprește proiectul și păstrează volumul bazei de date. [Contractul de readiness](docs/agents/CONTRACTS.md#c-001--readiness-ul-backendului)
+
+După migrare, încarcă explicit agregatele istorice aprobate cu `docker compose run --rm migrate npm run db:seed`. Poți rula comanda de mai multe ori. Pentru verificarea istoricului de migrări în baza shadow locală, folosește `docker compose run --rm migrate npm exec -- prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code`. [Agregatele aprobate](EVENT.md#9-utilizarea-datelor-în-voluntrack)
+
+## Verificarea backendului
+
+Rulează `bash backend/test/run-integration.sh` din rădăcina repository-ului. Suita creează un proiect Compose temporar, aplică migrarea pe un volum separat și folosește numai date sintetice. Aceeași comandă rulează în GitHub Actions. [Workflowul de integrare](.github/workflows/backend-ci.yml)
+
+Cu Node.js 24 LTS activ, rulează din `backend/`:
+
+```bash
+npm ci
+npm run build
+node -e "require('./dist/generated/prisma/client.js')"
+```
+
+Buildul rulează `npm run prisma:generate` înainte de compilarea TypeScript în CommonJS. Generarea, compilarea și încărcarea clientului funcționează fără PostgreSQL sau credențiale.
+
 ## Date și validare
 
-- **Istoric:** seed-ul planificat folosește agregatele ediției „Trenulețul Moșului” din 20.12.2025, cu 24 de voluntari, opt roluri și patru intervale. Alocările nominale, capacitățile pe rol și tură și pontajele individuale sunt necunoscute. [Datele evenimentului](EVENT.md)
+- **Istoric:** seed-ul folosește agregatele ediției „Trenulețul Moșului” din 20.12.2025, cu 24 de voluntari, opt roluri și patru intervale. Alocările nominale, capacitățile pe rol și tură și pontajele individuale sunt necunoscute. [Datele evenimentului](EVENT.md)
 - **Pilot:** minimum 15 colegi vor testa un eveniment demonstrativ separat, inclusiv confirmarea opțională la locație în cel puțin o tură. Pilotul poate include adulți și minori eligibili, după verificările asociației. Adeverințele vor avea serie proprie și marcaj demonstrativ. Raportarea va fi anonimă, iar datele personale din aplicație se vor șterge la 30 de zile după evaluare, cu excepțiile motivate de obligații legale de păstrare. [Criteriile pilotului](docs/agents/PROJECT-BRIEF.md#istoric-pilot-și-acceptare)
 - **Teste și predare:** datele sintetice rămân separate de istoric și pilot. Sunt planificate minimum 10 teste automate, dintre care minimum 6 de eligibilitate, precum și verificarea persistenței ofertelor și joburilor la restart pe hosting. Cerințele complete de predare sunt în brief. [D-006](docs/agents/DECISIONS.md#d-006--separarea-istoricului-de-demonstrație), [criterii de acceptare](docs/agents/PROJECT-BRIEF.md#istoric-pilot-și-acceptare)
 
@@ -47,4 +75,4 @@ Backend-ul va grupa modulele pentru identitate și organizație, eligibilitate, 
 - Glosarul proiectului și jurnalul sesiunilor sunt în [CONTEXT.md](CONTEXT.md) și [AI_LOG.md](AI_LOG.md).
 - Regulile Graffino și întrebările încă deschise, inclusiv despre capturi, hosting, email și evaluare, sunt în [AGENTS.md](AGENTS.md) și [registrul de întrebări](docs/agents/OPEN-QUESTIONS.md). Designul începe cu DS-004, DS-005 și DS-010, iar token-urile și mock-urile se aprobă înainte de implementarea ecranelor. [Ordinea livrării](docs/agents/PROJECT-BRIEF.md#ordinea-livrării)
 - Politica de prelucrare, testul interesului legitim și cerințele de activare sunt în [documentația GDPR](docs/privacy/GDPR.md).
-- Registrul se verifică cu `python3 docs/agents/tools/ledger-lint.py`. Comenzile de instalare, pornire, build și testare a aplicației rămân de stabilit. [Q-003](docs/agents/OPEN-QUESTIONS.md#q-003--which-installation-run-build-test-and-quality-commands-will-the-selected-stack-provide)
+- Registrul se verifică cu `python3 docs/agents/tools/ledger-lint.py`. Comenzile frontend și lint-ul de aplicație rămân deschise. [Q-003](docs/agents/OPEN-QUESTIONS.md#q-003--which-installation-run-build-test-and-quality-commands-will-the-selected-stack-provide)

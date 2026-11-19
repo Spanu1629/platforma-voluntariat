@@ -1,0 +1,19 @@
+name: Backend CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Check the knowledge ledger
+        run: python3 docs/agents/tools/ledger-lint.py
+      - name: Build and test with isolated PostgreSQL
+        run: bash backend/test/run-integration.sh
