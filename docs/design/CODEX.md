@@ -166,3 +166,22 @@ by the presence of this file alone. Missing capabilities block their steps.
 - Reviewed hover captures: [light](screens/DS-003.light.hover.png) and [dark](screens/DS-003.dark.hover.png).
 - Visual approval in chat (2026-11-19): “Aprob designul final al DS-003 pentru VolunTrack, inclusiv animațiile și bara laterală de hover.”
 - The project owner requested `approved` for this locally reviewed revision. Figma publication and comparison remain pending.
+
+### DS-003 și DS-004 · revizii finale aprobate, 2026-11-19
+
+Aprobare vizuală în conversație, 2026-11-19. „Aprob versiunile actuale ale DS-003 și DS-004, inclusiv noul sistem de filtre, animațiile și designul aerisit.”
+
+Tema luminoasă implicită este aprobată prin [D-010](../agents/DECISIONS.md#d-010--temă-luminoasă-implicită-în-ds-003-și-ds-004).
+
+| Ecran | Machetă aprobată | SHA-256 la revizuire | SHA-256 la calea din registru |
+|---|---|---|---|
+| DS-003 | [Evenimente disponibile](mocks/2026-11-19/DS-003.html) | `fa53967ceaba76ba845418754c0ba70c0b7f42100ed01b96d0aa977dfbadefd1` | `9074a30d3c687c1825f5bb12566109f2e8ece40c5cf45de6e334a7d87bb9a4ea` |
+| DS-004 | [Detalii eveniment și înscriere](mocks/2026-11-19/DS-004.html) | `890bf82cf0aca380b90eb049dde623ce7b3a07368446c207fbfde26ad80c7221` | `a5bcdeab2b4a92f612f02ecb91816e60654be2d5fd8a1230c0d80b531094f371` |
+
+Amprentele de revizie se calculează din ieșirea `sha256sum` pentru `DESIGN.md`, machetă, imaginile WebP și fonturile WOFF2 folosite, ordonate după calea relativă la rădăcina repo-ului. Trecerea din `mocks/drafts/` în `mocks/2026-11-19/` a schimbat calea din manifest. Fișierele HTML, imaginile, fonturile și capturile au fost verificate după mutare. Registrul indică reviziile finale, iar machetele și capturile aprobate anterior sunt păstrate la căile înregistrate mai sus.
+
+[Comparația reviziilor aprobate](screens/2026-11-19/comparatie.html) include opt perechi de capturi integrale, două perechi pentru hover în DS-003 și capturile panoului de filtre deschis. Verificarea a rulat cu Playwright 1.65.1 și Chromium 159.0.8154.6 la 1440 × 900 și 320 × 720, în ambele teme. Publicarea în Figma rămâne amânată la cererea responsabilului de proiect.
+
+Au fost verificate căutarea și filtrele combinate în DS-003, resetarea, indicatorul de filtre active, închiderea cu Escape, legătura spre DS-004, înscrierea demonstrativă și lista de așteptare. Verificarea accesibilității a acoperit tastatura, focusul, contrastul, dimensiunea controalelor și mișcarea redusă.
+
+Verificarea animațiilor a acoperit dezvăluirea unică la intrarea în viewport, revenirea prin scroll, filtrarea, zoomul de 1,03× pe cardul interactiv, gradientul la hover și pauza animațiilor. [DS-003 pe desktop](screens/2026-11-19/DS-003.motion.desktop.light.webm) · [DS-004 pe mobil](screens/2026-11-19/DS-004.motion.mobile.dark.webm)

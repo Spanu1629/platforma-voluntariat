@@ -15,6 +15,7 @@
 - D-007 · QR temporar și confirmare opțională la locație
 - D-008 · Direcție vizuală pentru VolunTrack
 - D-009 · Docker local și PostgreSQL administrat permis la deploy
+- D-010 · Temă luminoasă implicită în DS-003 și DS-004
 
 ---
 
@@ -95,4 +96,14 @@
 - **Why:** Excepția permite stocarea persistentă independentă de procesul web gratuit.
 - **Rejected:** PostgreSQL în container și în cloud ar necesita stocare persistentă și administrare suplimentară.
 - **Evidence:** [Scope VolunTrack](PROJECT-BRIEF.md), planul final aprobat în conversație.
+- **Source:** user · confidence high
+
+## D-010 · Temă luminoasă implicită în DS-003 și DS-004
+- **Status:** approved
+- **Date:** 2026-11-19
+- **Confirmed:** 2026-11-19
+- **Rule:** În reviziile DS-003 și DS-004, pornește în tema luminoasă când utilizatorul nu a ales explicit o temă. Păstrează comutatorul de temă și transmiterea temei din catalog către detaliul evenimentului.
+- **Why:** Voluntarii intră în experiența luminoasă inclusiv când sistemul lor preferă tema întunecată.
+- **Rejected:** Inițializarea pe baza preferinței de sistem poate deschide macheta în tema întunecată fără o alegere în VolunTrack.
+- **Evidence:** Aprobarea deciziei D-010 în conversația de revizuire a DS-003 și DS-004 la 2026-11-19.
 - **Source:** user · confidence high

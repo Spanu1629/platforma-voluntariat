@@ -23,10 +23,10 @@ designs:
     kind: screen
     # Local visual approval recorded in CODEX.md at the project owner's direction.
     status: approved
-    mock: mocks/DS-003.html
+    mock: mocks/2026-11-19/DS-003.html
   - id: DS-004
     name: Detalii eveniment și înscriere
     kind: screen
     # Local visual approval recorded in CODEX.md at the project owner's direction.
     status: approved
-    mock: mocks/DS-004.html
+    mock: mocks/2026-11-19/DS-004.html
