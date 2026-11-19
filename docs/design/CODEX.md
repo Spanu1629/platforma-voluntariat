@@ -142,7 +142,7 @@ by the presence of this file alone. Missing capabilities block their steps.
 
 
 ## Repo-owned Codex review record
-- Figma review URL: pending (Q-008); distinct from the shared optional snapshot URL.
+- Codex review destination, confirmed by the project owner on 2026-11-19 (Q-008). [Existing Figma file](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe)
 - Tokens and reference viewports: approved under Q-005. [Shared design specification](DESIGN.md#tokens)
 - Local mock: [DS-004](mocks/archive/DS-004.html), with Playwright and Chromium verification at 320 × 720 and 1440 × 900 in both themes (Q-007).
 - Approved local revision: SHA-256 `d1aea04988fdb6a533b680f470b0570964a7251715d0bcf321ae91d01b63cdce`. Computed over the `sha256sum` output for `DESIGN.md`, the mock HTML and its asset directory files, sorted by repository-relative path.
@@ -212,3 +212,10 @@ Amprentele de mai sus păstrează căile și conținutul din momentul aprobării
 | [DS-005](mocks/approved/DS-005.html) | `47bc53374cb869a4d65d9757eaa5504105a154c0ee5af2cf2ecae5e8829c5290` |
 
 După reorganizare, Playwright 1.65.1 și Chromium 159.0.8154.6 au verificat traseul DS-005 → DS-003 → DS-004 cu păstrarea temei, resursele, stările interactive, animațiile, tastatura, focusul, contrastul și dimensiunile tactile. Cele 12 capturi regenerate la 320 × 720 și 1440 × 900, în light și dark, au aceleași dimensiuni ca referințele și diferă pe cel mult 0,064% dintre pixeli. Inspecția vizuală a confirmat aspectul. Cele 20 de imagini din comparație și cele două clipuri WebM se încarcă. Capturile păstrate, clipurile, resursele și tokenurile au trecut verificarea de integritate.
+
+
+### Aplicarea clarificărilor organizatorice în design
+
+Aprobările locale de mai sus consemnează reviziile vizuale descrise în această pagină. Textele și scenariile existente din DS-003, DS-004 și DS-005 păstrează regulile demonstrative de la data review-ului.
+
+Înainte de implementarea fluxurilor, revizuirile viitoare trebuie să alinieze catalogul și detaliile la solicitarea de participare și repartizarea propusă de coordonator. DS-004 demonstrează înscrierea directă din locul liber și intrarea directă pe lista de așteptare. Revizia viitoare trebuie să arate solicitarea la nivel de eveniment și faptul că acceptarea unei propuneri pentru o poziție ocupată înscrie voluntarul eligibil în coada FIFO a combinației exacte rol–tură. DS-005 trebuie să prezinte oferta ca repartizare deja autorizată și să alinieze retragerea la pragul de o oră și validarea pontajelor complete la fluxul automat. Trebuie actualizate și scenariile de instruire fără expirare automată, intervalul dintre ture și pauzele. Revizuirile vor urma procedura de aprobare vizuală. [Brief-ul funcțional](../agents/PROJECT-BRIEF.md) · [Q-014](../agents/OPEN-QUESTIONS.md#q-014--cum-se-leagă-lista-de-așteptare-fifo-de-repartizarea-decisă-de-coordonator)

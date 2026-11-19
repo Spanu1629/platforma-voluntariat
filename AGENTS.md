@@ -119,7 +119,7 @@ No application source, dependencies, database definitions or Docker configuratio
 - Team, ClickUp and Slack addons are declined. No ticket workflow is installed.
 - Use the approved scope; confirm requirements attributed to the partner before dependent implementation (D-002).
 - Historical aggregates, pilot records and synthetic test data stay separate (D-006).
-- The pilot is adults only. Registration of real minors requires verification of the legal conditions (Q-010).
+- The pilot may include adults and eligible minors. The association handles the documents and checks applicable conditions before real minors participate (D-012, D-016, Q-010).
 - UI work loads both `docs/design/DESIGN.md` and `docs/design/CODEX.md` in Codex.
 
 ## 5. Release

@@ -9,6 +9,7 @@
 
 ## Index
 - D-001 · Backend services and databases run in Docker · _superseded-by D-009_
+- D-004 · Înscrieri și rezervări tranzacționale · _superseded-by D-014_
 
 ---
 
@@ -19,4 +20,13 @@
 - **Why:** The university laboratory requires Docker for backend services and databases.
 - **Rejected:** No alternatives were supplied or evaluated.
 - **Evidence:** [Setup report](SETUP-REPORT.md#ledger), initial laboratory constraint.
+- **Source:** user · confidence high
+
+## D-004 · Înscrieri și rezervări tranzacționale
+- **Status:** superseded-by D-014
+- **Date:** 2026-11-18
+- **Rule:** Verifică eligibilitatea și capacitatea în tranzacții PostgreSQL care serializează operațiile asupra poziției și programului voluntarului. Oferta activă rezervă un loc exclusiv. Lista de așteptare eligibilă are prioritate față de înscrierile noi.
+- **Why:** Prevenim suprarezervarea și înscrierile concurente incompatibile.
+- **Rejected:** Blocarea doar a poziției nu protejează programul voluntarului.
+- **Evidence:** [Scope VolunTrack](PROJECT-BRIEF.md), planul final aprobat în conversație.
 - **Source:** user · confidence high

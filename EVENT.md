@@ -100,7 +100,7 @@ Mecanismul automat de listă de așteptare este o cerință a proiectului univer
 ## 9. Utilizarea datelor în VolunTrack
 
 - **Seed real:** evenimentul din 20.12.2025, cele patru intervale orare, cele opt roluri și efectivele comunicate pentru fiecare rol.
-- **Pilot demonstrativ:** minimum 15 colegi adulți își creează conturi și se înscriu într-un eveniment separat. Participarea lor la pilot nu este atribuită ediției din 2025.
+- **Pilot demonstrativ:** minimum 15 colegi își creează conturi și solicită participarea la un eveniment separat. Pilotul poate include adulți și minori eligibili, cu documentele și condițiile aplicabile verificate de asociație. Participarea lor la pilot nu este atribuită ediției din 2025.
 - **Teste automate:** date sintetice separate, inclusiv pentru verificarea regulilor de eligibilitate aplicabile minorilor.
 - **Neconfirmat:** alocarea persoanelor pe fiecare tură, capacitățile rol–tură și pontajele individuale.
 - **Reguli ale proiectului:** eligibilitatea, instruirile, orele, pauzele și termenul ofertelor sunt descrise separat în [scope-ul aprobat](docs/agents/PROJECT-BRIEF.md). Aceste reguli nu se deduc din structura evenimentului istoric.

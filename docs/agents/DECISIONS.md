@@ -9,7 +9,6 @@
 ## Index
 - D-002 · Confirm exact requirements with the partner
 - D-003 · Monolit modular și stack-ul VolunTrack
-- D-004 · Înscrieri și rezervări tranzacționale
 - D-005 · Joburi persistente și dashboard SSE
 - D-006 · Separarea istoricului de demonstrație
 - D-007 · QR temporar și confirmare opțională la locație
@@ -17,6 +16,14 @@
 - D-009 · Docker local și PostgreSQL administrat permis la deploy
 - D-010 · Temă luminoasă implicită în DS-003 și DS-004
 - D-011 · Temă luminoasă implicită în DS-005
+
+### [Reguli organizatorice](decisions/reguli-organizatorice.md)
+- D-012 · Eligibilitatea de vârstă și programul voluntarilor
+- D-013 · Evidența instruirilor finalizate
+- D-014 · Repartizare propusă de coordonator și rezervări tranzacționale
+- D-015 · Validarea automată a pontajelor conforme
+- D-016 · Verificarea identității și evidența documentelor
+- D-017 · Generarea adeverințelor și semnarea externă
 
 ---
 
@@ -36,16 +43,6 @@
 - **Rule:** Folosește React, TypeScript, Vite și Tailwind în frontend și NestJS în backend, cu REST documentat în Swagger/OpenAPI, PostgreSQL și Prisma. Folosește Jest, teste de integrare și GitHub Actions.
 - **Why:** Un monolit modular păstrează tranzacțiile comune și simplifică operarea pilotului.
 - **Rejected:** Microserviciile adaugă cost operațional.
-- **Evidence:** [Scope VolunTrack](PROJECT-BRIEF.md), planul final aprobat în conversație.
-- **Source:** user · confidence high
-
-## D-004 · Înscrieri și rezervări tranzacționale
-- **Status:** approved
-- **Date:** 2026-11-18
-- **Confirmed:** 2026-11-18
-- **Rule:** Verifică eligibilitatea și capacitatea în tranzacții PostgreSQL care serializează operațiile asupra poziției și programului voluntarului. Oferta activă rezervă un loc exclusiv. Lista de așteptare eligibilă are prioritate față de înscrierile noi.
-- **Why:** Prevenim suprarezervarea și înscrierile concurente incompatibile.
-- **Rejected:** Blocarea doar a poziției nu protejează programul voluntarului.
 - **Evidence:** [Scope VolunTrack](PROJECT-BRIEF.md), planul final aprobat în conversație.
 - **Source:** user · confidence high
 

@@ -1,5 +1,7 @@
 # INTERVIEW — Asociația „Mâini Mici, Suflete Mari”
 
+Secțiunile 1–13 consemnează documentarea inițială. Clarificările ulterioare ale responsabilului proiectului sunt consemnate separat în secțiunea 14.
+
 ## Identificare
 
 - **Proiect universitar:** VolunTrack – Platformă web pentru gestionarea voluntarilor și a evenimentelor caritabile
@@ -91,3 +93,14 @@ Voluntarii contribuie la comunitate și dobândesc experiență în organizare, 
 ## 13. Feedback după demonstrație
 
 **Neefectuat la momentul redactării.** După prezentarea versiunii funcționale, se vor completa data demonstrației, persoana care a participat, observațiile reale, modificările solicitate și deciziile aferente. Nu se vor inventa răspunsuri ori reacții.
+
+
+## 14. Clarificări aprobate de responsabilul proiectului la 19.11.2026
+
+Clarificările provin din conversația de proiect și actualizează regulile funcționale folosite în VolunTrack. Secțiunile de mai sus păstrează informațiile istorice și întrebările de la data documentării scrise.
+
+- Participarea are prag general de 15 ani și praguri pe rol. Pilotul poate include adulți și minori eligibili, cu documentele și condițiile aplicabile gestionate de asociație. Limitele efective zilnice sunt de 4 ore pentru minori și 8 pentru adulți, cu minimum 30 de minute între ture și minimum 30 de minute de pauză la ture de cel puțin 4 ore. [Planificare și vârste pe rol](docs/agents/PROJECT-BRIEF.md#conturi-eligibilitate-și-planificare)
+- Asociația desfășoară instruirile. Coordonatorul autorizat consemnează instruirea generală obligatorie și instruirile specializate pentru rolurile relevante. Instruirile nu expiră automat. [Evidența instruirilor](docs/agents/PROJECT-BRIEF.md#evidența-instruirilor)
+- Voluntarul solicită participarea, iar coordonatorul propune rolul și tura. Acceptarea este urmată de confirmarea automată dacă sunt îndeplinite condițiile. Retragerea individuală cere minimum o oră înainte de tură. Dacă locul lipsește, acceptarea propunerii înscrie voluntarul eligibil în coada FIFO a rolului și turei autorizate. Acceptarea ofertei pentru locul eliberat confirmă aceeași repartizare după reverificare. Pontajele complete și conforme se validează automat, separat de confirmarea prezenței. [Înscrieri, prezență și ore](docs/agents/PROJECT-BRIEF.md#înscrieri-prezență-și-ore)
+- Asociația gestionează contractele, fișele și documentele minorilor în afara aplicației. Coordonatorul le verifică înainte de participare și păstrează în aplicație evidența verificării. Responsabilul proiectului declară că asociația îndeplinește condițiile aplicabile minorilor. Verificările înainte de activarea cu persoane reale sunt documentate separat. [Identitate și documente](docs/agents/PROJECT-BRIEF.md#identitate-contracte-și-documente) · [Verificări GDPR](docs/privacy/GDPR.md#verificări-obligatorii-înainte-de-activarea-cu-date-reale)
+- Responsabilul proiectului a aprobat încărcarea privată a fotografiei actului pentru verificarea identității și vârstei, cu ștergere după verificare. VolunTrack generează certificatul de voluntariat și raportul de activitate. Coordonatorul autorizat descarcă documentele, le semnează în afara aplicației și le înmânează voluntarului. [Cadrul GDPR](docs/privacy/GDPR.md) · [Documentele de voluntariat](docs/agents/PROJECT-BRIEF.md#comunicare-documente-și-statistici)
