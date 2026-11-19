@@ -51,8 +51,8 @@ board or Figma.
 **Layout and spacing**
 - Spacing comes from the scale only. Align to the grid; equal gaps for equal
   relationships.
-- No horizontal scroll at the smallest supported width. Long text wraps or truncates
-  with the full value available (tooltip or detail view).
+- The page fits the viewport at every supported width. Follow the shared layout
+  and carousel rules for local scrolling and long text. [Shared rules](DESIGN.md#breakpoints--window-sizes)
 
 **Typography**
 - Only the type scale below. One primary heading per screen. Sentence case for
@@ -219,3 +219,38 @@ După reorganizare, Playwright 1.65.1 și Chromium 159.0.8154.6 au verificat tra
 Aprobările locale de mai sus consemnează reviziile vizuale descrise în această pagină. Textele și scenariile existente din DS-003, DS-004 și DS-005 păstrează regulile demonstrative de la data review-ului.
 
 Înainte de implementarea fluxurilor, revizuirile viitoare trebuie să alinieze catalogul și detaliile la solicitarea de participare și repartizarea propusă de coordonator. DS-004 demonstrează înscrierea directă din locul liber și intrarea directă pe lista de așteptare. Revizia viitoare trebuie să arate solicitarea la nivel de eveniment și faptul că acceptarea unei propuneri pentru o poziție ocupată înscrie voluntarul eligibil în coada FIFO a combinației exacte rol–tură. DS-005 trebuie să prezinte oferta ca repartizare deja autorizată și să alinieze retragerea la pragul de o oră și validarea pontajelor complete la fluxul automat. Trebuie actualizate și scenariile de instruire fără expirare automată, intervalul dintre ture și pauzele. Revizuirile vor urma procedura de aprobare vizuală. [Brief-ul funcțional](../agents/PROJECT-BRIEF.md) · [Q-014](../agents/OPEN-QUESTIONS.md#q-014--cum-se-leagă-lista-de-așteptare-fifo-de-repartizarea-decisă-de-coordonator)
+
+### Carusele mobile și contrast light · draft pentru review local, 2026-11-19
+
+Registrul indică drafturile pentru review. Fișierele și capturile aprobate anterior
+se păstrează la căile lor, cu amprentele istorice raportate la versiunea specificației
+din momentul aprobării. D-018 și D-019 consemnează regulile aprobate pentru
+carusele și pentru `section-background`. [Deciziile](../agents/DECISIONS.md#d-018--carusele-pentru-colecții-de-carduri-pe-mobil)
+
+| Draft interactiv | SHA-256 al reviziei | Mobil 320 × 720 | Desktop 1440 × 900 |
+|---|---|---|---|
+| [DS-003](mocks/drafts/DS-003.html) | `8f31f66392dfee2714246781c0dba6de980a7f18459e350352766ea00eda128e` | [Light](screens/review/mobile-carousels/DS-003.light.mobile.png) · [Dark](screens/review/mobile-carousels/DS-003.dark.mobile.png) | [Light](screens/review/mobile-carousels/DS-003.light.png) · [Dark](screens/review/mobile-carousels/DS-003.dark.png) |
+| [DS-004](mocks/drafts/DS-004.html) | `392caadc55efdcac31a6fbd9e44a3da0905c2e85e2958588b9e9a0ce12e49fd6` | [Light](screens/review/mobile-carousels/DS-004.light.mobile.png) · [Dark](screens/review/mobile-carousels/DS-004.dark.mobile.png) | [Light](screens/review/mobile-carousels/DS-004.light.png) · [Dark](screens/review/mobile-carousels/DS-004.dark.png) |
+| [DS-005](mocks/drafts/DS-005.html) | `b0d0eb019819194aa643b753cb8111f290bcef1409578ec74c7f3d38e135a1b4` | [Light](screens/review/mobile-carousels/DS-005.light.mobile.png) · [Dark](screens/review/mobile-carousels/DS-005.dark.mobile.png) | [Light](screens/review/mobile-carousels/DS-005.light.png) · [Dark](screens/review/mobile-carousels/DS-005.dark.png) |
+
+Amprentele folosesc ieșirea `sha256sum` pentru `DESIGN.md`, HTML, CSS și JS
+comune și resursele referite, sortate după calea relativă la rădăcina repo-ului.
+Capturile integrale folosesc Playwright 1.65.1 și Chromium 159.0.8154.6.
+
+Comparația cu reviziile aprobate recapturate în același browser a găsit aceeași
+geometrie la 768, 1024 și 1440 px, în ambele teme. Capturile desktop dark sunt
+identice pixel cu pixel. Verificările la 320, 390 și 767 px au acoperit
+porțiunea vizibilă a cardului următor, alinierea și lățimea paginii. Verificările
+de interacțiune au acoperit swipe emulat, clic, tastatură, focus, filtre și
+stările prioritare ale agendei. Cele 12 audituri automate axe-core pentru starea
+implicită la lățimile de referință au trecut. Arborele de accesibilitate a fost
+inspectat în Chromium.
+
+Capturi de scenariu. [Filtre și focus în DS-003](screens/review/mobile-carousels/DS-003.light.mobile.filters-focus.png) ·
+[Focus pe al doilea card DS-004](screens/review/mobile-carousels/DS-004.dark.mobile.focus.png) ·
+[Tură curentă și ofertă](screens/review/mobile-carousels/DS-005.light.mobile.current-offer.png) ·
+[Oferte multiple](screens/review/mobile-carousels/DS-005.light.mobile.multiple-offers.png) ·
+[Istoric vertical](screens/review/mobile-carousels/DS-005.dark.mobile.history.png)
+
+Aprobarea vizuală locală este în așteptare. Publicarea și verificarea în Figma
+au fost amânate la cererea responsabilului proiectului.

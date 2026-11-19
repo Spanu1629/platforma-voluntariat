@@ -16,6 +16,8 @@
 - D-009 · Docker local și PostgreSQL administrat permis la deploy
 - D-010 · Temă luminoasă implicită în DS-003 și DS-004
 - D-011 · Temă luminoasă implicită în DS-005
+- D-018 · Carusele pentru colecții de carduri pe mobil
+- D-019 · Fundal pentru secțiunile care grupează carduri
 
 ### [Reguli organizatorice](decisions/reguli-organizatorice.md)
 - D-012 · Eligibilitatea de vârstă și programul voluntarilor
@@ -114,4 +116,22 @@
 - **Rule:** În DS-005, pornește în tema luminoasă în lipsa unei alegeri explicite și oferă comutare în tema întunecată.
 - **Why:** Programul voluntarului pornește în aceeași temă ca ecranele aprobate de evenimente.
 - **Evidence:** Aprobarea planului Graffino pentru DS-005 și a propunerii D-011 în conversația de proiect.
+- **Source:** user · confidence high
+
+## D-018 · Carusele pentru colecții de carduri pe mobil
+- **Status:** approved
+- **Date:** 2026-11-19
+- **Confirmed:** 2026-11-19
+- **Rule:** La 320–767 px, afișează secțiunile într-o coloană și limitează scrollul orizontal la colecții eligibile de cel puțin două carduri explorabile independent. Păstrează în fluxul paginii acțiunile urgente, informațiile de comparat și instrucțiunile ordonate. De la 768 px folosește layoutul aprobat al ecranului. Urmează interacțiunile și excepțiile din specificația de design.
+- **Why:** Swipe-ul scurtează listele de carduri pe mobil, iar acțiunile prioritare rămân la vedere.
+- **Evidence:** Aprobarea în conversație a planului „Carusele pentru cardurile VolunTrack pe mobil” și a excepțiilor DS-005. [Reguli responsive](../design/DESIGN.md#breakpoints--window-sizes)
+- **Source:** user · confidence high
+
+## D-019 · Fundal pentru secțiunile care grupează carduri
+- **Status:** approved
+- **Date:** 2026-11-19
+- **Confirmed:** 2026-11-19
+- **Rule:** Folosește `section-background` pentru benzile care grupează carduri și pentru tranzițiile lor decorative. În light, folosește `#F4EADB`. În dark, folosește `var(--background)`. Folosește `surface` pe carduri și `surface-subtle` pe elementele secundare.
+- **Why:** Crește separarea vizuală între card și secțiune în tema luminoasă și păstrează paleta întunecată.
+- **Evidence:** Aprobarea în conversație a planului completat și a valorilor tokenului. [Paleta partajată](../design/DESIGN.md#color)
 - **Source:** user · confidence high

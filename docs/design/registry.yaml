@@ -17,21 +17,20 @@
 # DS-011 · Utilizatori, aprobări, instruiri, permisiuni și atribuiri
 # DS-012 · Politicile organizației și statistici
 # Intrarea activă a unui ecran primește statusul draft la crearea machetei sale.
+# Reviziile aprobate anterior se păstrează în mocks/approved/ și în CODEX.md.
 designs:
   - id: DS-003
     name: Evenimente disponibile
     kind: screen
-    # Local visual approval recorded in CODEX.md at the project owner's direction.
-    status: approved
-    mock: mocks/approved/DS-003.html
+    status: draft
+    mock: mocks/drafts/DS-003.html
   - id: DS-004
     name: Detalii eveniment și înscriere
     kind: screen
-    # Local visual approval recorded in CODEX.md at the project owner's direction.
-    status: approved
-    mock: mocks/approved/DS-004.html
+    status: draft
+    mock: mocks/drafts/DS-004.html
   - id: DS-005
     name: Programul meu
     kind: screen
-    status: approved
-    mock: mocks/approved/DS-005.html
+    status: draft
+    mock: mocks/drafts/DS-005.html

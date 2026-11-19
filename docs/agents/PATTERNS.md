@@ -11,6 +11,7 @@
 - PATTERN-003 · Panou de filtre pliabil cu focus gestionat · candidate
 - PATTERN-004 · Ceas controlat pentru stările temporizate ale machetelor · candidate
 - PATTERN-005 · Proiect Compose temporar pentru testele de integrare · candidate
+- PATTERN-006 · Scroll nativ pentru listele de carduri pe mobil · candidate
 
 ---
 
@@ -38,3 +39,8 @@
 - **Status:** candidate
 - **How:** Pornește serviciile într-un proiect Compose cu nume unic, credențiale temporare și volum propriu. Rulează migrările și testele cu date sintetice în acel proiect și elimină la final doar containerele și volumul lui.
 - **Example:** [Verificările fundației backend](../../backend/test/run-integration.sh).
+
+## PATTERN-006 · Scroll nativ pentru listele de carduri pe mobil
+- **Status:** candidate
+- **How:** Folosește lista semantică existentă drept zonă de scroll-snap. Leagă butoanele de listă, sincronizează indicatorul cu poziția aliniată și adu în vedere cardul al cărui control primește focus. Folosește aceeași listă în layoutul de tabletă și desktop.
+- **Example:** [Stilurile caruselului](../design/mocks/carousel.css) și [navigarea comună celor trei drafturi](../design/mocks/carousel.js).

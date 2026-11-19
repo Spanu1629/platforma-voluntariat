@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Programul meu · VolunTrack</title>
+  <style>
+    @font-face {
+      font-family: Fraunces;
+      src: url("../DS-004-assets/fraunces-latin-wght-normal.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: Fraunces;
+      src: url("../DS-004-assets/fraunces-latin-ext-wght-normal.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+      unicode-range: U+0100-024F, U+1E00-1EFF;
+    }
+    @font-face {
+      font-family: "DM Sans";
+      src: url("../DS-004-assets/dm-sans-latin-wght-normal.woff2") format("woff2");
+      font-weight: 100 1000;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "DM Sans";
+      src: url("../DS-004-assets/dm-sans-latin-ext-wght-normal.woff2") format("woff2");
+      font-weight: 100 1000;
+      font-display: swap;
+      unicode-range: U+0100-024F, U+1E00-1EFF;
+    }
+    /* Values from DESIGN.md and its accessibility guardrails. */
+    :root {
+      color-scheme: light;
+      --background: #FAF6ED;
+      --section-background: #F4EADB;
+      --surface: #FFFCF7;
+      --surface-subtle: #F0E8DB;
+      --text: #272820;
+      --text-muted: #5D6055;
+      --border: #827A6D;
+      --primary: #214B3E;
+      --primary-hover: #193E32;
+      --primary-active: #123126;
+      --on-primary: #FFFCF7;
+      --accent: #A44B35;
+      --success: #286044;
+      --warning: #785317;
+      --danger: #A12F37;
+      --focus: var(--accent);
+      --fraunces: Fraunces, Georgia, serif;
+      --dm-sans: "DM Sans", system-ui, sans-serif;
+      --type-page-title: 600 2rem/2.5rem var(--fraunces);
+      --type-section-title: 600 1.5rem/2rem var(--fraunces);
+      --type-card-title: 600 1.25rem/1.75rem var(--dm-sans);
+      --type-body: 400 1rem/1.5rem var(--dm-sans);
+      --type-label: 500 0.875rem/1.25rem var(--dm-sans);
+      --space-4: 0.25rem;
+      --space-8: 0.5rem;
+      --space-12: 0.75rem;
+      --space-16: 1rem;
+      --space-24: 1.5rem;
+      --space-32: 2rem;
+      --space-48: 3rem;
+      --space-64: 4rem;
+      --radius-control: 0.5rem;
+      --radius-card: 0.75rem;
+      --radius-dialog: 1rem;
+      --focus-width: 2px;
+      --focus-gap: 2px;
+      --motion-control: 120ms;
+      --motion-panel: 180ms;
+      --motion-reduced: 0ms;
+      --target-touch: 44px;
+      --desktop-reference-width: 1440px;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --background: #171D19;
+      --section-background: var(--background);
+      --surface: #202821;
+      --surface-subtle: #2A342D;
+      --text: #F5EEE2;
+      --text-muted: #C6C8BC;
+      --border: #8A9588;
+      --primary: #A7C9AF;
+      --primary-hover: #B8D5BF;
+      --primary-active: #8DB59A;
+      --on-primary: #11251C;
+      --accent: #EF9F83;
+      --success: #A4D6AF;
+      --warning: #F2C880;
+      --danger: #FFA3A9;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      :root { --motion-control: var(--motion-reduced); --motion-panel: var(--motion-reduced); }
+    }
+    :root[data-motion="off"] { --motion-control: var(--motion-reduced); --motion-panel: var(--motion-reduced); }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; color: var(--text); background: var(--surface); font: var(--type-body); }
+    h1, h2, h3, p, dl, dd { margin: 0; }
+    h1 { font: var(--type-page-title); }
+    h2 { font: var(--type-section-title); }
+    h3 { font: var(--type-card-title); }
+    :where(h1, h2, h3, p, dd, button) { overflow-wrap: anywhere; }
+    :focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-gap); }
+    a { color: var(--accent); text-underline-offset: var(--space-4); }
+    .frame { width: min(100%, var(--desktop-reference-width)); margin-inline: auto; padding-inline: var(--space-16); }
+    .masthead { background: var(--surface); }
+    .masthead .frame {
+      min-height: var(--space-48);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-8);
+      padding-block: var(--space-8);
+    }
+    .wordmark { display: inline-flex; align-items: center; gap: var(--space-8); color: var(--primary); font: var(--type-section-title); }
+    .header-controls { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+    .icon-library { display: none; }
+    .icon { width: var(--space-16); height: var(--space-16); flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-large { width: var(--space-24); height: var(--space-24); }
+    .icon-tile { display: inline-grid; place-items: center; align-self: start; padding: var(--space-8); border-radius: var(--radius-control); background: var(--surface-subtle); color: var(--primary); }
+    .wordmark .icon-tile { background: var(--primary); color: var(--on-primary); }
+    .hero-copy { display: grid; justify-items: start; gap: var(--space-16); min-width: 0; }
+    .hero-title { display: grid; gap: var(--space-12); }
+    .hero-title p, .hero-copy > .hint { text-wrap: pretty; }
+    .section-wave { block-size: var(--space-32); overflow: hidden; background: var(--surface); color: var(--section-background); }
+    .section-wave, .section-wave svg { border: 0; outline: none; }
+    .section-wave svg { display: block; inline-size: 100%; block-size: 100%; pointer-events: none; }
+    .section-wave path { fill: currentColor; }
+    .section-wave.from-opportunities { background: var(--section-background); color: var(--surface); }
+    .demo { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); border-radius: var(--radius-control); background: var(--surface-subtle); color: var(--accent); font: var(--type-label); font-weight: 600; }
+    .hint, dt { color: var(--text-muted); }
+    .event-meta { display: flex; flex-wrap: wrap; gap: var(--space-12) var(--space-32); }
+    .event-meta dt { display: flex; align-items: center; gap: var(--space-8); }
+    .event-meta dd { padding-inline-start: var(--space-24); }
+    .event-meta .icon { color: var(--accent); }
+    dt, .hint { font: var(--type-label); }
+    dd { font-weight: 600; }
+    .opportunities { background: var(--section-background); }
+    .shift-list { display: grid; gap: var(--space-24); padding: 0; margin: 0; list-style: none; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-subtle);
+      border-radius: var(--radius-dialog);
+      padding: var(--space-24);
+    }
+    .shift-card { position: relative; min-width: 0; display: flex; flex-direction: column; gap: var(--space-16); }
+    .shift-card[data-status]::before {
+      content: "";
+      position: absolute;
+      inset-block: var(--space-24);
+      inset-inline-start: 0;
+      inline-size: var(--space-4);
+      border-radius: 0 var(--radius-control) var(--radius-control) 0;
+      background: var(--card-accent, var(--primary));
+      opacity: 0;
+      transform: scaleY(0);
+      transform-origin: center top;
+      transition: opacity var(--motion-control) ease-out, transform var(--motion-panel) ease-out;
+      pointer-events: none;
+    }
+    .shift-card[data-status="full"], .shift-card[data-status="queued"] { --card-accent: var(--warning); }
+    .shift-card[data-status="ineligible"] { --card-accent: var(--danger); }
+    .shift-card[data-status="confirmed"] { --card-accent: var(--success); }
+    .shift-card[data-status]:focus-within::before { opacity: 1; transform: scaleY(1); }
+    .shift-opening { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-8); }
+    .shift-card[data-status="full"] .icon-tile { color: var(--warning); }
+    .shift-description, .shift-action { display: grid; gap: var(--space-12); }
+    .shift-action { margin-block-start: auto; padding-block-start: var(--space-8); }
+    .shift-time, .state { font: var(--type-label); font-weight: 600; }
+    .shift-time { display: flex; align-items: center; gap: var(--space-8); color: var(--accent); font-variant-numeric: tabular-nums; }
+    .state { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-4) var(--space-8); border-radius: var(--radius-control); background: var(--surface-subtle); }
+    .confirmation-tick { display: none; }
+    .state.confirmed .confirmation-tick { display: block; }
+    .available, .confirmed { color: var(--success); }
+    .full, .queued { color: var(--warning); }
+    .ineligible { color: var(--text); }
+    .shift-card[data-status="ineligible"] [data-reason], .error { color: var(--danger); }
+    .button, select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-8);
+      min-height: var(--target-touch);
+      min-width: var(--target-touch);
+      max-width: 100%;
+      padding: var(--space-8) var(--space-12);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-control);
+      background: var(--surface);
+      color: var(--text);
+      font: var(--type-label);
+    }
+    .button {
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color var(--motion-control) ease-out, border-color var(--motion-control) ease-out,
+        color var(--motion-control) ease-out, transform var(--motion-control) ease-out;
+    }
+    .header-control-label { display: none; }
+    .header-controls .button[aria-pressed="true"] { background: var(--surface-subtle); }
+    .shift-action .button { padding-inline: var(--space-16); }
+    .shift-action .button { width: 100%; }
+    .action-icon { transition: transform var(--motion-control) ease-out; }
+    .button:is(:active, [data-touch-pressed]) { background: var(--background); }
+    .button.primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+    .button.primary:is(:active, [data-touch-pressed]) { background: var(--primary-active); border-color: var(--primary-active); }
+    .button:disabled { background: var(--surface-subtle); color: var(--text-muted); cursor: default; }
+    .button[hidden] { display: none; }
+    .notice { display: grid; justify-items: start; gap: var(--space-8); }
+    .skeleton { display: block; height: var(--space-12); width: 60%; border-radius: var(--radius-control); background: var(--surface-subtle); }
+    .skeleton + .skeleton:not(.skeleton-action) { width: 42%; }
+    .skeleton-heading { height: var(--space-24); }
+    .skeleton-action { height: var(--target-touch); width: 100%; }
+    .preview { margin-block-end: var(--space-32); }
+    .preview summary { display: list-item; min-height: var(--target-touch); max-width: fit-content; padding: var(--space-12) 0; cursor: pointer; color: var(--accent); font: var(--type-label); }
+    .preview-controls { display: grid; justify-items: start; gap: var(--space-8); }
+    .skip-link { position: absolute; z-index: 1; inset-inline-start: var(--space-16); inset-block-start: var(--space-8); padding: var(--space-12); background: var(--surface); transform: translateY(-200%); }
+    .skip-link:focus { transform: none; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @keyframes hero-copy-in {
+      from { opacity: 0.28; transform: translateY(var(--space-24)); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes section-reveal {
+      from { opacity: 0.38; transform: translateY(var(--space-32)); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes confirmation-draw {
+      from { stroke-dashoffset: 1; }
+      to { stroke-dashoffset: 0; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      [data-motion="on"] .hero.is-entering h1,
+      [data-motion="on"] .hero.is-entering .hero-title p {
+        animation: hero-copy-in calc(3 * var(--motion-panel)) cubic-bezier(0.22, 0.65, 0.28, 1) backwards;
+      }
+      [data-motion="on"] .hero.is-entering .hero-title p { animation-delay: var(--motion-control); }
+      [data-motion="on"] .motion-reveal.has-entered { animation: section-reveal calc(2.5 * var(--motion-panel)) cubic-bezier(0.22, 0.65, 0.28, 1); }
+      [data-motion="on"] .button:not(:disabled):is(:active, [data-touch-pressed]) { transform: translateY(var(--focus-width)) scale(0.96); }
+      [data-motion="on"] .state.just-confirmed .confirmation-tick {
+        stroke-dasharray: 1;
+        animation: confirmation-draw calc(2 * var(--motion-panel)) ease-out backwards;
+      }
+    }
+    @media (pointer: fine) and (hover: hover) {
+      .button:not(:disabled):hover, select:hover { background: var(--surface-subtle); }
+      .button.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+      .button.primary:active { background: var(--primary-active); border-color: var(--primary-active); }
+      .shift-card[data-status]:hover::before { opacity: 1; transform: scaleY(1); }
+    }
+    @media (pointer: fine) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+      [data-motion="on"] .shift-card[data-status] { transition: transform var(--motion-panel) ease-out; }
+      [data-motion="on"] .shift-card[data-status]::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: 0 var(--space-12) var(--space-24) calc(-1 * var(--space-8)) color-mix(in srgb, var(--text) 25%, transparent);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--motion-panel) ease-out;
+      }
+      :root[data-theme="dark"][data-motion="on"] .shift-card[data-status]::after {
+        box-shadow: 0 var(--space-12) var(--space-24) calc(-1 * var(--space-8)) var(--background);
+      }
+      [data-motion="on"] .shift-opening .icon-tile { transition: transform var(--motion-panel) ease-out; }
+      [data-motion="on"] .shift-card[data-status]:hover { transform: translateY(calc(-1 * var(--space-8))); }
+      [data-motion="on"] .shift-card[data-status]:hover::after { opacity: 1; }
+      [data-motion="on"] .shift-card:hover .shift-opening .icon-tile { transform: rotate(-7deg) scale(1.12); }
+      [data-motion="on"] .shift-opening .icon { transition: translate var(--motion-control) ease-out; }
+      [data-motion="on"] .shift-card:hover .shift-opening .icon-tile .icon { translate: 0 calc(-1 * var(--focus-width)); }
+      [data-motion="on"] .shift-action .button.primary:hover .action-icon { transform: translateX(var(--space-4)); }
+    }
+    @media (min-width: 768px) {
+      .header-control-label { display: inline; }
+    }
+    @media (min-width: 1024px) {
+      .frame {
+        width: min(100%, calc(var(--desktop-reference-width) - 2 * var(--space-64)));
+        padding-inline: var(--space-32);
+      }
+      .section-wave { block-size: var(--space-48); }
+      .shift-list { gap: var(--space-32); }
+      .shift-card { gap: var(--space-24); padding: var(--space-32); }
+      .shift-action .button { width: fit-content; }
+      .skeleton-action { width: 60%; }
+    }
+    /* DS-005 arrangements use the same controls, cards and motion rules above. */
+    [hidden] { display: none !important; }
+    .agenda { width: min(100%, 80ch); margin-inline: auto; }
+    .hero { padding-block: var(--space-32); }
+    .opportunities .frame { padding-block: var(--space-32) var(--space-48); }
+    .agenda-content { display: grid; gap: var(--space-32); }
+    .priority-section, .schedule, #schedule-content { display: grid; gap: var(--space-24); }
+    .schedule-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-16); }
+    .button-group { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+    .schedule-heading .button[aria-pressed="true"] { background: var(--surface-subtle); }
+    :root[data-theme="light"] .schedule-heading .button[aria-pressed="true"] {
+      text-decoration: underline;
+      text-underline-offset: var(--space-4);
+    }
+    .date-group { display: grid; gap: var(--space-12); }
+    .date-title { font: var(--type-label); font-weight: 600; color: var(--text-muted); }
+    .shift-meta { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-24); }
+    .shift-place { display: flex; align-items: start; gap: var(--space-8); }
+    .shift-place .icon { color: var(--primary); }
+    .shift-time span, .shift-place span, .attendance-meta div { min-width: 0; }
+    .state { max-width: 100%; }
+    .state .icon { flex-shrink: 0; }
+    .attendance-meta { border-block-start: 1px solid var(--surface-subtle); padding-block-start: var(--space-16); }
+    .attendance-meta dd { padding-inline-start: 0; font-variant-numeric: tabular-nums; }
+    .feedback { padding: var(--space-12) var(--space-16); border-radius: var(--radius-control); background: var(--surface); color: var(--success); }
+    .feedback.error { color: var(--danger); }
+    .agenda-dialog {
+      width: min(calc(100% - 2 * var(--space-16)), 54ch);
+      max-height: calc(100% - 2 * var(--space-16));
+      overflow: auto;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .agenda-dialog::backdrop { background: color-mix(in srgb, var(--text) 32%, transparent); }
+    :root[data-theme="dark"] .agenda-dialog::backdrop { background: color-mix(in srgb, var(--background) 80%, transparent); }
+    .dialog-content, .dialog-fields, .field { display: grid; gap: var(--space-16); }
+    .field { gap: var(--space-4); }
+    .field label { font: var(--type-label); font-weight: 600; }
+    .field select, .preview select { width: 100%; }
+    #dialog-status:empty { display: none; }
+    .preview { padding-block-start: var(--space-24); }
+    @media (min-width: 768px) {
+      .field select, .preview select { width: auto; }
+    }
+    @media (min-width: 1024px) {
+      .hero { padding-block: var(--space-48); }
+      .opportunities .frame { padding-block: var(--space-48) var(--space-64); }
+      .agenda-content { gap: var(--space-48); }
+    }
+  </style>
+  <link rel="stylesheet" href="../carousel.css">
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.5 8.5c0 4-4.8 7.4-8.5 10.5C8.3 15.9 3.5 12.5 3.5 8.5a4.5 4.5 0 0 1 8.5-2 4.5 4.5 0 0 1 8.5 2Z"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.5 15.5A9 9 0 0 1 8.5 3.5a9 9 0 1 0 12 12Z"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M9 5v14m6-14v14"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2Zm7 13v6m-3-3h6"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18m-13 4h2m4 0h2m-8 4h2"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M12 4v15m-6-6 6 6 6-6"/></symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+    <symbol id="icon-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2m2-15a3 3 0 0 1 0 6m1 3a4 4 0 0 1 3 4v2"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M3 8l3-4h12l3 4m-9 0v12m-3-7h6"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"/></symbol>
+  </svg>
+  <a class="skip-link" href="#schedule-title">Sari la programul meu</a>
+  <header class="masthead">
+    <div class="frame">
+      <span class="wordmark"><span class="icon-tile"><svg class="icon" aria-hidden="true"><use href="#icon-heart"/></svg></span>VolunTrack</span>
+      <div class="header-controls">
+        <button class="button" type="button" id="motion" aria-label="Pauză animații" aria-pressed="false">
+          <svg class="icon" aria-hidden="true"><use href="#icon-pause"/></svg><span class="header-control-label">Pauză animații</span>
+        </button>
+        <button class="button" type="button" id="theme" aria-label="Temă întunecată">
+          <svg class="icon" aria-hidden="true"><use href="#icon-moon"/></svg><span class="header-control-label">Temă întunecată</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="hero frame" aria-labelledby="page-title">
+      <div class="agenda hero-copy">
+        <p class="demo"><svg class="icon" aria-hidden="true"><use href="#icon-spark"/></svg>Program demonstrativ · Date fictive</p>
+        <div class="hero-title">
+          <h1 id="page-title">Programul meu</h1>
+          <p class="hint">Orele sunt locale (Europe/Bucharest).</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 64" preserveAspectRatio="none" focusable="false">
+        <path d="M0 24 C140 12 248 39 390 40 S630 16 750 20 968 44 1100 37 1310 13 1440 26 V64 H0 Z"/>
+      </svg>
+    </div>
+
+    <section class="opportunities" aria-label="Programul voluntarului">
+      <div class="frame">
+        <div class="agenda agenda-content motion-reveal">
+          <p id="feedback" class="feedback" tabindex="-1" hidden></p>
+          <section class="priority-section" id="current-section" aria-labelledby="current-title" hidden>
+            <h2 id="current-title">Tura curentă</h2>
+            <ul class="shift-list" id="current-list" role="list"></ul>
+          </section>
+          <section class="priority-section" id="offer-section" aria-labelledby="offer-title" hidden>
+            <h2 id="offer-title">Oferte de răspuns</h2>
+            <ul class="shift-list" id="offer-list" role="list"></ul>
+          </section>
+
+          <section class="schedule" aria-labelledby="schedule-title">
+            <div class="schedule-heading">
+              <h2 id="schedule-title" tabindex="-1">Turele mele</h2>
+              <div class="button-group" role="group" aria-label="Perioada programului">
+                <button class="button" type="button" data-view="upcoming" aria-pressed="true" aria-controls="schedule-content">Viitoare</button>
+                <button class="button" type="button" data-view="history" aria-pressed="false" aria-controls="schedule-content">Istoric</button>
+              </div>
+            </div>
+            <div id="schedule-content"></div>
+          </section>
+          <p id="announcement" role="status" class="visually-hidden"></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-wave from-opportunities" aria-hidden="true">
+      <svg viewBox="0 0 1440 64" preserveAspectRatio="none" focusable="false">
+        <path d="M0 37 C166 46 265 17 430 19 S669 44 808 39 1034 14 1161 18 1351 44 1440 30 V64 H0 Z"/>
+      </svg>
+    </div>
+
+    <div class="frame">
+      <details class="agenda preview" id="preview">
+        <summary>Verifică stările machetei</summary>
+        <div class="preview-controls">
+          <label for="preview-state">Stare demonstrativă</label>
+          <select id="preview-state">
+            <option value="default">Program viitor</option>
+            <option value="urgent">Ofertă din lista de așteptare</option>
+            <option value="multiple-offers">Mai multe oferte de răspuns</option>
+            <option value="live-offer">Tură în curs și ofertă de răspuns</option>
+            <option value="offer-race">Oferta expiră în timpul răspunsului</option>
+            <option value="offer-ineligible">Eligibilitate reevaluată la acceptare</option>
+            <option value="scan">Check-in disponibil</option>
+            <option value="on-site">Check-in cu confirmare la locație</option>
+            <option value="waiting-on-site">Așteaptă confirmarea la locație</option>
+            <option value="present">Tură în curs</option>
+            <option value="break">Pauză în curs</option>
+            <option value="reentry">Revenire după check-out</option>
+            <option value="outside">Fereastra QR s-a încheiat</option>
+            <option value="history">Istoric și pontaje</option>
+            <option value="single">O singură tură</option>
+            <option value="many">Mai multe ture</option>
+            <option value="long">Titlu și locație lungi</option>
+            <option value="empty">Program gol</option>
+            <option value="loading">Încărcare</option>
+            <option value="error">Eroare de încărcare</option>
+            <option value="success">Ofertă acceptată</option>
+          </select>
+          <p class="hint" id="preview-clock"></p>
+          <div class="button-group">
+            <button class="button" id="advance-time" type="button">Avansează ceasul cu 20 min</button>
+            <button class="button" id="confirm-location" type="button" hidden>Simulează confirmarea coordonatorului</button>
+          </div>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <dialog class="card agenda-dialog" id="action-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-copy">
+    <div class="dialog-content">
+      <h2 id="dialog-title" tabindex="-1"></h2>
+      <p id="dialog-copy"></p>
+      <div class="dialog-fields" id="qr-fields" hidden>
+        <div class="field">
+          <label for="qr-operation">Acțiune de prezență</label>
+          <select id="qr-operation"></select>
+        </div>
+        <div class="field">
+          <label for="qr-result">Rezultat simulat</label>
+          <select id="qr-result">
+            <option value="valid">Cod valid</option>
+            <option value="expired">Cod expirat</option>
+            <option value="invalid">Cod invalid</option>
+            <option value="camera">Cameră indisponibilă</option>
+          </select>
+        </div>
+        <p class="hint">Codul comun se reînnoiește la 60 de secunde.</p>
+      </div>
+      <p id="dialog-status" class="hint" role="status" tabindex="-1"></p>
+      <div class="button-group dialog-actions">
+        <button class="button" type="button" id="dialog-close"></button>
+        <button class="button primary" type="button" id="dialog-action"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <template id="shift-template">
+    <li class="card shift-card">
+      <div class="shift-opening">
+        <span class="icon-tile"><svg class="icon icon-large" aria-hidden="true"><use href="#icon-calendar"/></svg></span>
+        <p class="state"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-info"/><path class="confirmation-tick" d="m8 12 2.5 2.5L16 9" pathLength="1"/></svg><span class="state-label"></span></p>
+      </div>
+      <div class="shift-description">
+        <h3></h3>
+        <p class="hint event-name"></p>
+        <div class="shift-meta">
+          <p class="shift-time"><svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg><span></span></p>
+          <p class="hint shift-place"><svg class="icon" aria-hidden="true"><use href="#icon-pin"/></svg><span></span></p>
+        </div>
+        <p class="hint shift-note" hidden></p>
+      </div>
+      <dl class="event-meta attendance-meta" hidden></dl>
+      <div class="shift-action" hidden>
+        <p class="hint" data-reason hidden></p>
+        <div class="button-group shift-buttons"></div>
+      </div>
+    </li>
+  </template>
+
+  <template id="loading-template">
+    <div class="card shift-card" aria-hidden="true">
+      <div class="shift-opening"><span class="icon-tile"><svg class="icon icon-large"><use href="#icon-calendar"/></svg></span><span class="skeleton"></span></div>
+      <div class="shift-description">
+        <span class="skeleton skeleton-heading"></span><span class="skeleton"></span><span class="skeleton"></span>
+      </div>
+      <div class="shift-action"><span class="skeleton"></span><span class="skeleton skeleton-action"></span></div>
+    </div>
+  </template>
+
+  <script src="../carousel.js"></script>
+  <script>
+    // The clock, signups and scans below are in-memory fixtures for design review.
+    const params = new URLSearchParams(location.search);
+    const themeButton = document.querySelector('#theme');
+    const preview = document.querySelector('#preview-state');
+    const content = document.querySelector('#schedule-content');
+    const announcement = document.querySelector('#announcement');
+    const feedback = document.querySelector('#feedback');
+    const template = document.querySelector('#shift-template');
+    const dialog = document.querySelector('#action-dialog');
+    const dialogTitle = document.querySelector('#dialog-title');
+    const dialogCopy = document.querySelector('#dialog-copy');
+    const dialogStatus = document.querySelector('#dialog-status');
+    const dialogAction = document.querySelector('#dialog-action');
+    const dialogClose = document.querySelector('#dialog-close');
+    const qrFields = document.querySelector('#qr-fields');
+    const qrOperation = document.querySelector('#qr-operation');
+    const qrResult = document.querySelector('#qr-result');
+    const advance = document.querySelector('#advance-time');
+    const confirmLocation = document.querySelector('#confirm-location');
+    const minute = 60_000;
+    const timeZone = 'Europe/Bucharest';
+    const localDate = new Intl.DateTimeFormat('ro-RO', { timeZone, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const localTime = new Intl.DateTimeFormat('ro-RO', { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    const at = (day, time) => Date.parse('2026-12-' + day + 'T' + time + ':00+02:00');
+    const date = value => localDate.format(value);
+    const time = value => localTime.format(value);
+    const dateTime = value => date(value) + ', ' + time(value);
+
+    const registration = {
+      confirmed: { label: 'Înscriere confirmată', icon: 'ring', tone: 'confirmed' },
+      queued: { label: 'Pe lista de așteptare', icon: 'clock', tone: 'queued' },
+      proposed: { label: 'Repartizare propusă', icon: 'info', tone: 'queued' },
+      review: { label: 'Înscriere în verificare', icon: 'lock', tone: 'ineligible' },
+      offer: { label: 'Loc rezervat temporar', icon: 'clock', tone: 'queued' },
+      expired: { label: 'Ofertă expirată', icon: 'clock', tone: 'queued' },
+      refused: { label: 'Ofertă refuzată', icon: 'info', tone: '' },
+      withdrawn: { label: 'Înscriere retrasă', icon: 'info', tone: '' },
+      cancelled: { label: 'Tură anulată', icon: 'info', tone: '' },
+      absent: { label: 'Neprezentare', icon: 'info', tone: 'queued' },
+      completed: { label: 'Tură finalizată', icon: 'check', tone: 'confirmed' },
+      location: { label: 'Prezență de confirmat', icon: 'clock', tone: 'queued' },
+      active: { label: 'Tură în curs', icon: 'clock', tone: 'available' }
+    };
+    const operations = {
+      checkin: 'Check-in (sosire)',
+      checkout: 'Check-out (plecare)',
+      endBreak: 'Încheie pauza prin QR',
+      reentry: 'Check-in (revenire)'
+    };
+    let model;
+    let transaction;
+    let currentTheme;
+
+    function fixture(id, day, start, end, role, status = 'confirmed', options = {}) {
+      return {
+        id, role, status,
+        event: 'Trenulețul de iarnă', place: 'Sala comunitară Nord · Sibiu',
+        start: at(day, start), end: at(day, end), attendance: [], breaks: [],
+        ...options
+      };
+    }
+
+    function fixtures(scenario) {
+      const upcoming = [
+        fixture('workshop', '19', '13:30', '15:00', 'Pregătirea atelierelor'),
+        fixture('welcome', '19', '15:30', '16:30', 'Primirea participanților', 'queued'),
+        fixture('packs', '20', '09:00', '13:00', 'Pregătirea pachetelor', 'proposed', {
+          event: 'Pachete pentru comunitate', place: 'Atelierul Stejarului · Mediaș',
+          plannedBreak: [at('20', '11:00'), at('20', '11:20')]
+        }),
+        fixture('reading', '22', '10:00', '12:00', 'Sprijin la lectură', 'review', {
+          event: 'Atelier de povești', place: 'Casa cu povești · Dumbrăveni'
+        })
+      ];
+      const history = [
+        fixture('finished', '18', '10:00', '15:00', 'Pregătirea materialelor', 'completed', {
+          plannedBreak: [at('18', '12:30'), at('18', '12:50')],
+          attendance: [[at('18', '09:55'), at('18', '15:05')]],
+          breaks: [[at('18', '12:32'), at('18', '12:52')]],
+          payroll: 'validated'
+        }),
+        fixture('incomplete', '17', '09:00', '13:00', 'Distribuirea materialelor', 'completed', {
+          attendance: [[at('17', '09:00'), null]], payroll: 'review'
+        }),
+        fixture('short-break', '16', '10:00', '15:00', 'Sprijin logistic', 'completed', {
+          plannedBreak: [at('16', '12:30'), at('16', '12:50')],
+          attendance: [[at('16', '10:00'), at('16', '15:00')]],
+          breaks: [[at('16', '12:30'), at('16', '12:40')]], payroll: 'review'
+        }),
+        fixture('missed', '16', '16:00', '17:00', 'Strângerea materialelor', 'absent'),
+        fixture('cancelled', '15', '09:00', '12:00', 'Amenajarea sălii', 'cancelled', {
+          note: 'Organizatorul a anulat tura.'
+        }),
+        fixture('withdrawn', '14', '10:00', '12:00', 'Pregătirea materialelor', 'withdrawn')
+      ];
+
+      const state = { scenario, now: at('19', '12:35'), view: scenario === 'history' ? 'history' : 'upcoming', shifts: [...upcoming, ...history] };
+      if (scenario === 'empty') state.shifts = [];
+      if (scenario === 'single') state.shifts = [upcoming[0]];
+      if (scenario === 'many') {
+        state.shifts.push(
+          fixture('decor', '19', '17:00', '18:30', 'Strângerea decorațiunilor'),
+          fixture('setup', '21', '10:00', '12:00', 'Amenajarea sălii'),
+          fixture('supplies', '22', '14:00', '16:00', 'Distribuirea materialelor'),
+          fixture('tidy', '23', '17:00', '19:00', 'Strângerea materialelor')
+        );
+      }
+      if (scenario === 'long') {
+        state.shifts = [fixture('long', '19', '13:30', '15:00',
+          'Pregătirea materialelor pentru atelierele creative și întâmpinarea grupurilor de voluntari', 'confirmed', {
+            event: 'Trenulețul de iarnă pentru copii, familii și voluntarii din comunitate',
+            place: 'Centrul comunitar de activități pentru familii și voluntari din Dumbrăveni'
+          }), upcoming[1]];
+      }
+      if (['urgent', 'multiple-offers', 'live-offer', 'offer-race', 'offer-ineligible', 'success'].includes(scenario)) {
+        const offered = upcoming[1];
+        offered.status = scenario === 'success' ? 'confirmed' : 'offer';
+        offered.deadline = Math.min(at('19', '00:50') + 12 * 60 * minute, offered.start);
+        offered.justConfirmed = scenario === 'success';
+      }
+      if (scenario === 'multiple-offers') {
+        state.shifts.push(fixture('second-offer', '21', '16:00', '18:00', 'Sortarea donațiilor', 'offer', {
+          deadline: at('19', '13:20')
+        }));
+      }
+      if (['scan', 'on-site', 'waiting-on-site', 'present', 'live-offer', 'break', 'reentry', 'outside'].includes(scenario)) {
+        const shift = fixture('live-shift', '19', '10:00', '15:00', 'Sprijin logistic', 'confirmed', {
+          plannedBreak: [at('19', '12:30'), at('19', '12:50')]
+        });
+        state.now = at('19', '09:50');
+        shift.onSiteRequired = ['on-site', 'waiting-on-site'].includes(scenario);
+        if (scenario === 'waiting-on-site') shift.attendance.push([state.now, null]);
+        if (['present', 'live-offer', 'break', 'reentry', 'outside'].includes(scenario)) {
+          state.now = at('19', scenario === 'live-offer' ? '12:40' : '12:50');
+          shift.attendance.push([at('19', '09:55'), scenario === 'reentry' ? at('19', '12:25') : null]);
+        }
+        if (scenario === 'break') shift.breaks.push([at('19', '12:30'), null]);
+        if (scenario === 'outside') {
+          state.now = at('19', '15:31');
+          state.view = 'history';
+        }
+        state.shifts = [shift, ...state.shifts.filter(item => item.id !== 'workshop')];
+      }
+      return state;
+    }
+
+    function duration(ms) {
+      const minutes = Math.floor(ms / minute);
+      const hours = Math.floor(minutes / 60);
+      return hours ? hours + ' h' + (minutes % 60 ? ' ' + minutes % 60 + ' min' : '') : minutes + ' min';
+    }
+
+    function bounded(intervals, start, end) {
+      return intervals.map(([from, to]) => [Math.max(start, from), Math.min(end, to ?? end)])
+        .filter(([from, to]) => to > from);
+    }
+
+    function total(intervals) {
+      const ordered = intervals.slice().sort(([a], [b]) => a - b);
+      let sum = 0;
+      let last = -Infinity;
+      for (const [start, end] of ordered) {
+        sum += Math.max(0, end - Math.max(start, last));
+        last = Math.max(last, end);
+      }
+      return sum;
+    }
+
+    function times(shift) {
+      const end = Math.min(model.now, shift.end);
+      const attendance = bounded(shift.attendance, shift.start, end);
+      const breaks = attendance.flatMap(([start, stop]) => bounded(shift.breaks, start, stop));
+      return { performed: total(attendance) - total(breaks), breaks: total(breaks), actualBreaks: total(bounded(shift.breaks, -Infinity, model.now)) };
+    }
+
+    function awaitingLocation(shift) {
+      return shift.onSiteRequired && !shift.onSiteConfirmed && shift.attendance.length > 0;
+    }
+
+    function inWindow(shift) {
+      return model.now >= shift.start - 15 * minute && model.now <= shift.end + 30 * minute;
+    }
+
+    function openInterval(intervals) {
+      return intervals.at(-1)?.[1] === null;
+    }
+
+    function refreshStatuses() {
+      for (const shift of model.shifts) {
+        if (shift.status === 'offer' && model.now >= shift.deadline) shift.status = 'expired';
+        if (shift.status !== 'confirmed' || model.now < shift.end) continue;
+        if (!shift.attendance.length) {
+          shift.status = 'absent';
+          continue;
+        }
+        if (openInterval(shift.attendance) && model.now <= shift.end + 30 * minute) continue;
+        shift.status = 'completed';
+        const planned = shift.plannedBreak ? shift.plannedBreak[1] - shift.plannedBreak[0] : 0;
+        shift.payroll = awaitingLocation(shift) || openInterval(shift.attendance) || times(shift).breaks < planned ? 'review' : 'calculated';
+      }
+    }
+
+    function pendingActions(shift) {
+      if (openInterval(shift.breaks)) return ['endBreak', 'checkout'];
+      if (openInterval(shift.attendance)) return ['checkout'];
+      return [shift.attendance.length ? 'reentry' : 'checkin'];
+    }
+
+    function svg(icon, className = 'icon') {
+      const item = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      item.setAttribute('class', className);
+      item.setAttribute('aria-hidden', 'true');
+      const use = document.createElementNS(item.namespaceURI, 'use');
+      use.setAttribute('href', '#icon-' + icon);
+      item.append(use);
+      return item;
+    }
+
+    function action(label, handler, primary = false, icon = '') {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = primary ? 'button primary' : 'button';
+      button.append(label);
+      if (icon) button.append(svg(icon, 'icon action-icon'));
+      button.addEventListener('click', handler);
+      return button;
+    }
+
+    function writeCardField(card, selector, text) {
+      const field = card.querySelector(selector);
+      field.textContent = text;
+      field.hidden = !text;
+    }
+
+    function addFact(list, label, value, icon) {
+      const group = document.createElement('div');
+      const title = document.createElement('dt');
+      const detail = document.createElement('dd');
+      title.append(svg(icon), label);
+      detail.textContent = value;
+      group.append(title, detail);
+      list.append(group);
+      list.hidden = false;
+    }
+
+    function addAttendanceFacts(list, shift) {
+      const summary = times(shift);
+      if (shift.plannedBreak) {
+        const [start, end] = shift.plannedBreak;
+        addFact(list, 'Pauză planificată', time(start) + '–' + time(end) + ' · ' + duration(end - start), 'clock');
+      }
+      if (shift.attendance.length) addFact(list, 'Pauză efectuată', duration(summary.actualBreaks), 'pause');
+      if (awaitingLocation(shift)) {
+        addFact(list, 'Confirmare la locație', 'În așteptare', 'info');
+      } else if (shift.attendance.length && !openInterval(shift.attendance)) {
+        addFact(list, 'Timp efectuat', duration(summary.performed), 'clock');
+      } else if (shift.status === 'confirmed' && shift.attendance.length) {
+        addFact(list, 'Timp efectuat până acum', duration(summary.performed), 'clock');
+      }
+      if (shift.onSiteConfirmed) addFact(list, 'Prezență la locație', 'Confirmată', 'check');
+      if (shift.payroll) {
+        const state = { validated: 'Ore validate', review: 'Necesită verificare', calculated: 'Calculat · În așteptarea validării' };
+        addFact(list, 'Pontaj', state[shift.payroll], shift.payroll === 'validated' ? 'check' : 'info');
+      }
+    }
+
+    function buildCard(shift, priority) {
+      const card = template.content.firstElementChild.cloneNode(true);
+      const pendingLocation = awaitingLocation(shift);
+      const currentStatus = pendingLocation ? 'location' : 'active';
+      const state = registration[priority === 'current' ? currentStatus : shift.status];
+      const badge = card.querySelector('.state');
+      const buttons = card.querySelector('.shift-buttons');
+      const facts = card.querySelector('.attendance-meta');
+      card.dataset.shiftId = shift.id;
+      card.dataset.status = state.tone || shift.status;
+      badge.classList.add(...[state.tone, shift.justConfirmed ? 'just-confirmed' : ''].filter(Boolean));
+      badge.querySelector('.state-label').textContent = priority === 'current' && !shift.attendance.length && model.now < shift.start
+        ? 'Check-in disponibil' : state.label;
+      badge.querySelector('use').setAttribute('href', '#icon-' + state.icon);
+      card.querySelector('h3').textContent = shift.role;
+      writeCardField(card, '.event-name', shift.event);
+      writeCardField(card, '.shift-time span', time(shift.start) + '–' + time(shift.end));
+      writeCardField(card, '.shift-place span', shift.place);
+
+      let note = shift.note || '';
+      let reason = '';
+      if (priority) note = date(shift.start);
+      if (priority === 'offer') {
+        addFact(facts, 'Răspunde până la', dateTime(shift.deadline), 'clock');
+        reason = 'Timp rămas: ' + duration(shift.deadline - model.now);
+        buttons.append(
+          action('Acceptă oferta', () => ask('accept', shift), true, 'arrow-right'),
+          action('Refuză oferta', () => ask('refuse', shift))
+        );
+      } else if (priority === 'current') {
+        card.append(facts);
+        if (shift.attendance.length) addFact(facts, 'Check-in înregistrat', time(shift.attendance[0][0]), 'clock');
+        addAttendanceFacts(facts, shift);
+        if (pendingLocation) {
+          reason = 'Așteaptă confirmarea la locație de către coordonator.';
+        } else {
+          const hasBreak = openInterval(shift.breaks);
+          if (openInterval(shift.attendance) && model.now < shift.end) {
+            const label = hasBreak ? 'Încheie pauza' : 'Începe pauza';
+            buttons.append(action(label, () => changeBreak(shift), true));
+          }
+          buttons.append(action('Scanează codul QR', () => ask('scan', shift), !buttons.children.length, 'arrow-right'));
+          if (hasBreak) reason = 'Pauza este în curs.';
+          else if (openInterval(shift.attendance)) reason = 'Prezența este înregistrată.';
+          else if (shift.attendance.length) reason = 'Poți reveni în tură prin scanare.';
+          else reason = 'Poți face check-in la locație.';
+        }
+        if (model.now < shift.start) buttons.append(action('Retrage înscrierea', () => ask('withdraw', shift)));
+      } else if (shift.status === 'confirmed') {
+        if (shift.start - 15 * minute > model.now) reason = 'Check-in disponibil de la ' + time(shift.start - 15 * minute) + '.';
+        if (model.now < shift.start) buttons.append(action('Retrage înscrierea', () => ask('withdraw', shift)));
+        if (shift.plannedBreak) addAttendanceFacts(facts, shift);
+      } else if (shift.status === 'queued') {
+        reason = 'Vei primi o ofertă dacă se eliberează un loc și îți vine rândul.';
+      } else if (shift.status === 'proposed') {
+        reason = 'Coordonatorul ți-a propus acest rol.';
+        if (model.now < shift.start) buttons.append(action('Acceptă repartizarea', () => ask('assignment', shift), true, 'arrow-right'));
+      } else if (shift.status === 'review') {
+        reason = 'Locul tău rămâne rezervat. Check-in-ul este blocat până la remediere.';
+        if (model.now < shift.start) buttons.append(action('Retrage înscrierea', () => ask('withdraw', shift)));
+      } else if (shift.status === 'completed') {
+        addAttendanceFacts(facts, shift);
+        if (shift.payroll === 'review') reason = awaitingLocation(shift)
+          ? 'Check-in-ul a rămas în așteptarea confirmării la locație.'
+          : 'Coordonatorul verifică pontajul înainte de validare.';
+      } else if (['expired', 'refused'].includes(shift.status) && model.now < shift.start) {
+        reason = 'Poți intra din nou la finalul listei de așteptare.';
+        buttons.append(action('Intră din nou pe lista de așteptare', () => ask('rejoin', shift)));
+      }
+      if (shift.id === 'live-shift' && model.scenario === 'outside') reason = 'Fereastra de scanare s-a încheiat. Coordonatorul verifică pontajul.';
+      if (shift.status === 'absent') reason = 'Pentru această tură nu a fost înregistrat un check-in.';
+      writeCardField(card, '.shift-note', note);
+      writeCardField(card, '[data-reason]', reason);
+      card.querySelector('.shift-action').hidden = !reason && !buttons.children.length;
+      return card;
+    }
+
+    function renderList(id, shifts, priority) {
+      document.querySelector('#' + id + '-section').hidden = !shifts.length;
+      document.querySelector('#' + id + '-list').replaceChildren(...shifts.map(shift => buildCard(shift, priority)));
+    }
+
+    function showNotice(title, text, next) {
+      const card = document.createElement('div');
+      card.className = 'card notice';
+      const heading = document.createElement('h3');
+      const detail = document.createElement('p');
+      heading.textContent = title;
+      detail.textContent = text;
+      card.append(heading, detail);
+      if (next) card.append(next);
+      content.append(card);
+    }
+
+    function displayGroups(shifts, history, visibleCards) {
+      const days = new Map();
+      for (const shift of shifts) {
+        const day = date(shift.start);
+        if (!days.has(day)) days.set(day, []);
+        days.get(day).push(shift);
+      }
+      let index = 0;
+      for (const [day, entries] of days) {
+        const group = document.createElement('div');
+        group.className = 'date-group';
+        group.setAttribute('role', 'group');
+        const label = document.createElement('p');
+        label.className = 'date-title';
+        label.id = 'day-' + ++index;
+        label.textContent = day[0].toUpperCase() + day.slice(1);
+        group.setAttribute('aria-labelledby', label.id);
+        const list = document.createElement('ul');
+        list.className = 'shift-list';
+        list.setAttribute('role', 'list');
+        list.append(...entries.map(shift => buildCard(shift)));
+        group.append(label, list);
+        content.append(group);
+        if (!history && !entries.some(shift => ['proposed', 'review'].includes(shift.status))) {
+          const initialCard = Array.from(list.children).find(card => visibleCards.has(card.dataset.shiftId));
+          addCardCarousel(list, label.id, initialCard);
+        }
+      }
+    }
+
+    function render(preservePosition = true) {
+      const visibleCards = new Set();
+      if (preservePosition && cardCarouselMobile.matches) {
+        for (const list of content.querySelectorAll('.card-carousel-list')) {
+          visibleCards.add(activeCarouselCard(list).dataset.shiftId);
+        }
+      }
+      refreshStatuses();
+      const current = model.shifts.filter(shift => shift.status === 'confirmed' && inWindow(shift))
+        .sort((left, right) => left.start - right.start);
+      const offers = model.shifts.filter(shift => shift.status === 'offer')
+        .sort((left, right) => left.deadline - right.deadline);
+      const activeIds = new Set([...current, ...offers].map(shift => shift.id));
+      const loading = model.scenario === 'loading';
+      const unavailable = loading || model.scenario === 'error';
+      renderList('current', unavailable ? [] : current, 'current');
+      renderList('offer', unavailable ? [] : offers, 'offer');
+      document.querySelectorAll('[data-view]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.view === model.view));
+      });
+      document.querySelector('#preview-clock').textContent = 'Ora simulată: ' + dateTime(model.now);
+      advance.disabled = unavailable;
+      confirmLocation.hidden = !current.some(awaitingLocation);
+      content.replaceChildren();
+      content.setAttribute('aria-busy', String(loading));
+      if (loading) {
+        const message = document.createElement('p');
+        message.className = 'hint';
+        message.setAttribute('role', 'status');
+        message.textContent = 'Se încarcă programul…';
+        const placeholder = document.querySelector('#loading-template');
+        content.append(message, placeholder.content.cloneNode(true));
+        return;
+      }
+      if (model.scenario === 'error') {
+        showNotice('Programul nu s-a încărcat', 'Încearcă din nou pentru a vedea turele.',
+          action('Încearcă din nou', () => {
+            reset('default');
+            document.querySelector('#schedule-title').focus();
+          }));
+        return;
+      }
+      const past = ['completed', 'absent', 'cancelled', 'withdrawn'];
+      const history = model.view === 'history';
+      const shifts = model.shifts.filter(shift => !activeIds.has(shift.id) &&
+        (history === (past.includes(shift.status) || shift.end < model.now)))
+        .sort((left, right) => history ? right.start - left.start : left.start - right.start);
+      if (shifts.length) {
+        displayGroups(shifts, history, visibleCards);
+      } else if (history) {
+        showNotice('Istoricul este gol', 'Aici vor apărea turele după încheiere.',
+          action('Vezi turele viitoare', () => setView('upcoming', true)));
+      } else {
+        const link = document.createElement('a');
+        link.className = 'button primary';
+        link.id = 'empty-catalog';
+        link.href = 'DS-003.html?theme=' + currentTheme;
+        link.append('Vezi evenimentele', svg('arrow-right', 'icon action-icon'));
+        showNotice('Nu ai ture viitoare', 'Alege un eveniment pentru a găsi o tură.', link);
+      }
+    }
+
+    function notify(message, error = false, focus = false) {
+      feedback.hidden = false;
+      feedback.textContent = message;
+      feedback.classList.toggle('error', error);
+      announcement.textContent = message;
+      if (focus) feedback.focus();
+    }
+
+    function reset(scenario) {
+      model = fixtures(scenario);
+      preview.value = scenario;
+      feedback.hidden = true;
+      announcement.textContent = '';
+      render(false);
+      if (scenario === 'success') notify('Oferta a fost acceptată. Înscrierea este confirmată.');
+    }
+
+    function setView(view, focus) {
+      const sameView = model.view === view;
+      model.view = view;
+      render(sameView);
+      if (focus) document.querySelector('[data-view="' + view + '"]').focus();
+    }
+
+    const confirmations = {
+      accept: ['Acceptă oferta', 'Verificăm din nou condițiile de înscriere înainte de confirmare.'],
+      refuse: ['Refuză oferta', 'Locul rezervat va fi eliberat. Dacă revii pe listă, intri la final.'],
+      assignment: ['Acceptă repartizarea', 'Verificăm eligibilitatea și locul pentru rolul propus.'],
+      withdraw: ['Retrage înscrierea', 'Retragerea eliberează locul rezervat pentru această tură.'],
+      rejoin: ['Intră din nou pe lista de așteptare', 'Vei fi adăugat la finalul listei de așteptare.']
+    };
+
+    function ask(kind, shift) {
+      transaction = { kind, shift, opener: document.activeElement, changed: false };
+      qrFields.hidden = kind !== 'scan';
+      dialogStatus.textContent = '';
+      dialogStatus.classList.remove('error');
+      dialogClose.textContent = 'Renunță';
+      if (kind === 'scan') {
+        dialogTitle.textContent = 'Scanează codul QR';
+        dialogCopy.textContent = 'Scanare simulată pentru ' + shift.role + '. Alege rezultatul codului.';
+        qrOperation.replaceChildren(...pendingActions(shift).map(key => new Option(operations[key], key)));
+        qrOperation.disabled = qrOperation.options.length === 1;
+        qrResult.value = 'valid';
+        dialogAction.textContent = 'Simulează scanarea';
+      } else {
+        const [title, copy] = confirmations[kind];
+        dialogTitle.textContent = title;
+        dialogCopy.textContent = shift.role + ' · ' + dateTime(shift.start) + '. ' + copy;
+        dialogAction.textContent = title;
+      }
+      dialog.showModal();
+      dialogTitle.focus();
+    }
+
+    function finish(message, error = false) {
+      transaction.changed = true;
+      render();
+      notify(message, error);
+      dialog.close();
+    }
+
+    function respond() {
+      const { kind, shift } = transaction;
+      if (kind === 'scan') {
+        scan(shift);
+        return;
+      }
+      if (kind === 'accept' && model.scenario === 'offer-race') model.now = shift.deadline;
+      refreshStatuses();
+      if (['accept', 'refuse'].includes(kind) && shift.status !== 'offer') {
+        finish('Oferta a expirat. Poți intra din nou la finalul listei de așteptare.', true);
+        return;
+      }
+      if (kind === 'accept' && model.scenario === 'offer-ineligible') {
+        finish('Condițiile de înscriere nu mai sunt îndeplinite. Înscrierea nu a fost confirmată.', true);
+        return;
+      }
+      if (kind === 'withdraw' && model.now >= shift.start) {
+        finish('Retragerea este disponibilă până la începutul turei.', true);
+        return;
+      }
+      const results = {
+        accept: ['confirmed', 'Oferta a fost acceptată. Înscrierea este confirmată.'],
+        assignment: ['confirmed', 'Repartizarea a fost acceptată. Înscrierea este confirmată.'],
+        refuse: ['refused', 'Oferta a fost refuzată. Locul rezervat a fost eliberat.'],
+        withdraw: ['withdrawn', 'Înscrierea a fost retrasă.'],
+        rejoin: ['queued', 'Ai intrat din nou la finalul listei de așteptare.']
+      };
+      const [status, message] = results[kind];
+      shift.status = status;
+      shift.justConfirmed = status === 'confirmed';
+      finish(message);
+    }
+
+    function closeInterval(intervals) {
+      if (openInterval(intervals)) intervals.at(-1)[1] = model.now;
+    }
+
+    function changeBreak(shift) {
+      const ending = openInterval(shift.breaks);
+      if (ending) closeInterval(shift.breaks);
+      else shift.breaks.push([model.now, null]);
+      render();
+      notify(ending ? 'Pauza a fost încheiată.' : 'Pauza a început.', false, true);
+    }
+
+    function scan(shift) {
+      const errors = {
+        invalid: 'Codul QR nu este valid. Scanează codul afișat la locație.',
+        expired: 'Codul QR a expirat. Încearcă din nou cu codul actual.',
+        camera: 'Camera este indisponibilă. Verifică accesul la cameră și reîncearcă.'
+      };
+      let error = errors[qrResult.value];
+      if (!inWindow(shift)) error = 'Fereastra de scanare pentru această tură s-a încheiat.';
+      if (shift.status !== 'confirmed') error = 'Check-in-ul necesită o înscriere confirmată și eligibilă.';
+      if (error) {
+        dialogStatus.textContent = error;
+        dialogStatus.classList.add('error');
+        return;
+      }
+      if (transaction.recorded) {
+        dialogStatus.classList.remove('error');
+        dialogStatus.textContent = 'Scanarea a fost deja înregistrată. Pontajul a rămas același.';
+        return;
+      }
+
+      const operation = qrOperation.value;
+      let message;
+      if (operation === 'checkout') {
+        const hadBreak = openInterval(shift.breaks);
+        closeInterval(shift.attendance);
+        closeInterval(shift.breaks);
+        message = hadBreak ? 'Check-out înregistrat. Pauza a fost încheiată.' : 'Check-out înregistrat.';
+      } else if (operation === 'endBreak') {
+        closeInterval(shift.breaks);
+        message = 'Pauza a fost încheiată prin QR. Prezența continuă.';
+      } else {
+        shift.attendance.push([model.now, null]);
+        message = awaitingLocation(shift) ? 'Check-in înregistrat. Așteaptă confirmarea la locație.'
+          : operation === 'reentry' ? 'Revenirea a fost înregistrată.' : 'Check-in înregistrat.';
+      }
+      transaction.recorded = true;
+      transaction.changed = true;
+      qrOperation.disabled = true;
+      qrResult.disabled = true;
+      dialogClose.textContent = 'Închide';
+      dialogAction.textContent = 'Repetă scanarea';
+      dialogStatus.classList.remove('error');
+      dialogStatus.textContent = message;
+      render();
+      notify(message);
+    }
+
+    document.querySelectorAll('[data-view]').forEach(button => {
+      button.addEventListener('click', () => setView(button.dataset.view, false));
+    });
+    preview.addEventListener('change', () => reset(preview.value));
+    advance.addEventListener('click', () => {
+      const previousOffers = model.shifts.filter(shift => shift.status === 'offer');
+      model.now += 20 * minute;
+      render();
+      if (previousOffers.some(shift => shift.status === 'expired')) notify('Oferta a expirat.');
+      else announcement.textContent = 'Ora simulată: ' + time(model.now);
+    });
+    confirmLocation.addEventListener('click', () => {
+      const shift = model.shifts.find(item => item.status === 'confirmed' && inWindow(item) && awaitingLocation(item));
+      if (!shift) return;
+      shift.onSiteConfirmed = true;
+      render();
+      notify('Prezența la locație a fost confirmată. Ora check-in-ului a rămas ' + time(shift.attendance[0][0]) + '.', false, true);
+    });
+    dialogAction.addEventListener('click', respond);
+    dialogClose.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => {
+      qrResult.disabled = false;
+      if (transaction.changed) feedback.focus();
+      else if (transaction.opener?.isConnected) transaction.opener.focus();
+      transaction = null;
+    });
+
+    function setTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      const dark = theme === 'dark';
+      const label = dark ? 'Temă luminoasă' : 'Temă întunecată';
+      themeButton.setAttribute('aria-label', label);
+      themeButton.querySelector('.header-control-label').textContent = label;
+      themeButton.querySelector('use').setAttribute('href', dark ? '#icon-sun' : '#icon-moon');
+    }
+
+    const touchPresses = new Map();
+    document.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch') return;
+      const button = event.target.closest('.button:not(:disabled)');
+      if (!button) return;
+      button.setAttribute('data-touch-pressed', '');
+      touchPresses.set(event.pointerId, button);
+    }, { passive: true });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      document.addEventListener(type, event => {
+        touchPresses.get(event.pointerId)?.removeAttribute('data-touch-pressed');
+        touchPresses.delete(event.pointerId);
+      }, { passive: true });
+    }
+
+    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    const hoverPreference = matchMedia('(pointer: fine) and (hover: hover)');
+    const motionButton = document.querySelector('#motion');
+    const hero = document.querySelector('.hero');
+    const waves = Array.from(document.querySelectorAll('.section-wave'), (element, index) => {
+      const path = element.querySelector('path');
+      return {
+        element, path, restingPath: path.getAttribute('d'), phase: index * 1.8,
+        x: 0.5, targetX: 0.5, y: 0, targetY: 0, strength: 0, hovered: false
+      };
+    });
+    const visible = new Set();
+    let paused = false;
+    let frame = 0;
+    let previousFrame = 0;
+    let elapsed = 0;
+    let panelDuration = 0;
+
+    function motionEnabled() {
+      return !paused && !motionPreference.matches;
+    }
+
+    function drawWave(wave, phase, easing) {
+      wave.x += (wave.targetX - wave.x) * easing;
+      wave.y += (wave.targetY - wave.y) * easing;
+      const targetStrength = wave.hovered && hoverPreference.matches ? 1 : 0;
+      wave.strength += (targetStrength - wave.strength) * easing;
+
+      const amplitude = 11 + 9 * wave.strength;
+      const travelling = phase + wave.phase + (wave.x - 0.5) * 2.4 * wave.strength;
+      const points = Array.from({ length: 25 }, (_, index) => {
+        const x = index / 24;
+        const nearCursor = Math.max(0, 1 - Math.abs(x - wave.x) * 3) ** 2;
+        const bend = nearCursor * (wave.y * 8 - 5) * wave.strength;
+        const y = 32 + Math.sin(x * 10.5 - travelling) * amplitude
+          + Math.cos(x * 17 + travelling * 0.66) * 3.6 + bend;
+        return Math.max(2, Math.min(62, y));
+      });
+
+      let shape = `M0 ${points[0].toFixed(1)}`;
+      for (let index = 1; index < points.length - 1; index += 1) {
+        const midpoint = (points[index] + points[index + 1]) / 2;
+        shape += ` Q${index * 60} ${points[index].toFixed(1)} ${index * 60 + 30} ${midpoint.toFixed(1)}`;
+      }
+      shape += ` T1440 ${points.at(-1).toFixed(1)} V64 H0 Z`;
+      wave.path.setAttribute('d', shape);
+    }
+
+    function scheduleMotion() {
+      if (frame || !motionEnabled() || document.hidden) return;
+      if (!waves.some(wave => visible.has(wave.element))) return;
+      frame = requestAnimationFrame(time => {
+        frame = 0;
+        if (!motionEnabled() || document.hidden) return;
+        const delta = previousFrame ? Math.min(time - previousFrame, 50) : 0;
+        previousFrame = time;
+        elapsed += delta;
+
+        const phase = (elapsed / (panelDuration * 22)) * 2 * Math.PI;
+        const easing = 1 - Math.exp(-delta / (panelDuration * 0.56));
+        for (const wave of waves) {
+          if (visible.has(wave.element)) drawWave(wave, phase, easing);
+        }
+        scheduleMotion();
+        if (!frame) previousFrame = 0;
+      });
+    }
+
+    function syncMotion() {
+      const enabled = motionEnabled();
+      document.documentElement.dataset.motion = enabled ? 'on' : 'off';
+      motionButton.disabled = motionPreference.matches;
+      motionButton.setAttribute('aria-pressed', String(!enabled));
+      motionButton.querySelector('use').setAttribute('href', enabled ? '#icon-pause' : '#icon-play');
+
+      if (enabled) {
+        panelDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--motion-panel'));
+        scheduleMotion();
+        return;
+      }
+      cancelAnimationFrame(frame);
+      frame = 0;
+      previousFrame = 0;
+      hero.classList.remove('is-entering');
+      document.querySelectorAll('.motion-reveal.has-entered').forEach(section => section.classList.remove('has-entered'));
+      for (const wave of waves) {
+        wave.hovered = false;
+        if (motionPreference.matches) wave.path.setAttribute('d', wave.restingPath);
+      }
+    }
+
+    for (const wave of waves) {
+      wave.element.addEventListener('pointermove', event => {
+        if (!motionEnabled() || !hoverPreference.matches || event.pointerType === 'touch') return;
+        const bounds = wave.element.getBoundingClientRect();
+        wave.targetX = (event.clientX - bounds.left) / bounds.width;
+        wave.targetY = 2 * (event.clientY - bounds.top) / bounds.height - 1;
+        wave.hovered = true;
+      }, { passive: true });
+      wave.element.addEventListener('pointerleave', () => { wave.hovered = false; });
+    }
+
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const section = entry.target;
+          if (motionEnabled() && !section.contains(document.activeElement)) {
+            section.classList.add('has-entered');
+          }
+          revealObserver.unobserve(entry.target);
+        }
+      }, { rootMargin: '0px 0px -5% 0px' });
+      document.querySelectorAll('.motion-reveal').forEach(section => {
+        revealObserver.observe(section);
+        section.addEventListener('animationend', event => {
+          if (event.target === section) section.classList.remove('has-entered');
+        });
+      });
+      const visibilityObserver = new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+        }
+        scheduleMotion();
+      });
+      waves.forEach(wave => visibilityObserver.observe(wave.element));
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        previousFrame = 0;
+      } else {
+        scheduleMotion();
+      }
+    });
+    motionPreference.addEventListener('change', syncMotion);
+    motionButton.addEventListener('click', () => {
+      paused = !paused;
+      syncMotion();
+    });
+    if (motionEnabled()) hero.classList.add('is-entering');
+    hero.querySelector('.hero-title p').addEventListener('animationend', () => hero.classList.remove('is-entering'));
+    syncMotion();
+
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      setTheme(theme);
+      const link = document.querySelector('#empty-catalog');
+      if (link) link.href = 'DS-003.html?theme=' + theme;
+    }
+
+    applyTheme(params.get('theme') === 'dark' ? 'dark' : 'light');
+    themeButton.addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'));
+    const scenario = params.get('state');
+    reset([...preview.options].some(option => option.value === scenario) ? scenario : 'default');
+  </script>
+</body>
+</html>
