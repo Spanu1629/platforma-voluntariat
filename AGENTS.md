@@ -97,7 +97,7 @@ Approved project scope is in `docs/agents/PROJECT-BRIEF.md`; partner-specific de
 
 ## 2. Stack and commands
 The approved stack and architecture are in D-003 and D-005. Docker is required locally and for PostgreSQL integration tests. Managed PostgreSQL is permitted for public deployment under D-009.
-Install, build, run, test, lint, type-check and release: not run; no application or command definitions exist.
+The backend scaffold uses Node.js 24. From `backend/`, run `npm ci`, `npm run prisma:generate`, `npm run build` (generation and TypeScript compilation), and `npm start` (compiled NestJS bootstrap). Application test and lint commands remain open under Q-003, and release commands under Q-004.
 Mock screenshots use Playwright and Chromium for DS-004 at the [reference viewports](docs/design/DESIGN.md#breakpoints--window-sizes). The application screenshot procedure remains open (Q-007).
 Ledger check (run during setup):
 
@@ -107,13 +107,14 @@ python3 docs/agents/tools/ledger-lint.py
 ```
 
 ## 3. Layout
+- `backend/`: NestJS entry point, npm lockfile, TypeScript configuration and Prisma generator.
 - `.claude/`: Claude plan/build skills and planner/builder roles.
 - `.agents/skills/`: Codex plan/build skills.
 - `.codex/agents/`: Codex planner/builder roles.
 - `docs/agents/`: knowledge ledger, project brief, runtime mapping and setup report.
 - `docs/design/`: design rules, Codex companion, registry, mocks and screenshot directories.
 - `CONTEXT.md`: project vocabulary.
-No application source, dependencies, database definitions or Docker configuration exist yet.
+The backend scaffold is in place. Database models, migrations and Docker configuration are planned.
 
 ## 4. Rules for this repo
 - Team, ClickUp and Slack addons are declined. No ticket workflow is installed.

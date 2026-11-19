@@ -11,7 +11,7 @@
 ## Index
 - Q-001 · Which technologies and architecture will the application use? · _answered_
 - Q-002 · Ce reguli organizatorice de bază au fost confirmate? · _answered_
-- Q-003 · Which installation, run, build, test and quality commands will the selected stack provide?
+- Q-003 · Which installation, run, build, test and quality commands will the selected stack provide? · _investigating_
 - Q-004 · How will deployment, versioning and releases work?
 - Q-005 · What visual tokens and supported viewport sizes should the application use? · _answered_
 - Q-006 · Which screens and shared components should be designed first? · _answered_
@@ -33,6 +33,7 @@
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
 - **Answer:** 2026-11-18 — Separate React frontend and modular NestJS backend, PostgreSQL and Prisma, REST/OpenAPI, SSE, persistent PostgreSQL jobs, Jest, GitHub Actions and Docker Compose.
 - **Recorded as:** D-003, D-005 and D-009.
+- **Confirmed:** 2026-11-19
 
 ## Q-002 · Ce reguli organizatorice de bază au fost confirmate?
 - **Status:** answered
@@ -42,12 +43,12 @@
 - **Recorded as:** [D-012–D-017](decisions/reguli-organizatorice.md) și [brief-ul actualizat](PROJECT-BRIEF.md).
 
 ## Q-003 · Which installation, run, build, test and quality commands will the selected stack provide?
-- **Status:** open
-- **Blocks:** Executable application checks and application definition of done.
+- **Status:** investigating
+- **Blocks:** Application test and lint commands and the full application definition of done.
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
-- **Proposed answer:** None. No package manifests, source files or test runner exist.
+- **Proposed answer:** For the backend scaffold, use Node.js 24 and run `npm ci`, `npm run prisma:generate`, `npm run build` and `npm start` from `backend/`. The build generates the client before compiling TypeScript. Application test and lint commands are pending.
 - **Answer:** Pending.
-- **Recorded as:** None.
+- **Recorded as:** [Backend scaffold commands](../../backend/package.json) and [verification instructions](../../README.md#verificarea-scheletului-backend).
 
 ## Q-004 · How will deployment, versioning and releases work?
 - **Status:** open

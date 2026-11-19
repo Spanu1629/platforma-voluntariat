@@ -2,7 +2,7 @@
 
 VolunTrack este un proiect universitar pentru coordonarea voluntarilor Asociației „Mâini Mici, Suflete Mari”. Aplicația web va acoperi planificarea turelor, înscrierea voluntarilor, evidența prezenței și validarea orelor pentru o singură organizație. Asociația organizează evenimente caritabile și activități pentru copii și familii în Dumbrăveni, Mediaș și Sibiu. La data documentării, organizatorii comunicau direct programul și responsabilitățile. [Informații furnizate de asociație](INTERVIEW.md)
 
-**Stadiu:** repository-ul conține documentația proiectului, regulile Graffino și trei machete aprobate local, DS-003, DS-004 și DS-005. Aplicația, schema bazei de date, migrările, seed-ul, configurația Docker și CI, testele aplicației și deploy-ul public sunt planificate. Demonstrația aplicației și pilotul urmează în etapele de livrare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
+**Stadiu.** Repository-ul conține scheletul backendului NestJS și generatorul Prisma, documentația proiectului, regulile Graffino și trei machete aprobate local, DS-003, DS-004 și DS-005. Modelele bazei de date, migrările, seed-ul, configurația Docker și CI, testele aplicației și deploy-ul public sunt planificate. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
 
 ## Funcționalități planificate
 
@@ -36,6 +36,18 @@ VolunTrack este un proiect universitar pentru coordonarea voluntarilor Asociați
 
 Backend-ul va grupa modulele pentru identitate și organizație, eligibilitate, planificare, înscrieri și listă de așteptare, prezență și raportare, documente și comunicare. Joburile își păstrează termenele și progresul la restart și se reiau idempotent. Actualizările SSE se publică după commit, iar interfața recitește starea prin REST după reconectare. [Arhitectură propusă](docs/agents/ARCHITECTURE.md), [decizii aprobate](docs/agents/DECISIONS.md)
 
+## Verificarea scheletului backend
+
+Cu Node.js 24 LTS activ, rulează din `backend/`:
+
+```bash
+npm ci
+npm run build
+node -e "require('./dist/generated/prisma/client.js')"
+```
+
+Buildul rulează `npm run prisma:generate` înainte de compilarea TypeScript în CommonJS. Generarea, compilarea și încărcarea clientului funcționează fără PostgreSQL sau credențiale. Pentru a porni scheletul compilat, rulează `npm start`. NestJS ascultă pe portul 3000.
+
 ## Date și validare
 
 - **Istoric:** seed-ul planificat folosește agregatele ediției „Trenulețul Moșului” din 20.12.2025, cu 24 de voluntari, opt roluri și patru intervale. Alocările nominale, capacitățile pe rol și tură și pontajele individuale sunt necunoscute. [Datele evenimentului](EVENT.md)
@@ -47,4 +59,4 @@ Backend-ul va grupa modulele pentru identitate și organizație, eligibilitate, 
 - Glosarul proiectului și jurnalul sesiunilor sunt în [CONTEXT.md](CONTEXT.md) și [AI_LOG.md](AI_LOG.md).
 - Regulile Graffino și întrebările încă deschise, inclusiv despre capturi, hosting, email și evaluare, sunt în [AGENTS.md](AGENTS.md) și [registrul de întrebări](docs/agents/OPEN-QUESTIONS.md). Designul începe cu DS-004, DS-005 și DS-010, iar token-urile și mock-urile se aprobă înainte de implementarea ecranelor. [Ordinea livrării](docs/agents/PROJECT-BRIEF.md#ordinea-livrării)
 - Politica de prelucrare, testul interesului legitim și cerințele de activare sunt în [documentația GDPR](docs/privacy/GDPR.md).
-- Registrul se verifică cu `python3 docs/agents/tools/ledger-lint.py`. Comenzile de instalare, pornire, build și testare a aplicației rămân de stabilit. [Q-003](docs/agents/OPEN-QUESTIONS.md#q-003--which-installation-run-build-test-and-quality-commands-will-the-selected-stack-provide)
+- Registrul se verifică cu `python3 docs/agents/tools/ledger-lint.py`. Comenzile de testare și lint ale aplicației se stabilesc în etapele următoare. [Q-003](docs/agents/OPEN-QUESTIONS.md#q-003--which-installation-run-build-test-and-quality-commands-will-the-selected-stack-provide)

@@ -5,7 +5,7 @@
 > Once application code exists, update this page to match the code.
 <!-- graffino-agentic:end -->
 
-The repository contains project and design documentation. Application code, migrations, API contracts and runtime configuration have yet to be implemented.
+The backend foundation starts in `backend/` with a NestJS 11 bootstrap on Node.js 24 LTS. The build generates the Prisma 7 client under `src/generated/prisma/` before TypeScript 5.9 compiles the application and client to CommonJS in `dist/`. The Prisma schema declares PostgreSQL as the provider, and generation runs without database credentials. Data models, migrations, API contracts and Docker configuration are planned.
 
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
