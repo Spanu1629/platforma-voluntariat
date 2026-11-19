@@ -257,12 +257,15 @@ Capturi de scenariu. [Filtre și focus în DS-003](screens/review/mobile-carouse
 [Oferte multiple](screens/review/mobile-carousels/DS-005.light.mobile.multiple-offers.png) ·
 [Istoric vertical](screens/review/mobile-carousels/DS-005.dark.mobile.history.png)
 
-### Pregătirea publicării în Figma
+### Pregătirea inițială a importului HTML în Figma
+
+Această secțiune consemnează planul inițial de import HTML. Publicarea finală
+a folosit [snapshoturi PNG](#figma--snapshoturi-png-publicate-2026-11-19).
 
 Sursa publicării este revizia locală aprobată din tabel. Destinația de review
 este fișierul existent din Q-008, cheia `QAC75bztvLOiXcU7oKRHEe`. Registrul local
-consemnează doar aprobarea repo-ului. Accesul reviewerilor, nodurile și
-publicarea sunt de verificat după autorizarea explicită.
+consemnează aprobarea repo-ului. Verificarea accesului și rezultatul importului
+sunt înregistrate mai jos.
 [Destinația de review](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe)
 
 Pentru fiecare ecran, folosește câte un cadru pentru light și dark la
@@ -287,3 +290,84 @@ accesul și capabilitățile pe destinația confirmată, publică variantele și
 Compară capturile Figma cu cele Chromium la aceleași dimensiuni și cere
 confirmarea reviziei publicate după inspecție.
 [Procedura Codex](../agents/CODEX.md#publish-review-approve-implement-republish)
+
+### Figma · import parțial, blocat la verificare, 2026-11-19
+
+Responsabilul proiectului a autorizat publicarea commitului `08f3704` și a
+confirmat că poate deschide fișierul din contul său. Prin conector au fost
+verificate citirea structurii, importul HTML și exportul PNG. Cele 12 variante
+implicite au fost verificate local la dimensiunile aprobate, inclusiv după
+fixarea lățimii în copiile temporare de import.
+
+| Variantă | Cadru Figma | Captură de referință | Captură Figma | Rezultat |
+|---|---|---|---|---|
+| DS-003 · mobil 320 × 720 · light · implicit | [Pilot `21:2`](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=21-2) | [320 × 1606](screens/DS-003.light.mobile.png) | [320 × 1964](screens/review/mobile-carousels/DS-003.light.mobile.figma-pilot.png) | Respins la comparație |
+
+Importul a făcut vizibile legătura de salt, panoul de filtre, contorul de
+filtre cu valoarea zero și controalele din secțiunea demonstrativă închisă.
+Exportul include o bandă neagră deasupra antetului și conținutul este deplasat
+vertical. Figma raportează pentru nod dimensiunea 320 × 1876, iar exportul
+PNG are 320 × 1964.
+
+Instrumentul a adăugat pilotul pe pagina existentă `0:1`, deși răspunsul de
+pregătire indica o pagină nouă. Metadatele de nivel superior ale celor 12
+cadre preexistente coincid cu inventarul anterior importului. Importul s-a
+oprit după pilot. Cadrul rămâne nevalidat ca import HTML.
+
+### Figma · reluarea pilotului DS-003, 2026-11-19
+
+A fost repetată doar varianta DS-003 mobil light implicită din commitul
+`08f3704`. Copia HTML pentru import fixează viewportul și păstrează CSS-ul,
+imaginile și fonturile. Înainte de serializare, Chromium a măsurat panoul
+inert la 0 px cu opacitate 0 și legătura de salt la 40 px deasupra paginii.
+Copia exclude aceste elemente, nodurile marcate `hidden` și conținutul din
+secțiunile `details` închise. Randarea copiei în Chromium coincide pixel cu
+pixel cu referința la dimensiunea de export 320 × 1606. Sursele aprobate
+și interacțiunile lor au fost păstrate.
+
+| Variantă | Cadru Figma | Captură de referință | Captură Figma | Rezultat |
+|---|---|---|---|---|
+| DS-003 · mobil 320 × 720 · light · implicit | [Pilot reluat `22:2`](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=22-2) | [320 × 1606](screens/DS-003.light.mobile.png) | [320 × 1622](screens/review/mobile-carousels/DS-003.light.mobile.figma-pilot-retry.png) | Fidelitate dimensională nevalidată |
+
+Elementele ascunse și banda neagră din primul export au dispărut. În
+Chromium, formularul măsoară 44 px, are marginea inferioară de 0 px și
+este urmat de un spațiu de 24 px. Importul Figma adaugă în jurul
+formularului un grup `:margin` de 60 px. Acesta deplasează rezultatele,
+caruselul și conținutul de sub ele cu 16 px față de referință.
+
+Importul a fost direcționat către nodul de test `21:2`, iar conectorul a
+adăugat `22:2` la nivelul paginii. Inventarul și metadatele subarborilor
+celor 12 cadre preexistente coincid cu cele de dinaintea piloților.
+Cele două cadre de test sunt identificabile prin linkurile din evidență.
+S-a efectuat o singură reluare și restul variantelor a rămas în așteptare.
+
+### Figma · snapshoturi PNG publicate, 2026-11-19
+
+La alegerea responsabilului proiectului, cele 12 variante implicite aprobate
+din `08f3704` au fost publicate ca snapshoturi PNG statice, la dimensiunile
+native, pe o pagină separată din fișierul Q-008. Fiecare cadru conține o imagine.
+Textul și componentele sunt parte din imagine, iar machetele HTML aprobate din
+repo păstrează interacțiunile. [Pagina de snapshoturi](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=23-2)
+
+Pilotul DS-003 mobil light a fost verificat înaintea celorlalte încărcări.
+Pentru toate cele 12 cadre, exportul Figma la scară 1× are dimensiunile
+referinței și zero pixeli RGBA diferiți. Metadatele paginii preexistente
+coincid cu inventarul de dinaintea publicării, inclusiv cele două piloturi HTML.
+
+Confirmare în conversație la 2026-11-19. „Publicarea în Figma este finalizată
+și verificată.”
+
+| Variantă | Dimensiuni native | Referință în repo | Cadru Figma |
+|---|---|---|---|
+| DS-003 · Evenimente disponibile · Mobil · Light | 320 × 1606 | [PNG](screens/DS-003.light.mobile.png) | [23:3](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=23-3) |
+| DS-003 · Evenimente disponibile · Mobil · Dark | 320 × 1606 | [PNG](screens/DS-003.dark.mobile.png) | [24:2](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-2) |
+| DS-003 · Evenimente disponibile · Desktop · Light | 1440 × 1505 | [PNG](screens/DS-003.light.png) | [24:3](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-3) |
+| DS-003 · Evenimente disponibile · Desktop · Dark | 1440 × 1505 | [PNG](screens/DS-003.dark.png) | [24:4](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-4) |
+| DS-004 · Detalii eveniment și înscriere · Mobil · Light | 320 × 2400 | [PNG](screens/DS-004.light.mobile.png) | [24:5](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-5) |
+| DS-004 · Detalii eveniment și înscriere · Mobil · Dark | 320 × 2400 | [PNG](screens/DS-004.dark.mobile.png) | [24:6](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-6) |
+| DS-004 · Detalii eveniment și înscriere · Desktop · Light | 1440 × 1613 | [PNG](screens/DS-004.light.png) | [24:7](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-7) |
+| DS-004 · Detalii eveniment și înscriere · Desktop · Dark | 1440 × 1613 | [PNG](screens/DS-004.dark.png) | [24:8](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-8) |
+| DS-005 · Programul meu · Mobil · Light | 320 × 1890 | [PNG](screens/DS-005.light.mobile.png) | [24:9](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-9) |
+| DS-005 · Programul meu · Mobil · Dark | 320 × 1890 | [PNG](screens/DS-005.dark.mobile.png) | [24:10](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-10) |
+| DS-005 · Programul meu · Desktop · Light | 1440 × 2100 | [PNG](screens/DS-005.light.png) | [24:11](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-11) |
+| DS-005 · Programul meu · Desktop · Dark | 1440 × 2100 | [PNG](screens/DS-005.dark.png) | [24:12](https://www.figma.com/design/QAC75bztvLOiXcU7oKRHEe?node-id=24-12) |
