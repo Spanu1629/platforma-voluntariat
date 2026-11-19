@@ -10,6 +10,7 @@
     "prisma:generate": "prisma generate",
     "build": "npm run prisma:generate && tsc -p tsconfig.json",
     "start": "node dist/main.js",
+    "test": "jest --runInBand",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed"
   },
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "jest": "^30.5.2",
     "prisma": "7.10.1",
     "typescript": "~5.9.3"
   }
