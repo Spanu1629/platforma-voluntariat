@@ -1,6 +1,6 @@
 # Plan — Identitate și acces VolunTrack
 
-**Stare:** Cerințele de mai jos sunt confirmate. Pornirea implementării așteaptă aprobarea explicită a responsabilului proiectului.
+**Stare:** Implementarea a fost aprobată de responsabilul proiectului. Acceptarea livrării emailurilor depinde de proba reală în staging, conform Q-011.
 
 ## Dimensiune și punct de plecare
 

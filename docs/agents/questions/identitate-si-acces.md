@@ -17,3 +17,10 @@
 - **Answer:** 2026-11-20 — Înainte de verificare, contul poate parcurge fluxul de verificare a adresei. După verificare, voluntarul își poate completa profilul chiar dacă aprobarea este în așteptare. Participarea necesită aprobarea contului conform D-021.
 - **Recorded as:** [D-027](../decisions/identitate-si-acces.md#d-027--accesul-voluntarului-în-funcție-de-verificarea-emailului).
 - **Confirmed:** 2026-11-20
+
+## Q-019 · Cum remediem avertismentul din dependența Prisma?
+- **Status:** open
+- **Blocks:** Alegerea remedierii dependenței înainte de publicarea backendului.
+- **Who answers:** Responsabilul proiectului.
+- **Evidence:** Auditul npm raportează GHSA-7589-6fvf-x4pw în `effect` 3.20.0 prin `@prisma/config` 7.10.1. Versiunile sunt identice pe `main` și pe ramura de identitate. [Avizul furnizorului](https://github.com/advisories/GHSA-7589-6fvf-x4pw).
+- **Answer:** Pending.

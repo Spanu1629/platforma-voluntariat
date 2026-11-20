@@ -2,7 +2,7 @@
 
 VolunTrack este un proiect universitar pentru coordonarea voluntarilor Asociației „Mâini Mici, Suflete Mari”. Aplicația web va acoperi planificarea turelor, înscrierea voluntarilor, evidența prezenței și validarea orelor pentru o singură organizație. Asociația organizează evenimente caritabile și activități pentru copii și familii în Dumbrăveni, Mediaș și Sibiu. La data documentării, organizatorii comunicau direct programul și responsabilitățile. [Informații furnizate de asociație](INTERVIEW.md)
 
-**Stadiu.** Fundația backendului include NestJS, PostgreSQL și Prisma în Docker Compose, migrarea inițială, seed-ul istoric și verificările de integrare. Repository-ul conține și trei machete aprobate local, DS-003, DS-004 și DS-005. Funcționalitățile de produs și deploy-ul public sunt etape ulterioare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
+**Stadiu.** Fundația backendului include NestJS, PostgreSQL și Prisma în Docker Compose, migrarea inițială, seed-ul istoric și verificările de integrare. Repository-ul conține și trei machete aprobate local, DS-003, DS-004 și DS-005. Backendul include API-ul de identitate și acces. Validarea emailurilor reale în staging și deploy-ul public sunt etape ulterioare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
 
 ## Funcționalități planificate
 
@@ -49,6 +49,36 @@ curl -i http://127.0.0.1:3000/health/ready
 Backendul este disponibil local pe portul 3000, cu opțiunea `VOLUNTRACK_PORT` pentru un alt port pe host. PostgreSQL rulează în rețeaua Compose. `docker compose down` oprește proiectul și păstrează volumul bazei de date. [Contractul de readiness](docs/agents/CONTRACTS.md#c-001--readiness-ul-backendului)
 
 După migrare, încarcă explicit agregatele istorice aprobate cu `docker compose run --rm migrate npm run db:seed`. Poți rula comanda de mai multe ori. Pentru verificarea istoricului de migrări în baza shadow locală, folosește `docker compose run --rm migrate npm exec -- prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code`. [Agregatele aprobate](EVENT.md#9-utilizarea-datelor-în-voluntrack)
+
+## Operarea modulului de identitate
+
+- Configurează `IDENTITY_PUBLIC_URL` cu originea HTTPS a aplicației și
+  `IDENTITY_SECRET` cu o valoare unică de 32 de octeți în format hex.
+  Folosește secrete distincte pe medii. Păstrează secretul stabil cât timp
+  linkurile emise sunt valabile. Backendul publică schema JSON la
+  `/openapi.json`. Clientul și API-ul folosesc aceeași origine pentru cookie
+  și CSRF. Dacă un proxy de încredere termină TLS, setează
+  `IDENTITY_TRUSTED_PROXIES` cu IP-urile sau CIDR-urile sale explicite.
+- Pentru primul administrator, validează adresa persoanei desemnate în afara
+  aplicației. Rulează o singură dată `node dist/identity/bootstrap-admin.js`
+  în mediul backend cu `IDENTITY_ADMIN_EMAIL` furnizat la runtime și parola
+  transmisă pe stdin din mecanismul de secrete. Comanda refuză repetarea când
+  există deja un administrator. Contul dezvoltatorului se inițializează
+  separat în baza de dezvoltare.
+- Suita de integrare folosește transportul simulat. Pentru livrarea reală
+  confirmă mai întâi Q-011. Configurează apoi `IDENTITY_MAIL_TRANSPORT=resend`,
+  `IDENTITY_MAIL_FROM` și `RESEND_API_KEY` în mediul corespunzător. Domeniul
+  expeditorului trebuie verificat la furnizor. Păstrează tracking-ul de click
+  dezactivat pentru emailurile de acces. Testează trimiterea și primirea pe
+  adrese controlate conform planului de staging.
+- Un link deschis prin GET păstrează acțiunea disponibilă. Clientul trimite
+  fragmentul `token` în corpul POST, împreună cu dovada CSRF și, la resetare
+  sau activare, parola nouă. O probă manuală de staging poate folosi un client
+  API cu cookie jar. Consemnează numai rezultatele, fără tokenuri sau linkuri
+  complete. Pentru joburi în starea `REVIEW`, verifică starea la furnizor
+  înaintea unei noi trimiteri.
+
+[Contractul de identitate](docs/agents/CONTRACTS.md#c-002--api-de-identitate-și-acces) · [Acceptarea în staging](docs/agents/plans/identitate-si-acces.md#acceptarea-livrării-în-staging) · [Q-011](docs/agents/OPEN-QUESTIONS.md#q-011--ce-expeditor-va-livra-emailurile-reale-ale-pilotului)
 
 ## Verificarea backendului
 

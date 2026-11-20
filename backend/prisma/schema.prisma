@@ -36,3 +36,110 @@ model HistoricalInterval {
 
   @@id([eventId, ordinal])
 }
+
+enum IdentityRole {
+  VOLUNTEER
+  COORDINATOR
+  ADMIN
+}
+
+enum IdentityChallengePurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  ACTIVATE_STAFF
+}
+
+enum IdentityMailState {
+  PENDING
+  SENT
+  EXPIRED
+  REVIEW
+}
+
+enum IdentityLoginKind {
+  ACCOUNT
+  IP
+}
+
+model IdentityAccount {
+  id               String              @id @default(uuid()) @db.Uuid
+  organizationId   String
+  email            String              @unique
+  passwordHash     String?
+  role             IdentityRole
+  locale           String
+  emailVerifiedAt  DateTime?           @db.Timestamptz(3)
+  activatedAt      DateTime?           @db.Timestamptz(3)
+  disabledAt       DateTime?           @db.Timestamptz(3)
+  approvedAt       DateTime?           @db.Timestamptz(3)
+  canApprove       Boolean             @default(false)
+  profile          IdentityProfile?
+  sessions         IdentitySession[]
+  challenges       IdentityChallenge[]
+
+  @@index([organizationId, role])
+}
+
+model IdentityProfile {
+  accountId String          @id @db.Uuid
+  firstName String?
+  lastName  String?
+  birthDate DateTime?       @db.Date
+  phone     String?
+  locality  String?
+  account   IdentityAccount @relation(fields: [accountId], references: [id])
+}
+
+model IdentitySession {
+  digest     String          @id
+  accountId  String          @db.Uuid
+  createdAt  DateTime        @db.Timestamptz(3)
+  lastSeenAt DateTime        @db.Timestamptz(3)
+  account    IdentityAccount @relation(fields: [accountId], references: [id])
+
+  @@index([accountId])
+}
+
+model IdentityChallenge {
+  id         String                   @id @default(uuid()) @db.Uuid
+  accountId  String                   @db.Uuid
+  purpose    IdentityChallengePurpose
+  createdAt  DateTime                 @db.Timestamptz(3)
+  expiresAt  DateTime                 @db.Timestamptz(3)
+  consumedAt DateTime?                @db.Timestamptz(3)
+  account    IdentityAccount          @relation(fields: [accountId], references: [id])
+  mail       IdentityMailJob?
+
+  @@index([accountId, purpose, expiresAt])
+}
+
+model IdentityMailJob {
+  id          String            @id @db.Uuid
+  state       IdentityMailState @default(PENDING)
+  attempts    Int               @default(0)
+  availableAt DateTime          @db.Timestamptz(3)
+  leaseUntil  DateTime?         @db.Timestamptz(3)
+  challenge   IdentityChallenge @relation(fields: [id], references: [id])
+
+  @@index([state, availableAt])
+}
+
+model IdentityLoginBucket {
+  key          String            @id
+  kind         IdentityLoginKind
+  attempts     Int               @default(0)
+  expiresAt    DateTime          @db.Timestamptz(3)
+  blockedUntil DateTime?         @db.Timestamptz(3)
+
+  @@index([expiresAt])
+}
+
+model IdentityAudit {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String   @db.Uuid
+  targetId   String   @db.Uuid
+  action     String
+  occurredAt DateTime @db.Timestamptz(3)
+
+  @@index([targetId, occurredAt])
+}

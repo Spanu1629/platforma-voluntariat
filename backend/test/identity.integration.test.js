@@ -1,8 +1,7 @@
 const { createHash, randomBytes, randomUUID } = require('node:crypto');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { NestFactory } = require('@nestjs/core');
 const { PrismaClient } = require('../dist/generated/prisma/client');
-const { AppModule } = require('../dist/app.module');
+const { createApplication } = require('../dist/main');
 
 jest.setTimeout(30000);
 
@@ -25,7 +24,7 @@ function cookies(response, name) {
 }
 
 async function startApp() {
-  app = await NestFactory.create(AppModule, { logger: false, abortOnError: false });
+  app = await createApplication({ logger: false, abortOnError: false });
   await app.listen(0, '127.0.0.1');
   url = await app.getUrl();
 }
@@ -261,6 +260,30 @@ test('approval and delegation are restricted and audited', async () => {
   expect(audit.find((entry) => entry.action === 'ACCOUNT_APPROVED').actorId).toBe(coordinator.account.id);
 });
 
+test('unactivated staff can request a fresh activation email after the original expires', async () => {
+  const admin = await administrator();
+  const email = syntheticAddress();
+  const created = await request('/staff', { method: 'POST', session: admin.session, body: { email, role: 'COORDINATOR' } });
+  expect(created.status).toBe(201);
+  const account = await created.json();
+  const { token } = await deliveredTo(email);
+  const challenge = await migrator.identityChallenge.findFirstOrThrow({
+    where: { accountId: account.id, purpose: 'ACTIVATE_STAFF' },
+  });
+  await migrator.identityChallenge.update({
+    where: { id: challenge.id }, data: { expiresAt: new Date(Date.now() - 1) },
+  });
+  expect((await request('/staff/activate', { method: 'POST', body: { token, password } })).status).toBe(400);
+  expect((await request('/email/request', { method: 'POST', body: { email } })).status).toBe(202);
+  const { worker, delivery } = mailServices();
+  while (await worker.deliverNext()) {}
+  const renewed = delivery.messages.filter((message) => message.to === email);
+  expect(renewed.length).toBe(2);
+  const freshToken = new URLSearchParams(new URL(renewed.at(-1).link).hash.slice(1)).get('token');
+  expect((await request('/staff/activate', { method: 'POST', body: { token: freshToken, password } })).status).toBe(204);
+  await sessionFor(email);
+});
+
 test('first administrator is initialized once and the last active administrator survives concurrent changes', async () => {
   const admin = await administrator();
   const { bootstrapAdministrator } = require('../dist/identity/bootstrap-admin');
@@ -294,7 +317,8 @@ test('pending email delivery survives app restart and retries with the same link
   await startApp();
   ({ worker, delivery } = mailServices());
   expect(await worker.deliverNext(new Date(Date.now() + minute))).toBe(true);
-  expect(delivery.messages).toEqual([attempted]);
+  expect(delivery.messages.length).toBe(1);
+  expect(JSON.stringify(delivery.messages[0]) === JSON.stringify(attempted)).toBe(true);
   expect(await worker.deliverNext(new Date(Date.now() + minute))).toBe(false);
   expect((await migrator.identityMailJob.findUniqueOrThrow({ where: { id: job.id } })).state).toBe('SENT');
   expect(email).not.toBe(retryEmail);
@@ -333,11 +357,15 @@ test('Resend adapter sends the transactional payload with the stable idempotency
   const fetchStub = jest.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(null, { status: 202 }));
   try {
     await transport.send(mail);
-    expect(fetchStub).toHaveBeenCalledWith('https://api.resend.com/emails', expect.objectContaining({
-      method: 'POST',
-      headers: expect.objectContaining({ Authorization: `Bearer ${apiKey}`, 'Idempotency-Key': idempotencyKey }),
-      body: JSON.stringify({ from: sender, to: [mail.to], subject: mail.subject, text: mail.text }),
-    }));
+    expect(fetchStub.mock.calls.length).toBe(1);
+    const [target, options] = fetchStub.mock.calls[0];
+    expect(target).toBe('https://api.resend.com/emails');
+    expect(options.method).toBe('POST');
+    expect(options.headers.Authorization === `Bearer ${apiKey}`).toBe(true);
+    expect(options.headers['Idempotency-Key'] === idempotencyKey).toBe(true);
+    expect(options.body === JSON.stringify({
+      from: sender, to: [mail.to], subject: mail.subject, text: mail.text,
+    })).toBe(true);
   } finally {
     fetchStub.mockRestore();
   }

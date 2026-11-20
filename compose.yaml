@@ -38,6 +38,12 @@ services:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://voluntrack_app:${APP_PASSWORD:?Set APP_PASSWORD}@db:5432/voluntrack
+      IDENTITY_PUBLIC_URL: ${IDENTITY_PUBLIC_URL:-}
+      IDENTITY_SECRET: ${IDENTITY_SECRET:-}
+      IDENTITY_MAIL_TRANSPORT: ${IDENTITY_MAIL_TRANSPORT:-disabled}
+      IDENTITY_MAIL_FROM: ${IDENTITY_MAIL_FROM:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      IDENTITY_TRUSTED_PROXIES: ${IDENTITY_TRUSTED_PROXIES:-}
     ports:
       - "127.0.0.1:${VOLUNTRACK_PORT:-3000}:3000"
     healthcheck:

@@ -29,6 +29,7 @@
 - Q-016 · Cum se activează și se administrează conturile privilegiate? · _answered_
 - Q-017 · Ce limite inițiale folosim pentru încercările repetate de autentificare? · _answered_
 - Q-018 · Ce acces are voluntarul înainte de verificarea emailului? · _answered_
+- Q-019 · Cum remediem avertismentul din dependența Prisma?
 
 ---
 
