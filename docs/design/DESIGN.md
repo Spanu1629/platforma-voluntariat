@@ -51,8 +51,9 @@ board or Figma.
 **Layout and spacing**
 - Spacing comes from the scale only. Align to the grid; equal gaps for equal
   relationships.
-- No horizontal scroll at the smallest supported width. Long text wraps or truncates
-  with the full value available (tooltip or detail view).
+- The page fits the viewport at every supported width. On mobile, horizontal scrolling
+  is confined to eligible card collections. Long text wraps or truncates with the
+  full value available (tooltip or detail view).
 
 **Typography**
 - Only the type scale below. One primary heading per screen. Sentence case for
@@ -111,6 +112,7 @@ under [Q-005](../agents/OPEN-QUESTIONS.md#q-005--what-visual-tokens-and-supporte
 | `background` | `#FAF6ED` | `#171D19` | Page background |
 | `surface` | `#FFFCF7` | `#202821` | Cards, forms and dialogs |
 | `surface-subtle` | `#F0E8DB` | `#2A342D` | Secondary groups and disabled controls |
+| `section-background` | `#F4EADB` | `var(--background)` (`#171D19`) | Card collection sections and their decorative transitions |
 | `text` | `#272820` | `#F5EEE2` | Main text |
 | `text-muted` | `#5D6055` | `#C6C8BC` | Secondary text |
 | `border` | `#827A6D` | `#8A9588` | Field and control outlines |
@@ -124,11 +126,17 @@ under [Q-005](../agents/OPEN-QUESTIONS.md#q-005--what-visual-tokens-and-supporte
 | `warning` | `#785317` | `#F2C880` | Warning text and icon |
 | `danger` | `#A12F37` | `#FFA3A9` | Error text and icon |
 
-Across `background`, `surface` and `surface-subtle`, the text, link and
-status colors have a minimum contrast of 4.75:1 in light and 6.12:1 in dark. Field
-borders reach 3.49:1 and 4.14:1 respectively. `on-primary` reaches 9.59:1 and
-7.06:1 across default, hover and active. Use the surrounding surface color in
-the focus ring gap so the ring has the expected contrast.
+Across `background`, `surface`, `surface-subtle` and `section-background`, the text,
+link and status colors have a minimum contrast of 4.75:1 in light and 6.12:1 in
+dark. Field borders reach 3.49:1 and 4.14:1 respectively. `on-primary` reaches
+9.59:1 and 7.06:1 across default, hover and active. Use the surrounding surface
+color in the focus ring gap so the ring has the expected contrast.
+
+Use `section-background` for bands that group cards in current and future mocks,
+including the decorative transition on either side. Use `surface` for cards and
+`surface-subtle` for secondary elements within them. In light mode, the card and
+section fills have a 1.16:1 contrast ratio. On the section background, muted text
+has 5.39:1, the focus color has 4.85:1 and the control border has 3.56:1.
 
 ### Typography
 | Token | Family | Size / line height | Weight | Use |
@@ -174,10 +182,23 @@ Page margins use `space-16` on mobile and `space-32` on desktop.
 | Tablet | 768 px | 1023 px |
 | Desktop | 1024 px | — |
 
-Use one column on mobile, add columns on tablet where the content fits and use
-side-by-side panels on desktop. Wrap dense list rows across multiple lines at
-narrow widths. The reference viewports for visual checks in both themes are
-**320 × 720 px** and **1440 × 900 px**.
+Use one column for page sections on mobile, add columns on tablet where the
+content fits and use side-by-side panels on desktop. Wrap dense list rows across
+multiple lines at narrow widths. The reference viewports for visual checks in
+both themes are **320 × 720 px** and **1440 × 900 px**.
+
+At 320–767 px, use a horizontal carousel for two or more same-type cards that
+can be browsed independently. Keep time-sensitive actions, comparisons, ordered
+instructions and operational lists in the page flow. Keep each active card
+readable, show part of the next card where one exists and snap to card edges.
+Provide a position indicator and accessible previous and next buttons, native
+touch scrolling and keyboard navigation. Keep all existing actions and content
+reachable. A single card fills the available width without carousel controls.
+From 768 px, use the screen's tablet or desktop layout.
+
+In DS-005, group upcoming cards by day before applying this rule. Keep the
+current shift, active offers, any day with a pending assignment or blocked
+check-in, and the attendance history vertical.
 
 ## Component inventory
 

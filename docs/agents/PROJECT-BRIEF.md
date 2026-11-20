@@ -63,6 +63,12 @@ Aceste praguri guvernează repartizările viitoare. Datele ediției 2025 rămân
 - Pe hosting gratuit, repornim backend-ul cu aceeași bază și folosim două oferte pentru ture încă viitoare. Una rămâne activă cu termenul inițial, alta expiră cât procesul este oprit sau în repaus. După pornire, serverul respinge oferta expirată, recuperează jobul și oferă locul unui singur următor candidat eligibil. Repetăm pornirea pentru a exclude dublurile. Verificăm și pornirea la rece și resincronizarea dashboard-ului.
 - Predarea cere minimum 6 tabele relaționale reale, migrări și seed, autentificare și autorizare, OpenAPI, Docker Compose, CI, deploy public HTTPS, minimum 25 de commit-uri în minimum 8 zile distincte, 8 decizii aprobate și 10 intrări reale în AI_LOG.md.
 
+## Stadiul livrării la 19.11.2026
+
+- Fundația backend este implementată pe ramura separată `chore/voluntrack-technical-foundation`, la `52b1778`. Ea include NestJS, PostgreSQL și Prisma în Docker Compose, migrarea inițială, seed-ul agregatelor istorice și endpointul de readiness. GitHub Actions a trecut verificarea registrului și buildul cu testele de integrare pe PostgreSQL izolat. [Rularea Backend CI](https://github.com/Spanu1629/platforma-voluntariat/actions/runs/44514835751)
+- Machetele HTML DS-003 (Evenimente disponibile), DS-004 (Detalii eveniment și înscriere) și DS-005 (Programul meu) au aprobare vizuală. Cele 12 variante implicite pentru mobil și desktop, în ambele teme, sunt publicate în Figma ca snapshoturi PNG verificate la dimensiunile native. Machetele din repository păstrează interacțiunile. [Registrul machetelor](../design/registry.yaml) · [Evidența verificării și publicării](../design/CODEX.md#figma--snapshoturi-png-publicate-2026-11-19)
+- D-018 stabilește caruselul mobil pentru colecțiile eligibile, cu excepțiile pentru informațiile prioritare. D-019 stabilește tokenul `section-background` pentru benzile cu carduri și tranzițiile decorative. Ambele decizii sunt aprobate. [D-018 și D-019](DECISIONS.md#d-018--carusele-pentru-colecții-de-carduri-pe-mobil)
+
 ## Ordinea livrării
 
 1. Corectarea surselor istorice și actualizarea scope-ului și a registrului.
