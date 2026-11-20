@@ -9,6 +9,20 @@ The backend foundation in `backend/` uses NestJS 11 on Node.js 24 LTS. The build
 
 The initial migration creates only the three historical relations. Q-009 supplies their seed. The application role can read the historical tables. Jest runs against a separate Compose volume with synthetic data, through the same command locally and in GitHub Actions. [Local commands](../../README.md#pornirea-backendului)
 
+The additive identity migration creates separate relations for accounts, profiles,
+sessions, email challenges, delivery jobs, login counters and audit. The application
+role can insert audit entries, and reading them requires a separate authorized
+database role. The NestJS identity module shares the existing Prisma provider.
+PostgreSQL transactions keep challenge consumption, password resets, approvals and
+audit atomic. An advisory lock serializes staff and delegation changes that affect
+the last active administrator or permission checks. [API contract](CONTRACTS.md#c-002--api-de-identitate-și-acces)
+
+Identity email jobs are created in the same transaction as their challenges. The
+worker takes a short database lease and rebuilds the same signed link on retry,
+using a runtime secret. Resend is configurable for staging and production.
+Automated tests use an in-process simulated transport. Real staging verification
+remains a release criterion under Q-011. [Delivery contract](CONTRACTS.md#c-003--livrarea-tranzacțională-prin-resend)
+
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
 | Module | Conceptual entities and responsibilities |

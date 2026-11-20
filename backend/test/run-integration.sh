@@ -7,6 +7,13 @@ export POSTGRES_PASSWORD="$(openssl rand -hex 32)"
 export MIGRATOR_PASSWORD="$(openssl rand -hex 32)"
 export APP_PASSWORD="$(openssl rand -hex 32)"
 export VOLUNTRACK_PORT=0
+# Keep the container used for readiness disconnected from any real mail transport.
+export IDENTITY_MAIL_TRANSPORT=disabled
+export IDENTITY_PUBLIC_URL=
+export IDENTITY_SECRET=
+export IDENTITY_MAIL_FROM=
+export RESEND_API_KEY=
+export IDENTITY_TRUSTED_PROXIES=
 export TEST_APP_URL="postgresql://voluntrack_app:${APP_PASSWORD}@db:5432/voluntrack"
 export TEST_BACKEND_URL="http://backend:3000"
 
@@ -23,6 +30,8 @@ trap cleanup EXIT
 
 compose config --quiet
 compose up -d --build --wait --wait-timeout 90
+compose run --rm --no-deps migrate npm exec -- prisma migrate diff \
+  --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code
 compose run --rm --no-deps \
   --volume "$PWD/backend/test:/app/test:ro" \
   --env TEST_APP_URL --env TEST_BACKEND_URL migrate npm test
