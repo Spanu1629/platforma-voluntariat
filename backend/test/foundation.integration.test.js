@@ -49,12 +49,16 @@ afterAll(async () => {
   await Promise.all([migrator?.$disconnect(), application?.$disconnect()]);
 });
 
-test('deploy applies the historical baseline migration', async () => {
+test('deploy applies the exact historical and identity migrations', async () => {
   const migrations = await migrator.$queryRaw`
     SELECT migration_name FROM "_prisma_migrations"
     WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL
+    ORDER BY migration_name
   `;
-  expect(migrations).toEqual([{ migration_name: '20261119000000_historical_baseline' }]);
+  expect(migrations).toEqual([
+    { migration_name: '20261119000000_historical_baseline' },
+    { migration_name: '20261120000000_identity_access' },
+  ]);
 });
 
 test('the application role reads all three relations and dates round-trip in local time', async () => {
@@ -132,4 +136,34 @@ test('the final backend image serves the readiness contract', async () => {
     signal: AbortSignal.timeout(4000),
   });
   expect(response.status).toBe(200);
+});
+
+test('identity migration preserves all historical relations when applied to an existing database', async () => {
+  const { readFileSync } = require('node:fs');
+  const { Client } = require('pg');
+  const baseline = readFileSync('prisma/migrations/20261119000000_historical_baseline/migration.sql', 'utf8');
+  const identity = readFileSync('prisma/migrations/20261120000000_identity_access/migration.sql', 'utf8');
+  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  try {
+    await client.query('CREATE SCHEMA identity_upgrade_fixture');
+    await client.query('SET search_path = identity_upgrade_fixture');
+    await client.query(baseline);
+    // Copy a synthetic aggregate into an independent schema with only the baseline applied.
+    await client.query('INSERT INTO "HistoricalEvent" SELECT * FROM public."HistoricalEvent"');
+    await client.query('INSERT INTO "HistoricalRoleTotal" SELECT * FROM public."HistoricalRoleTotal"');
+    await client.query('INSERT INTO "HistoricalInterval" SELECT * FROM public."HistoricalInterval"');
+    await client.query(identity);
+    for (const [table, order] of [
+      ['HistoricalEvent', 'id'], ['HistoricalRoleTotal', 'role'], ['HistoricalInterval', 'ordinal'],
+    ]) {
+      const expected = (await client.query(`SELECT * FROM public."${table}" ORDER BY "${order}"`)).rows;
+      expect(expected.length).toBeGreaterThan(0);
+      expect((await client.query(`SELECT * FROM "${table}" ORDER BY "${order}"`)).rows).toEqual(expected);
+    }
+  } finally {
+    await client.query('ROLLBACK');
+    await client.query('DROP SCHEMA IF EXISTS identity_upgrade_fixture CASCADE');
+    await client.end();
+  }
 });
