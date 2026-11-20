@@ -19,8 +19,7 @@
 - **Confirmed:** 2026-11-20
 
 ## Q-019 · Cum remediem avertismentul din dependența Prisma?
-- **Status:** investigating
-- **Blocks:** Remedierea este aplicată și verificată pe ramura de identitate. Confirmarea răspunsului în registru rămâne deschisă.
-- **Who answers:** Responsabilul proiectului.
-- **Proposed answer:** Păstrează Prisma 7.10.1 cu un override limitat la `@prisma/config@7.10.1 → effect@3.22.1`. Docker a confirmat compatibilitatea cu toate cele 22 de teste, iar GHSA-7589-6fvf-x4pw a dispărut la audit. [Analiza și verificările](../../security/DEPENDENCIES.md#ghsa-7589-6fvf-x4pw--effect-prin-configurația-prisma).
-- **Answer:** Remedierea verificată așteaptă confirmarea în registru.
+- **Status:** answered
+- **Answer:** 2026-11-20 — Responsabilul proiectului a confirmat remedierea verificată. Prisma rămâne la 7.10.1, cu un override limitat la `@prisma/config@7.10.1 → effect@3.22.1`. Cele 22 de teste PostgreSQL au trecut, schema corespunde migrărilor, iar GHSA-7589-6fvf-x4pw a dispărut din audit.
+- **Recorded as:** [Analiza de securitate și rezultatele verificărilor](../../security/DEPENDENCIES.md#ghsa-7589-6fvf-x4pw--effect-prin-configurația-prisma).
+- **Confirmed:** 2026-11-20
