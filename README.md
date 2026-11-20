@@ -105,4 +105,5 @@ Buildul rulează `npm run prisma:generate` înainte de compilarea TypeScript în
 - Glosarul proiectului și jurnalul sesiunilor sunt în [CONTEXT.md](CONTEXT.md) și [AI_LOG.md](AI_LOG.md).
 - Regulile Graffino și întrebările încă deschise, inclusiv despre capturi, hosting, email și evaluare, sunt în [AGENTS.md](AGENTS.md) și [registrul de întrebări](docs/agents/OPEN-QUESTIONS.md). Designul începe cu DS-004, DS-005 și DS-010, iar token-urile și mock-urile se aprobă înainte de implementarea ecranelor. [Ordinea livrării](docs/agents/PROJECT-BRIEF.md#ordinea-livrării)
 - Politica de prelucrare, testul interesului legitim și cerințele de activare sunt în [documentația GDPR](docs/privacy/GDPR.md).
+- Analiza avizelor și remedierile backendului sunt în [documentația de securitate a dependențelor](docs/security/DEPENDENCIES.md).
 - Registrul se verifică cu `python3 docs/agents/tools/ledger-lint.py`. Comenzile frontend și lint-ul de aplicație rămân deschise. [Q-003](docs/agents/OPEN-QUESTIONS.md#q-003--which-installation-run-build-test-and-quality-commands-will-the-selected-stack-provide)

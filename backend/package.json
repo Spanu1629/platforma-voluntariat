@@ -31,5 +31,10 @@
     "jest": "^30.5.2",
     "prisma": "7.10.1",
     "typescript": "~5.9.3"
+  },
+  "overrides": {
+    "@prisma/config@7.10.1": {
+      "effect": "3.22.1"
+    }
   }
 }
