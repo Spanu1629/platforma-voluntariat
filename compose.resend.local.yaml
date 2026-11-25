@@ -1,0 +1,34 @@
+name: voluntrack-resend-local
+
+services:
+  backend:
+    ports: !reset []
+    environment:
+      CI: ${CI:-}
+      IDENTITY_PUBLIC_URL: https://localhost:3443
+      IDENTITY_SECRET: ${IDENTITY_SECRET:?Set IDENTITY_SECRET in .env.resend.local}
+      IDENTITY_MAIL_TRANSPORT: resend
+      IDENTITY_MAIL_FROM: onboarding@resend.dev
+      RESEND_API_KEY: ${RESEND_API_KEY:?Set RESEND_API_KEY in .env.resend.local}
+      IDENTITY_TRUSTED_PROXIES: ""
+
+  caddy:
+    image: caddy:2.11-alpine
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3443:3443"
+    volumes:
+      - ./backend/docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    healthcheck:
+      test: ["CMD", "test", "-s", "/data/caddy/pki/authorities/local/root.crt"]
+      interval: 1s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  caddy-data:
+  caddy-config:

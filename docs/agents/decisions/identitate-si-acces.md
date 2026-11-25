@@ -82,3 +82,12 @@ Decizii tehnice și funcționale confirmate de responsabilul proiectului. Confir
 - **Why:** Alegerea furnizorului permite implementarea adaptorului, iar proba în staging verifică fluxul inclusiv după ce mesajul părăsește aplicația.
 - **Evidence:** Responsabilul proiectului a confirmat Resend și criteriul de acceptare în staging. [Documentația API Resend](https://resend.com/docs/api-reference/emails/send-email) · [Planul modulului](../plans/identitate-si-acces.md#acceptarea-livrării-în-staging).
 - **Source:** user · confidence high
+
+## D-029 · Probă manuală locală cu expeditorul de test Resend
+- **Status:** approved
+- **Date:** 2026-11-25
+- **Confirmed:** 2026-11-25
+- **Rule:** Pentru proba manuală locală, activează explicit proiectul Compose dedicat. Folosește `onboarding@resend.dev` cu adresa asociată contului Resend, o origine HTTPS pe localhost și credențiale locale private. Testele automate folosesc transportul simulat. Acceptarea în staging se face conform D-024, D-028 și Q-011. Producția folosește configurație și credențiale proprii.
+- **Why:** Verifică trimiterea, primirea și folosirea linkurilor înainte de configurarea domeniului propriu.
+- **Evidence:** Responsabilul proiectului a aprobat proba locală și menținerea Q-011 și Q-004 deschise. [Instrucțiuni locale](../../../README.md#testare-locală-cu-resend) · [Expeditorul de test Resend](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain).
+- **Source:** user · confidence high

@@ -65,12 +65,12 @@ După migrare, încarcă explicit agregatele istorice aprobate cu `docker compos
   transmisă pe stdin din mecanismul de secrete. Comanda refuză repetarea când
   există deja un administrator. Contul dezvoltatorului se inițializează
   separat în baza de dezvoltare.
-- Suita de integrare folosește transportul simulat. Pentru livrarea reală
-  confirmă mai întâi Q-011. Configurează apoi `IDENTITY_MAIL_TRANSPORT=resend`,
-  `IDENTITY_MAIL_FROM` și `RESEND_API_KEY` în mediul corespunzător. Domeniul
-  expeditorului trebuie verificat la furnizor. Păstrează tracking-ul de click
-  dezactivat pentru emailurile de acces. Testează trimiterea și primirea pe
-  adrese controlate conform planului de staging.
+- Suita de integrare folosește transportul simulat. Proba manuală locală
+  urmează instrucțiunile de mai jos. Pentru staging, confirmă Q-011 și
+  configurează `IDENTITY_MAIL_TRANSPORT=resend`, `IDENTITY_MAIL_FROM` și
+  `RESEND_API_KEY` cu expeditorul de pe domeniul verificat la furnizor.
+  Producția folosește propriul set de variabile și credențiale. Păstrează
+  urmărirea clickurilor dezactivată pentru emailurile de acces.
 - Un link deschis prin GET păstrează acțiunea disponibilă. Clientul trimite
   fragmentul `token` în corpul POST, împreună cu dovada CSRF și, la resetare
   sau activare, parola nouă. O probă manuală de staging poate folosi un client
@@ -79,6 +79,81 @@ După migrare, încarcă explicit agregatele istorice aprobate cu `docker compos
   înaintea unei noi trimiteri.
 
 [Contractul de identitate](docs/agents/CONTRACTS.md#c-002--api-de-identitate-și-acces) · [Acceptarea în staging](docs/agents/plans/identitate-si-acces.md#acceptarea-livrării-în-staging) · [Q-011](docs/agents/OPEN-QUESTIONS.md#q-011--ce-expeditor-va-livra-emailurile-reale-ale-pilotului)
+
+### Testare locală cu Resend
+
+Pornește din rădăcina worktree-ului. Creează fișierul privat
+`.env.resend.local` dacă lipsește. Git îl ignoră.
+
+```bash
+if [ ! -e .env.resend.local ]; then
+  (umask 077 && touch .env.resend.local)
+fi
+```
+
+Deschide fișierul într-un editor local. Adaugă următoarele câmpuri și completează
+valorile după semnul `=`. Generează separat fiecare dintre cele patru valori hex
+cu `openssl rand -hex 32`. Păstrează aceleași valori pentru volumul local
+existent și pentru linkurile active.
+
+```dotenv
+POSTGRES_PASSWORD=
+MIGRATOR_PASSWORD=
+APP_PASSWORD=
+IDENTITY_SECRET=
+RESEND_API_KEY=
+```
+
+Introdu la `RESEND_API_KEY` o cheie cu permisiunea **Sending access**.
+Fișierul Compose suplimentar setează `IDENTITY_MAIL_TRANSPORT=resend`,
+`IDENTITY_MAIL_FROM=onboarding@resend.dev` și
+`IDENTITY_PUBLIC_URL=https://localhost:3443`. Destinatarul este adresa
+asociată contului tău Resend. Introdu-o când înregistrezi contul local
+de probă. [Restricția expeditorului de test](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain)
+
+```bash
+resend_compose() (
+  unset POSTGRES_PASSWORD MIGRATOR_PASSWORD APP_PASSWORD IDENTITY_SECRET RESEND_API_KEY
+  docker compose --project-name voluntrack-resend-local --env-file .env.resend.local \
+    -f compose.yaml -f compose.resend.local.yaml "$@"
+)
+resend_compose config --quiet
+resend_compose up -d --build --wait
+resend_ca_dir="$(mktemp -d)"
+resend_compose cp caddy:/data/caddy/pki/authorities/local/root.crt "$resend_ca_dir/root.crt"
+curl --fail --silent --show-error --retry 5 --retry-connrefused \
+  --cacert "$resend_ca_dir/root.crt" https://localhost:3443/health/ready
+```
+
+Folosește certificatul `root.crt` și un client API cu cookie jar pentru
+`https://localhost:3443`. Păstrează numai rezultatele, fără istoricul
+cererilor, capturi sau valori sensibile. Folosește `config --quiet` la
+validarea Compose pentru a evita afișarea configurației cu secrete.
+
+1. Cere `GET /identity/csrf` și păstrează cookie-ul emis. La fiecare POST
+   trimite acel cookie, `Origin: https://localhost:3443` și valoarea
+   `token` din răspuns în headerul `X-CSRF-Token`.
+2. Trimite `POST /identity/register` cu `email` și `password` în corpul
+   JSON. Așteaptă HTTP 202 și mesajul de verificare. În
+   `POST /identity/email/verify` trimite în JSON câmpul `token` cu
+   valoarea de după `#token=` din link. Așteaptă HTTP 204.
+3. Trimite `POST /identity/password/request` cu `email` în corpul JSON.
+   Așteaptă HTTP 202 și mesajul de resetare. În
+   `POST /identity/password/reset` trimite în JSON câmpurile `token`
+   și `password` cu tokenul nou și parola nouă. Așteaptă HTTP 204.
+   Dacă un mesaj lipsește, verifică starea trimiterii în dashboardul Resend.
+
+Oprește proiectul cu `resend_compose down`. Volumul bazei locale și
+certificatul se păstrează între rulări. Proba locală urmează D-029.
+Acceptarea livrării în staging rămâne condiționată de Q-011, iar deploymentul
+public de Q-004. [D-029](docs/agents/decisions/identitate-si-acces.md#d-029--probă-manuală-locală-cu-expeditorul-de-test-resend)
+
+#### Rezultatul probei locale din 25 noiembrie 2026
+
+Backendul a răspuns cu HTTP 200 prin HTTPS. Resend a acceptat ambele mesaje la prima încercare, iar destinatarul a confirmat primirea lor.
+
+- Verificarea adresei a returnat HTTP 202 la înregistrare, 200 la deschiderea linkului, 204 la confirmare și 400 la refolosire.
+- Resetarea parolei pe același cont a returnat HTTP 202 la solicitare, 200 la deschiderea linkului, 204 la resetare și 400 la refolosire. Cu parola nouă, autentificarea și accesul la profil au returnat HTTP 200, iar deconectarea a returnat 204.
 
 ## Verificarea backendului
 

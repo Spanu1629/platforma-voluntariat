@@ -11,6 +11,7 @@
 # Local credentials are never shared.
 .aws/
 /.env
+/.env.resend.local
 
 # Backend build artifacts and local configuration.
 /backend/node_modules/

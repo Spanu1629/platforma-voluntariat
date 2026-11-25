@@ -19,9 +19,11 @@ the last active administrator or permission checks. [API contract](CONTRACTS.md#
 
 Identity email jobs are created in the same transaction as their challenges. The
 worker takes a short database lease and rebuilds the same signed link on retry,
-using a runtime secret. Resend is configurable for staging and production.
-Automated tests use an in-process simulated transport. Real staging verification
-remains a release criterion under Q-011. [Delivery contract](CONTRACTS.md#c-003--livrarea-tranzacțională-prin-resend)
+using a runtime secret. D-029 permits a manual Resend check in a dedicated local
+Compose project with a separate PostgreSQL volume and a loopback HTTPS proxy.
+Automated tests use an in-process simulated transport. Staging and production
+have their own configuration and credentials. Real staging verification remains
+a release criterion under Q-011. [Delivery contract](CONTRACTS.md#c-003--livrarea-tranzacțională-prin-resend) · [Local setup](../../README.md#testare-locală-cu-resend)
 
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
