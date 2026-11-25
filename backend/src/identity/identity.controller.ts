@@ -80,11 +80,11 @@ export class IdentityController {
   @Post('register')
   @HttpCode(202)
   @Write('Register a volunteer and request email verification.', 202)
-  @ApiBody({ schema: { type: 'object', required: ['email', 'password'], additionalProperties: false,
-    properties: { email, password, locale } } })
+  @ApiBody({ schema: { type: 'object', required: ['email'], additionalProperties: false,
+    properties: { email, locale } } })
   async register(@Body() body: unknown): Promise<void> {
-    const values = input(body, ['email', 'password', 'locale']);
-    await this.identity.register(values.email, values.password, localeInput(values.locale));
+    const values = input(body, ['email', 'locale']);
+    await this.identity.register(values.email, localeInput(values.locale));
   }
 
   @Post('email/request')
@@ -104,10 +104,12 @@ export class IdentityController {
 
   @Post('email/verify')
   @HttpCode(204)
-  @Write('Confirm a volunteer email address with a single-use link.', 204)
-  @ApiBody({ schema: { type: 'object', required: ['token'], additionalProperties: false, properties: { token } } })
+  @Write('Confirm a volunteer email address and set its initial password with a single-use link.', 204)
+  @ApiBody({ schema: { type: 'object', required: ['token', 'password'], additionalProperties: false,
+    properties: { token, password } } })
   verifyEmail(@Body() body: unknown) {
-    return this.identity.consumeLink('VERIFY_EMAIL', input(body, ['token']).token);
+    const values = input(body, ['token', 'password']);
+    return this.identity.consumeLink('VERIFY_EMAIL', values.token, values.password);
   }
 
   @Post('password/request')
@@ -148,7 +150,17 @@ export class IdentityController {
 
   @Post('logout')
   @HttpCode(204)
-  @Write('Revoke the current session and clear its cookie.', 204, true)
+  @ApiOperation({
+    summary: 'Revoke the current session if present and clear its cookie.',
+    description: 'Requires the configured HTTPS origin and matching host-only CSRF cookie, including for repeated requests.',
+  })
+  @ApiSecurity('session')
+  @ApiSecurity({})
+  @ApiHeader({ name: 'X-CSRF-Token', required: true, description: 'Token returned by GET /identity/csrf.' })
+  @ApiResponse({ status: 204, headers: {
+    'Set-Cookie': { description: 'Expires the host-only session cookie.', schema: { type: 'string' } },
+  } })
+  @ApiResponse({ status: 403, description: 'Invalid request origin or CSRF token.' })
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<void> {
     await this.identity.logout(cookie(request, SESSION_COOKIE));
     response.clearCookie(SESSION_COOKIE, cookieOptions);

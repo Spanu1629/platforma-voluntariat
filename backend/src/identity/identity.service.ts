@@ -44,13 +44,12 @@ export class IdentityService {
 
   constructor(private readonly db: PrismaService, private readonly settings: IdentitySettings) {}
 
-  async register(address: unknown, password: unknown, locale: string): Promise<void> {
+  async register(address: unknown, locale: string): Promise<void> {
     const email = emailAddress(address);
-    const passwordHash = await hashPassword(password);
     try {
       await this.db.$transaction(async (tx) => {
         const { id } = await tx.identityAccount.create({
-          data: { email, passwordHash, locale, role: 'VOLUNTEER', organizationId: ORGANIZATION },
+          data: { email, locale, role: 'VOLUNTEER', organizationId: ORGANIZATION },
           select: { id: true },
         });
         await enqueueChallenge(tx, id, 'VERIFY_EMAIL', new Date());
@@ -77,7 +76,7 @@ export class IdentityService {
     });
   }
 
-  async consumeLink(purpose: IdentityChallengePurpose, token: unknown, password?: unknown): Promise<void> {
+  async consumeLink(purpose: IdentityChallengePurpose, token: unknown, password: unknown): Promise<void> {
     if (typeof token !== 'string' || token.length !== 80) throw invalidLink();
     const [id, signature] = token.split('.');
     if (!uuid(id) || !SESSION_FORMAT.test(signature ?? '') ||
@@ -86,7 +85,7 @@ export class IdentityService {
     if (!challenge || challenge.purpose !== purpose || challenge.consumedAt || challenge.expiresAt <= new Date()) {
       throw invalidLink();
     }
-    const passwordHash = purpose === 'VERIFY_EMAIL' ? undefined : await hashPassword(password);
+    const passwordHash = await hashPassword(password);
     await this.db.$transaction(async (tx) => {
       await lockAccount(tx, challenge.accountId);
       const account = await tx.identityAccount.findUniqueOrThrow({ where: { id: challenge.accountId } });

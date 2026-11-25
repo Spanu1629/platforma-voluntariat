@@ -72,13 +72,13 @@ După migrare, încarcă explicit agregatele istorice aprobate cu `docker compos
   Producția folosește propriul set de variabile și credențiale. Păstrează
   urmărirea clickurilor dezactivată pentru emailurile de acces.
 - Un link deschis prin GET păstrează acțiunea disponibilă. Clientul trimite
-  fragmentul `token` în corpul POST, împreună cu dovada CSRF și, la resetare
-  sau activare, parola nouă. O probă manuală de staging poate folosi un client
+  `token` și `password` în corpul POST la verificare, resetare sau activare,
+  cu dovada CSRF în antet. O probă manuală de staging poate folosi un client
   API cu cookie jar. Consemnează numai rezultatele, fără tokenuri sau linkuri
   complete. Pentru joburi în starea `REVIEW`, verifică starea la furnizor
   înaintea unei noi trimiteri.
 
-[Contractul de identitate](docs/agents/CONTRACTS.md#c-002--api-de-identitate-și-acces) · [Acceptarea în staging](docs/agents/plans/identitate-si-acces.md#acceptarea-livrării-în-staging) · [Q-011](docs/agents/OPEN-QUESTIONS.md#q-011--ce-expeditor-va-livra-emailurile-reale-ale-pilotului)
+[Contractul de identitate](docs/agents/CONTRACTS.md#c-004--api-de-identitate-și-acces) · [Acceptarea în staging](docs/agents/plans/identitate-si-acces.md#acceptarea-livrării-în-staging) · [Q-011](docs/agents/OPEN-QUESTIONS.md#q-011--ce-expeditor-va-livra-emailurile-reale-ale-pilotului)
 
 ### Testare locală cu Resend
 
@@ -133,10 +133,10 @@ validarea Compose pentru a evita afișarea configurației cu secrete.
 1. Cere `GET /identity/csrf` și păstrează cookie-ul emis. La fiecare POST
    trimite acel cookie, `Origin: https://localhost:3443` și valoarea
    `token` din răspuns în headerul `X-CSRF-Token`.
-2. Trimite `POST /identity/register` cu `email` și `password` în corpul
-   JSON. Așteaptă HTTP 202 și mesajul de verificare. În
-   `POST /identity/email/verify` trimite în JSON câmpul `token` cu
-   valoarea de după `#token=` din link. Așteaptă HTTP 204.
+2. Trimite `POST /identity/register` cu `email` și, opțional, `locale` în
+   corpul JSON. Așteaptă HTTP 202 și mesajul de verificare. În
+   `POST /identity/email/verify` trimite în JSON `token` cu valoarea de după
+   `#token=` din link și `password` cu parola inițială. Așteaptă HTTP 204.
 3. Trimite `POST /identity/password/request` cu `email` în corpul JSON.
    Așteaptă HTTP 202 și mesajul de resetare. În
    `POST /identity/password/reset` trimite în JSON câmpurile `token`
@@ -149,6 +149,8 @@ Acceptarea livrării în staging rămâne condiționată de Q-011, iar deploymen
 public de Q-004. [D-029](docs/agents/decisions/identitate-si-acces.md#d-029--probă-manuală-locală-cu-expeditorul-de-test-resend)
 
 #### Rezultatul probei locale din 25 noiembrie 2026
+
+Proba a folosit contractul C-002, în vigoare la data testării.
 
 Backendul a răspuns cu HTTP 200 prin HTTPS. Resend a acceptat ambele mesaje la prima încercare, iar destinatarul a confirmat primirea lor.
 

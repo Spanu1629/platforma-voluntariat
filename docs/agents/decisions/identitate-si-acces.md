@@ -91,3 +91,12 @@ Decizii tehnice și funcționale confirmate de responsabilul proiectului. Confir
 - **Why:** Verifică trimiterea, primirea și folosirea linkurilor înainte de configurarea domeniului propriu.
 - **Evidence:** Responsabilul proiectului a aprobat proba locală și menținerea Q-011 și Q-004 deschise. [Instrucțiuni locale](../../../README.md#testare-locală-cu-resend) · [Expeditorul de test Resend](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain).
 - **Source:** user · confidence high
+
+## D-030 · Stabilirea parolei inițiale la verificarea adresei
+- **Status:** approved
+- **Date:** 2026-11-25
+- **Confirmed:** 2026-11-25
+- **Rule:** Voluntarul stabilește parola inițială când confirmă controlul adresei cu tokenul din email. Consumul unic al tokenului, salvarea hashului Argon2id, verificarea adresei și activarea contului au loc în aceeași tranzacție. Politica parolelor și aprobarea voluntarului urmează D-022 și D-021.
+- **Why:** Parola cu care se activează contul este stabilită de persoana care confirmă controlul adresei.
+- **Evidence:** Responsabilul proiectului a aprobat remedierea din PR #3 și contractul C-004. [Contractul API](../CONTRACTS.md#c-004--api-de-identitate-și-acces)
+- **Source:** user · confidence high

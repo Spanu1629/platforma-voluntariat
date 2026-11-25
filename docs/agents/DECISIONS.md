@@ -30,6 +30,7 @@
 - D-027 · Accesul voluntarului în funcție de verificarea emailului
 - D-028 · Resend prin API și acceptarea livrării în staging
 - D-029 · Probă manuală locală cu expeditorul de test Resend
+- D-030 · Stabilirea parolei inițiale la verificarea adresei
 
 ### [Reguli organizatorice](decisions/reguli-organizatorice.md)
 - D-012 · Eligibilitatea de vârstă și programul voluntarilor

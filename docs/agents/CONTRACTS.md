@@ -10,7 +10,8 @@
 
 ## Index
 - C-001 · Readiness-ul backendului · provided
-- C-002 · API de identitate și acces · provided
+- C-002 · API de identitate și acces · provided · _superseded-by C-004_
+- C-004 · API de identitate și acces · provided
 - C-003 · Livrarea tranzacțională prin Resend · external
 
 ---
@@ -26,13 +27,23 @@
 - **Evidence:** Aprobarea planului final pentru fundația backend VolunTrack.
 
 ## C-002 · API de identitate și acces
-- **Status:** approved
-- **Confirmed:** 2026-11-25
+- **Status:** superseded-by C-004
 - **Interface:** HTTP JSON sub `/identity`. Schema OpenAPI generată de backend este disponibilă la `GET /openapi.json`.
 - **Guarantee:** `GET /identity/csrf` emite un token și cookie-ul CSRF host-only. Cererile care modifică starea folosesc aceeași origine HTTPS configurată, cookie-ul și headerul `X-CSRF-Token`. `POST /identity/login` emite cookie-ul de sesiune host-only, Secure, HttpOnly și SameSite=Lax. Profilul autenticat reprezintă propriul cont. Verificarea adresei și aprobarea voluntarului sunt stări distincte. Aprobarea, delegarea și administrarea se autorizează server-side în organizația utilizatorului.
 - **Links:** Linkurile din email folosesc fragmentul URL pentru token. Deschiderea prin GET păstrează tokenul valid. Clientul trimite tokenul în corpul JSON la POST pe aceeași cale, cu parola nouă la resetare sau activare. Răspunsurile de succes la confirmare au cod 204. Solicitările de email și înregistrare răspund generic cu 202 pentru intrări valide.
 - **Consumers:** [Teste HTTP sintetice](../../backend/test/identity.integration.test.js). Clientul de produs va folosi schema OpenAPI.
 - **Evidence:** [Planul de identitate](plans/identitate-si-acces.md) și D-020–D-028.
+
+## C-004 · API de identitate și acces
+- **Status:** approved
+- **Confirmed:** 2026-11-25
+- **Interface:** HTTP JSON sub `/identity`. Schema OpenAPI generată este disponibilă la `GET /openapi.json`.
+- **Guarantee:** `GET /identity/csrf` emite un token și cookie-ul CSRF host-only. Cererile care modifică starea folosesc aceeași origine HTTPS configurată, cookie-ul și headerul `X-CSRF-Token`. `POST /identity/login` emite cookie-ul de sesiune host-only, Secure, HttpOnly și SameSite=Lax. Profilul autenticat reprezintă propriul cont. Aprobarea, delegarea și administrarea se autorizează server-side în organizația utilizatorului.
+- **Registration:** `POST /identity/register` primește `email` și opțional `locale`. Creează voluntarul în așteptare fără hash de parolă. Solicitările valide de înregistrare și de email răspund generic cu HTTP 202.
+- **Links:** Tokenul se află în fragmentul URL, iar deschiderea prin GET îl păstrează disponibil. Clientul trimite `token` și `password` în corpul JSON la POST pe aceeași cale pentru verificarea voluntarului, resetare și activarea personalului. Verificarea voluntarului stabilește parola inițială și consumă tokenul în aceeași tranzacție cu activarea. Aprobarea voluntarului este separată. Confirmările reușite răspund cu HTTP 204.
+- **Logout:** `POST /identity/logout` necesită aceeași dovadă CSRF. Sesiunea este opțională. Dacă sesiunea indicată există, backendul o revocă, iar răspunsul HTTP 204 expiră cookie-ul de sesiune, inclusiv când sesiunea lipsește, a expirat sau a fost deja revocată. Originea sau dovada CSRF invalidă primește HTTP 403.
+- **Consumers:** [Teste HTTP sintetice](../../backend/test/identity.integration.test.js) și [proba manuală locală](../../README.md#testare-locală-cu-resend). Clientul de produs va folosi schema OpenAPI.
+- **Evidence:** [Planul de identitate](plans/identitate-si-acces.md), D-020–D-030 și aprobarea remedierilor din [PR #3](https://github.com/Spanu1629/platforma-voluntariat/pull/3).
 
 ## Consumed
 No provider interfaces have been identified.

@@ -13,9 +13,10 @@ The additive identity migration creates separate relations for accounts, profile
 sessions, email challenges, delivery jobs, login counters and audit. The application
 role can insert audit entries, and reading them requires a separate authorized
 database role. The NestJS identity module shares the existing Prisma provider.
-PostgreSQL transactions keep challenge consumption, password resets, approvals and
-audit atomic. An advisory lock serializes staff and delegation changes that affect
-the last active administrator or permission checks. [API contract](CONTRACTS.md#c-002--api-de-identitate-și-acces)
+PostgreSQL transactions keep challenge consumption, initial password setup,
+password resets, approvals and audit atomic. An advisory lock serializes staff
+and delegation changes that affect the last active administrator or permission
+checks. [API contract](CONTRACTS.md#c-004--api-de-identitate-și-acces)
 
 Identity email jobs are created in the same transaction as their challenges. The
 worker takes a short database lease and rebuilds the same signed link on retry,
