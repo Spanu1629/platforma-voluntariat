@@ -2,7 +2,7 @@
 
 VolunTrack este un proiect universitar pentru coordonarea voluntarilor Asociației „Mâini Mici, Suflete Mari”. Aplicația web va acoperi planificarea turelor, înscrierea voluntarilor, evidența prezenței și validarea orelor pentru o singură organizație. Asociația organizează evenimente caritabile și activități pentru copii și familii în Dumbrăveni, Mediaș și Sibiu. La data documentării, organizatorii comunicau direct programul și responsabilitățile. [Informații furnizate de asociație](INTERVIEW.md)
 
-**Stadiu.** Fundația backendului include NestJS, PostgreSQL și Prisma în Docker Compose, migrarea inițială, seed-ul istoric și verificările de integrare. Repository-ul conține și trei machete aprobate local, DS-003, DS-004 și DS-005. Funcționalitățile de produs și deploy-ul public sunt etape ulterioare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
+**Stadiu.** Fundația backendului include NestJS, PostgreSQL și Prisma în Docker Compose, migrarea inițială, seed-ul istoric și verificările de integrare. Repository-ul conține și trei machete aprobate local, DS-003, DS-004 și DS-005. Backendul include API-ul de identitate și acces. Validarea emailurilor reale în staging și deploy-ul public sunt etape ulterioare. [Registrul de design](docs/design/registry.yaml) · [Scope-ul și clarificările aprobate](docs/agents/PROJECT-BRIEF.md)
 
 ## Funcționalități planificate
 
@@ -50,6 +50,120 @@ Backendul este disponibil local pe portul 3000, cu opțiunea `VOLUNTRACK_PORT` p
 
 După migrare, încarcă explicit agregatele istorice aprobate cu `docker compose run --rm migrate npm run db:seed`. Poți rula comanda de mai multe ori. Pentru verificarea istoricului de migrări în baza shadow locală, folosește `docker compose run --rm migrate npm exec -- prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code`. [Agregatele aprobate](EVENT.md#9-utilizarea-datelor-în-voluntrack)
 
+## Operarea modulului de identitate
+
+- Configurează `IDENTITY_PUBLIC_URL` cu originea HTTPS a aplicației și
+  `IDENTITY_SECRET` cu o valoare unică de 32 de octeți în format hex.
+  Folosește secrete distincte pe medii. Păstrează secretul stabil cât timp
+  linkurile emise sunt valabile. Backendul publică schema JSON la
+  `/openapi.json`. Clientul și API-ul folosesc aceeași origine pentru cookie
+  și CSRF. Dacă un proxy de încredere termină TLS, setează
+  `IDENTITY_TRUSTED_PROXIES` cu IP-urile sau CIDR-urile sale explicite.
+- Pentru primul administrator, validează adresa persoanei desemnate în afara
+  aplicației. Rulează o singură dată `node dist/identity/bootstrap-admin.js`
+  în mediul backend cu `IDENTITY_ADMIN_EMAIL` furnizat la runtime și parola
+  transmisă pe stdin din mecanismul de secrete. Comanda refuză repetarea când
+  există deja un administrator. Contul dezvoltatorului se inițializează
+  separat în baza de dezvoltare.
+- Suita de integrare folosește transportul simulat. Proba manuală locală
+  urmează instrucțiunile de mai jos. Pentru staging, confirmă Q-011 și
+  configurează `IDENTITY_MAIL_TRANSPORT=resend`, `IDENTITY_MAIL_FROM` și
+  `RESEND_API_KEY` cu expeditorul de pe domeniul verificat la furnizor.
+  Producția folosește propriul set de variabile și credențiale. Păstrează
+  urmărirea clickurilor dezactivată pentru emailurile de acces.
+- Un link deschis prin GET păstrează acțiunea disponibilă. Clientul trimite
+  `token` și `password` în corpul POST la verificare, resetare sau activare,
+  cu dovada CSRF în antet. O probă manuală de staging poate folosi un client
+  API cu cookie jar. Consemnează numai rezultatele, fără tokenuri sau linkuri
+  complete. Pentru joburi în starea `REVIEW`, verifică starea la furnizor
+  înaintea unei noi trimiteri.
+
+[Contractul de identitate](docs/agents/CONTRACTS.md#c-004--api-de-identitate-și-acces) · [Acceptarea în staging](docs/agents/plans/identitate-si-acces.md#acceptarea-livrării-în-staging) · [Q-011](docs/agents/OPEN-QUESTIONS.md#q-011--ce-expeditor-va-livra-emailurile-reale-ale-pilotului)
+
+### Testare locală cu Resend
+
+Pornește din rădăcina worktree-ului. Creează fișierul privat
+`.env.resend.local` dacă lipsește. Git îl ignoră.
+
+```bash
+if [ ! -e .env.resend.local ]; then
+  (umask 077 && touch .env.resend.local)
+fi
+```
+
+Deschide fișierul într-un editor local. Adaugă următoarele câmpuri și completează
+valorile după semnul `=`. Generează separat fiecare dintre cele patru valori hex
+cu `openssl rand -hex 32`. Păstrează aceleași valori pentru volumul local
+existent și pentru linkurile active.
+
+```dotenv
+POSTGRES_PASSWORD=
+MIGRATOR_PASSWORD=
+APP_PASSWORD=
+IDENTITY_SECRET=
+RESEND_API_KEY=
+```
+
+Introdu la `RESEND_API_KEY` o cheie cu permisiunea **Sending access**.
+Fișierul Compose suplimentar setează `IDENTITY_MAIL_TRANSPORT=resend`,
+`IDENTITY_MAIL_FROM=onboarding@resend.dev` și
+`IDENTITY_PUBLIC_URL=https://localhost:3443`. Destinatarul este adresa
+asociată contului tău Resend. Introdu-o când înregistrezi contul local
+de probă. [Restricția expeditorului de test](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain)
+
+```bash
+resend_compose() (
+  unset POSTGRES_PASSWORD MIGRATOR_PASSWORD APP_PASSWORD IDENTITY_SECRET RESEND_API_KEY
+  docker compose --project-name voluntrack-resend-local --env-file .env.resend.local \
+    -f compose.yaml -f compose.resend.local.yaml "$@"
+)
+resend_compose config --quiet
+resend_compose up -d --build --wait
+resend_ca_dir="$(mktemp -d)"
+resend_compose cp caddy:/data/caddy/pki/authorities/local/root.crt "$resend_ca_dir/root.crt"
+curl --fail --silent --show-error --retry 5 --retry-connrefused \
+  --cacert "$resend_ca_dir/root.crt" https://localhost:3443/health/ready
+```
+
+Folosește certificatul `root.crt` și un client API cu cookie jar pentru
+`https://localhost:3443`. Păstrează numai rezultatele, fără istoricul
+cererilor, capturi sau valori sensibile. Folosește `config --quiet` la
+validarea Compose pentru a evita afișarea configurației cu secrete.
+
+1. Cere `GET /identity/csrf` și păstrează cookie-ul emis. La fiecare POST
+   trimite acel cookie, `Origin: https://localhost:3443` și valoarea
+   `token` din răspuns în headerul `X-CSRF-Token`.
+2. Trimite `POST /identity/register` cu `email` și, opțional, `locale` în
+   corpul JSON. Așteaptă HTTP 202 și mesajul de verificare. În
+   `POST /identity/email/verify` trimite în JSON `token` cu valoarea de după
+   `#token=` din link și `password` cu parola inițială. Așteaptă HTTP 204.
+3. Trimite `POST /identity/password/request` cu `email` în corpul JSON.
+   Așteaptă HTTP 202 și mesajul de resetare. În
+   `POST /identity/password/reset` trimite în JSON câmpurile `token`
+   și `password` cu tokenul nou și parola nouă. Așteaptă HTTP 204.
+   Dacă un mesaj lipsește, verifică starea trimiterii în dashboardul Resend.
+
+Oprește proiectul cu `resend_compose down`. Volumul bazei locale și
+certificatul se păstrează între rulări. Proba locală urmează D-029.
+Acceptarea livrării în staging rămâne condiționată de Q-011, iar deploymentul
+public de Q-004. [D-029](docs/agents/decisions/identitate-si-acces.md#d-029--probă-manuală-locală-cu-expeditorul-de-test-resend)
+
+#### Rezultatul probei locale din 25 noiembrie 2026
+
+Proba a folosit contractul C-002, în vigoare la data testării.
+
+Backendul a răspuns cu HTTP 200 prin HTTPS. Resend a acceptat ambele mesaje la prima încercare, iar destinatarul a confirmat primirea lor.
+
+- Verificarea adresei a returnat HTTP 202 la înregistrare, 200 la deschiderea linkului, 204 la confirmare și 400 la refolosire.
+- Resetarea parolei pe același cont a returnat HTTP 202 la solicitare, 200 la deschiderea linkului, 204 la resetare și 400 la refolosire. Cu parola nouă, autentificarea și accesul la profil au returnat HTTP 200, iar deconectarea a returnat 204.
+
+#### Repetarea probei D-029 cu D-030 și C-004
+
+Pe 25 noiembrie 2026, la commitul `91d6418`, backendul a răspuns cu HTTP 200 prin HTTPS. Resend a acceptat ambele mesaje la prima încercare, iar destinatarul a confirmat primirea lor.
+
+- Înregistrarea fără parolă a returnat HTTP 202 și a creat contul fără hash. Linkul s-a deschis cu HTTP 200, confirmarea fără parolă a primit 400, iar stabilirea parolei inițiale a primit 204. Refolosirea a primit 400. Autentificarea și accesul la profilul în așteptarea aprobării au returnat 200.
+- Solicitarea resetării a returnat HTTP 202, deschiderea linkului 200, resetarea 204 și refolosirea 400. Parola inițială și sesiunea anterioară au fost respinse cu 401. Autentificarea cu parola nouă și accesul la profil au returnat 200, iar deconectarea 204.
+
 ## Verificarea backendului
 
 Rulează `bash backend/test/run-integration.sh` din rădăcina repository-ului. Suita creează un proiect Compose temporar, aplică migrarea pe un volum separat și folosește numai date sintetice. Aceeași comandă rulează în GitHub Actions. [Workflowul de integrare](.github/workflows/backend-ci.yml)
@@ -75,4 +189,5 @@ Buildul rulează `npm run prisma:generate` înainte de compilarea TypeScript în
 - Glosarul proiectului și jurnalul sesiunilor sunt în [CONTEXT.md](CONTEXT.md) și [AI_LOG.md](AI_LOG.md).
 - Regulile Graffino și întrebările încă deschise, inclusiv despre capturi, hosting, email și evaluare, sunt în [AGENTS.md](AGENTS.md) și [registrul de întrebări](docs/agents/OPEN-QUESTIONS.md). Designul începe cu DS-004, DS-005 și DS-010, iar token-urile și mock-urile se aprobă înainte de implementarea ecranelor. [Ordinea livrării](docs/agents/PROJECT-BRIEF.md#ordinea-livrării)
 - Politica de prelucrare, testul interesului legitim și cerințele de activare sunt în [documentația GDPR](docs/privacy/GDPR.md).
+- Analiza avizelor și remedierile backendului sunt în [documentația de securitate a dependențelor](docs/security/DEPENDENCIES.md).
 - Registrul se verifică cu `python3 docs/agents/tools/ledger-lint.py`. Comenzile frontend și lint-ul de aplicație rămân deschise. [Q-003](docs/agents/OPEN-QUESTIONS.md#q-003--which-installation-run-build-test-and-quality-commands-will-the-selected-stack-provide)

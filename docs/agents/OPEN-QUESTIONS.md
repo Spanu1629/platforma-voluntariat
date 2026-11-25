@@ -25,6 +25,12 @@
 - Q-014 · Cum se leagă lista de așteptare FIFO de repartizarea decisă de coordonator? · _answered_
 - Q-015 · Cum se încarcă, verifică și șterge fotografia actului? · _answered_
 
+### [Identitate si acces](questions/identitate-si-acces.md)
+- Q-016 · Cum se activează și se administrează conturile privilegiate? · _answered_
+- Q-017 · Ce limite inițiale folosim pentru încercările repetate de autentificare? · _answered_
+- Q-018 · Ce acces are voluntarul înainte de verificarea emailului? · _answered_
+- Q-019 · Cum remediem avertismentul din dependența Prisma? · _answered_
+
 ---
 
 ## Q-001 · Which technologies and architecture will the application use?
@@ -50,6 +56,7 @@
 - **Proposed answer:** Use `npm ci`, `npm run prisma:generate` and `npm run build` from `backend/` under Node.js 24. Use `docker compose up -d --build --wait` to build, migrate and start the local backend, `docker compose run --rm migrate npm run db:seed` for the historical seed and `bash backend/test/run-integration.sh` for the isolated Jest and Compose checks. Frontend commands and standalone application lint are pending.
 - **Answer:** Pending.
 - **Recorded as:** [Backend commands](../../backend/package.json) and [verification instructions](../../README.md#verificarea-backendului).
+- **Confirmed:** 2026-11-20
 
 ## Q-004 · How will deployment, versioning and releases work?
 - **Status:** open
@@ -96,7 +103,7 @@
 - **Who answers:** Responsabilul proiectului.
 - **Answer:** 2026-11-19 — Folosim exclusiv agregatele reale din EVENT.md pentru ediția din 20.12.2025, separate de pilot și datele sintetice. Setul confirmat cuprinde evenimentul, totalul de 24 de voluntari, distribuția pe opt roluri și cele patru intervale. Exclude înregistrările nominale, pontajele individuale, alocările și capacitățile pe combinație rol–tură, precum și orice date suplimentare indisponibile.
 - **Recorded as:** [EVENT.md](../../EVENT.md#9-utilizarea-datelor-în-voluntrack) și D-006.
-- **Confirmed:** 2026-11-19
+- **Confirmed:** 2026-11-20
 
 ## Q-010 · Cum se verifică documentele minorilor înainte de participare?
 - **Status:** answered
@@ -107,9 +114,10 @@
 
 ## Q-011 · Ce expeditor va livra emailurile reale ale pilotului?
 - **Status:** open
-- **Blocks:** Pilotul cu conturi reale și testarea livrării de email în mediul public.
-- **Proposed answer:** Testare locală cu o căsuță de test. Brevo este candidat, iar expeditorul și livrarea către căsuțe externe trebuie verificate înainte de pilot.
-- **Answer:** Pending.
+- **Blocks:** Configurarea expeditorului și verificarea livrării reale în staging. Adaptorul Resend se poate implementa și testa automat înaintea configurării externe.
+- **Who answers:** Responsabilul proiectului pentru domeniu, adresa expeditorului și URL-ul HTTPS de staging.
+- **Confirmed choice:** 2026-11-20 — Resend prin API din prima livrare a modulului, cu configurare prin variabile de mediu, transport simulat pentru testele automate și acceptare după proba reală în staging. [D-028](decisions/identitate-si-acces.md#d-028--resend-prin-api-și-acceptarea-livrării-în-staging).
+- **Answer:** Așteaptă doar domeniul, adresa expeditorului și URL-ul HTTPS de staging.
 
 ## Q-012 · Ce dovezi suplimentare sunt necesare pentru evaluare?
 - **Status:** open

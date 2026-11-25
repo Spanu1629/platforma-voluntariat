@@ -19,6 +19,19 @@
 - D-018 · Carusele pentru colecții de carduri pe mobil
 - D-019 · Fundal pentru secțiunile care grupează carduri
 
+### [Identitate si acces](decisions/identitate-si-acces.md)
+- D-020 · Crearea conturilor și continuitatea administrării
+- D-021 · Aprobare de cont, delegare și audit
+- D-022 · Parole și protecția autentificării
+- D-023 · Sesiuni și linkuri de acces
+- D-024 · Livrarea emailurilor de verificare și recuperare
+- D-025 · Activarea conturilor privilegiate și ultimul administrator activ
+- D-026 · Limitele încercărilor de autentificare
+- D-027 · Accesul voluntarului în funcție de verificarea emailului
+- D-028 · Resend prin API și acceptarea livrării în staging
+- D-029 · Probă manuală locală cu expeditorul de test Resend
+- D-030 · Stabilirea parolei inițiale la verificarea adresei
+
 ### [Reguli organizatorice](decisions/reguli-organizatorice.md)
 - D-012 · Eligibilitatea de vârstă și programul voluntarilor
 - D-013 · Evidența instruirilor finalizate

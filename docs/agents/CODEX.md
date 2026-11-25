@@ -3,6 +3,7 @@
 <!-- graffino-agentic:codex:begin v1 -->
 This file maps technical operations only. AGENTS.md, the original Graffino
 procedures, ledger, roles and design rules remain authoritative.
+Follow the [VolunTrack Git workflow](../../AGENTS.md#git-workflow) in each skill.
 
 ## Skills and roles
 
@@ -73,21 +74,21 @@ unknown, ask rather than inventing a trailer or omitting it.
 
 ## Worktrees
 
-Claude's `isolation: "worktree"` means a separate Git checkout and private worker
-branch per independent builder, cut from the specified integration tip. It does
-not mean several agents editing one working directory.
-Before a parallel write phase, verify that this Codex client can bind each builder
-to its own worktree and branch, including shell commands and patch/file tools.
-Check each worker's root and branch before any writes. A prompt that merely says
-to change directory is insufficient if file tools still target the shared checkout.
-Use the client's worktree capability only when it provides that binding. Codex CLI
-also exposes `--worktree` for a new session, but that flag alone does not establish
-the required delegated-agent orchestration or branch-base guarantees.
-If those guarantees cannot be verified, parallel building is BLOCKED. Do not
-substitute shared-directory agents or a sequential build without user approval.
+An isolated worktree is a separate checkout. Follow the
+[VolunTrack Git workflow](../../AGENTS.md#git-workflow) and reuse the module's
+existing branch for writes. Use a detached checkout for isolated read-only work
+when the branch is already checked out. Check whether a tool such as
+`--worktree` creates a branch and obtain approval before invoking it if it does.
+
+For an approved parallel write phase that requires private worker branches, list
+the existing refs and obtain explicit approval for the new branches first.
+Verify that this Codex client binds each builder to its approved worktree and
+branch, including shell and file tools. Check each builder's root and branch
+before writes. If isolation or branch approval is missing, parallel building
+is BLOCKED. Obtain approval before switching to a sequential build.
 Keep the original branch-base, never-push-worker, immediate integration, conflict
-handoff, affected-test rerun, linear-history and cleanup-after-integration rules.
-Never remove an unintegrated worktree.
+handoff, affected-test rerun and linear-history rules. Preserve unintegrated
+worktrees and follow the VolunTrack approval gate for branch deletion.
 
 ## Backfill review and memory
 

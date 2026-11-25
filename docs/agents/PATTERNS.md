@@ -12,6 +12,8 @@
 - PATTERN-004 · Ceas controlat pentru stările temporizate ale machetelor · candidate
 - PATTERN-005 · Proiect Compose temporar pentru testele de integrare · candidate
 - PATTERN-006 · Scroll nativ pentru listele de carduri pe mobil · candidate
+- PATTERN-007 · Job tranzacțional cu idempotency și termen de reluare · candidate
+- PATTERN-008 · Probă manuală cu furnizor extern în Compose · candidate
 
 ---
 
@@ -44,3 +46,13 @@
 - **Status:** candidate
 - **How:** Folosește lista semantică existentă drept zonă de scroll-snap. Leagă butoanele de listă, sincronizează indicatorul cu poziția aliniată și adu în vedere cardul al cărui control primește focus. Folosește aceeași listă în layoutul de tabletă și desktop.
 - **Example:** [Stilurile caruselului](../design/mocks/carousel.css) și [navigarea comună celor trei drafturi](../design/mocks/carousel.js).
+
+## PATTERN-007 · Job tranzacțional cu idempotency și termen de reluare
+- **Status:** candidate
+- **How:** Scrie jobul în tranzacția care creează acțiunea, revendică-l pentru un interval limitat și reutilizează cheia stabilă la fiecare încercare. Oprește reluarea la expirarea acțiunii și urmărește separat rezultatele ambigue. Verifică restartul cu un transport simulat.
+- **Example:** [Workerul de email](../../backend/src/identity/identity-mail.ts) și [testele de identitate](../../backend/test/identity.integration.test.js).
+
+## PATTERN-008 · Probă manuală cu furnizor extern în Compose
+- **Status:** candidate
+- **How:** Activează integrarea printr-un fișier Compose explicit, într-un proiect cu volum propriu. Transmite credențialele dintr-un fișier local ignorat de Git, doar serviciului care apelează furnizorul. Validează configurația cu valori fictive și folosește transportul simulat în suita automată.
+- **Example:** [Configurația probei locale Resend](../../compose.resend.local.yaml).
