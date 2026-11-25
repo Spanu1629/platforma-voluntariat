@@ -157,6 +157,13 @@ Backendul a răspuns cu HTTP 200 prin HTTPS. Resend a acceptat ambele mesaje la 
 - Verificarea adresei a returnat HTTP 202 la înregistrare, 200 la deschiderea linkului, 204 la confirmare și 400 la refolosire.
 - Resetarea parolei pe același cont a returnat HTTP 202 la solicitare, 200 la deschiderea linkului, 204 la resetare și 400 la refolosire. Cu parola nouă, autentificarea și accesul la profil au returnat HTTP 200, iar deconectarea a returnat 204.
 
+#### Repetarea probei D-029 cu D-030 și C-004
+
+Pe 25 noiembrie 2026, la commitul `91d6418`, backendul a răspuns cu HTTP 200 prin HTTPS. Resend a acceptat ambele mesaje la prima încercare, iar destinatarul a confirmat primirea lor.
+
+- Înregistrarea fără parolă a returnat HTTP 202 și a creat contul fără hash. Linkul s-a deschis cu HTTP 200, confirmarea fără parolă a primit 400, iar stabilirea parolei inițiale a primit 204. Refolosirea a primit 400. Autentificarea și accesul la profilul în așteptarea aprobării au returnat 200.
+- Solicitarea resetării a returnat HTTP 202, deschiderea linkului 200, resetarea 204 și refolosirea 400. Parola inițială și sesiunea anterioară au fost respinse cu 401. Autentificarea cu parola nouă și accesul la profil au returnat 200, iar deconectarea 204.
+
 ## Verificarea backendului
 
 Rulează `bash backend/test/run-integration.sh` din rădăcina repository-ului. Suita creează un proiect Compose temporar, aplică migrarea pe un volum separat și folosește numai date sintetice. Aceeași comandă rulează în GitHub Actions. [Workflowul de integrare](.github/workflows/backend-ci.yml)
