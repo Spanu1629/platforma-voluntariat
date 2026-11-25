@@ -1,4 +1,6 @@
 const { createHash, randomBytes, randomUUID } = require('node:crypto');
+const { inspect } = require('node:util');
+const { Logger } = require('@nestjs/common');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('../dist/generated/prisma/client');
 const { createApplication } = require('../dist/main');
@@ -21,6 +23,10 @@ function syntheticAddress() {
 
 function cookies(response, name) {
   return response.headers.getSetCookie().find((value) => value.startsWith(`${name}=`));
+}
+
+function sessionDigest(cookie) {
+  return createHash('sha256').update(cookie.split(';')[0].slice(sessionCookie.length + 1)).digest('hex');
 }
 
 async function startApp() {
@@ -88,6 +94,17 @@ function mailServices() {
   return { worker: app.get(IdentityMailWorker), delivery: app.get(SimulatedIdentityDelivery) };
 }
 
+function pendingVolunteerFixture({ passwordHash, issuedAt = new Date() } = {}) {
+  const { enqueueChallenge } = require('../dist/identity/identity-store');
+  return migrator.$transaction(async (tx) => {
+    const account = await tx.identityAccount.create({
+      data: { email: syntheticAddress(), passwordHash, role: 'VOLUNTEER', locale: 'ro', organizationId: 'voluntrack' },
+    });
+    await enqueueChallenge(tx, account.id, 'VERIFY_EMAIL', issuedAt);
+    return account;
+  });
+}
+
 async function deliveredTo(email) {
   const { worker, delivery } = mailServices();
   for (let i = 0; i < 30 && !delivery.messages.some((message) => message.to === email); i++) {
@@ -101,14 +118,14 @@ async function deliveredTo(email) {
 }
 
 async function register(email = syntheticAddress(), locale = 'ro') {
-  const response = await request('/register', { method: 'POST', body: { email, password, locale } });
+  const response = await request('/register', { method: 'POST', body: { email, locale } });
   expect(response.status).toBe(202);
   return email;
 }
 
 async function verify(email) {
   const { token } = await deliveredTo(email);
-  expect((await request('/email/verify', { method: 'POST', body: { token } })).status).toBe(204);
+  expect((await request('/email/verify', { method: 'POST', body: { token, password } })).status).toBe(204);
 }
 
 async function volunteer() {
@@ -147,13 +164,15 @@ test('registration verifies email once and grants access to the pending voluntee
   const row = await migrator.identityAccount.findUniqueOrThrow({ where: { email } });
   expect(row.role).toBe('VOLUNTEER');
   expect(row.approvedAt).toBeNull();
-  expect(row.passwordHash).toMatch(/^\$argon2id\$/);
+  expect(row.passwordHash).toBeNull();
   const { token, message, path } = await deliveredTo(email);
   expect(path).toBe('/email/verify');
   expect(message.subject).toMatch(/verify/i);
   expect((await request(path)).status).toBe(200);
-  const results = await Promise.all([1, 2].map(() => request(path, { method: 'POST', body: { token } })));
+  const results = await Promise.all([1, 2].map(() => request(path, { method: 'POST', body: { token, password } })));
   expect(results.map((result) => result.status).sort()).toEqual([204, 400]);
+  const verified = await migrator.identityAccount.findUniqueOrThrow({ where: { email } });
+  expect(verified.passwordHash).toMatch(/^\$argon2id\$/);
   const session = await sessionFor(email);
   const profile = await request('/profile', {
     method: 'PATCH', session, body: { firstName: 'Synthetic', lastName: 'Volunteer', birthDate: '2000-04-02', phone: '0000000000', locality: 'Fixture' },
@@ -167,24 +186,75 @@ test('registration verifies email once and grants access to the pending voluntee
   expect((await request('/profile', { session })).status).toBe(401);
 });
 
-test('password policy and CSRF cover anonymous and authenticated mutations', async () => {
+test('registration acknowledges duplicate addresses without replacing the pending account or sending again', async () => {
   const email = syntheticAddress();
+  const create = (body) => request('/register', { method: 'POST', body });
+  expect((await create({ email, password })).status).toBe(400);
+  const first = await create({ email });
+  const duplicate = await create({ email, locale: 'en' });
+  expect(first.status).toBe(202);
+  expect(duplicate.status).toBe(202);
+  expect(await duplicate.text()).toBe(await first.text());
+  const account = await migrator.identityAccount.findUniqueOrThrow({ where: { email } });
+  expect(account).toMatchObject({ locale: 'ro', passwordHash: null });
+  expect(await migrator.identityMailJob.count({ where: { challenge: { accountId: account.id } } })).toBe(1);
+});
+
+test('verification replaces a password hash from a previously registered pending account', async () => {
+  const { hashPassword } = require('../dist/identity/identity-input');
+  const previousPassword = `B2${randomBytes(16).toString('hex')}`;
+  const { email } = await pendingVolunteerFixture({ passwordHash: await hashPassword(previousPassword) });
+  const { token, path } = await deliveredTo(email);
+  expect((await login(email, previousPassword)).status).toBe(401);
+  expect((await request(path, { method: 'POST', body: { token, password } })).status).toBe(204);
+  expect((await login(email, previousPassword)).status).toBe(401);
+  await sessionFor(email);
+});
+
+test('password policy and CSRF cover anonymous and authenticated mutations', async () => {
+  const email = await register();
+  const { token, path } = await deliveredTo(email);
+  expect((await request(path, { method: 'POST', body: { token } })).status).toBe(400);
   for (const invalid of ['A1' + 'a'.repeat(7), 'a1' + 'a'.repeat(8), 'Aa'.repeat(5), 'A1' + 'a'.repeat(127)]) {
-    expect((await request('/register', { method: 'POST', body: { email, password: invalid } })).status).toBe(400);
+    expect((await request(path, { method: 'POST', body: { token, password: invalid } })).status).toBe(400);
   }
-  expect((await request('/register', { method: 'POST', body: { email, password }, protection: false })).status).toBe(403);
-  expect((await request('/register', { method: 'POST', body: { email, password }, from: 'https://other.example.invalid' })).status).toBe(403);
-  expect((await request('/register', { method: 'POST', body: { email, password: 'A1' + 'a'.repeat(126) } })).status).toBe(202);
+  const pending = await migrator.identityAccount.findUniqueOrThrow({ where: { email } });
+  expect(pending).toMatchObject({ passwordHash: null, activatedAt: null, emailVerifiedAt: null });
+  expect((await request('/register', { method: 'POST', body: { email }, protection: false })).status).toBe(403);
+  expect((await request('/register', { method: 'POST', body: { email }, from: 'https://other.example.invalid' })).status).toBe(403);
+  expect((await request(path, { method: 'POST', body: { token, password }, protection: false })).status).toBe(403);
+  const longestPassword = 'A1' + 'a'.repeat(126);
+  expect((await request(path, { method: 'POST', body: { token, password: longestPassword } })).status).toBe(204);
+  await sessionFor(email, longestPassword);
   const person = await volunteer();
   expect((await request('/profile', { method: 'PATCH', session: person.session, body: { firstName: 'Fixture' }, protection: false })).status).toBe(403);
+});
+
+test('logout revokes the session and clears the cookie idempotently with valid CSRF', async () => {
+  const person = await administrator();
+  const active = person.session;
+  const expired = await sessionFor(person.email);
+  await migrator.identitySession.update({ where: { digest: sessionDigest(expired) }, data: { lastSeenAt: new Date(Date.now() - 24 * hour) } });
+
+  for (const options of [{ protection: false }, { from: 'https://other.example.invalid' }]) {
+    expect((await request('/logout', { method: 'POST', session: active, ...options })).status).toBe(403);
+    expect((await request('/profile', { session: active })).status).toBe(200);
+  }
+
+  for (const session of [active, active, expired, undefined]) {
+    const response = await request('/logout', { method: 'POST', session });
+    expect(response.status).toBe(204);
+    expect(cookies(response, sessionCookie)).toMatch(/^__Host-voluntrack-session=;.*Expires=/i);
+  }
+  expect(await migrator.identitySession.findUnique({ where: { digest: sessionDigest(active) } })).toBeNull();
+  expect((await request('/profile', { session: active })).status).toBe(401);
 });
 
 test('sessions expire on inactivity or maximum age and reset revokes all sessions', async () => {
   const person = await volunteer();
   const second = await sessionFor(person.email);
-  const id = (cookie) => createHash('sha256').update(cookie.split(';')[0].slice(sessionCookie.length + 1)).digest('hex');
-  await migrator.identitySession.update({ where: { digest: id(person.session) }, data: { lastSeenAt: new Date(Date.now() - 24 * hour) } });
-  await migrator.identitySession.update({ where: { digest: id(second) }, data: { createdAt: new Date(Date.now() - 7 * 24 * hour) } });
+  await migrator.identitySession.update({ where: { digest: sessionDigest(person.session) }, data: { lastSeenAt: new Date(Date.now() - 24 * hour) } });
+  await migrator.identitySession.update({ where: { digest: sessionDigest(second) }, data: { createdAt: new Date(Date.now() - 7 * 24 * hour) } });
   for (const session of [person.session, second]) expect((await request('/profile', { session })).status).toBe(401);
   const firstLive = await sessionFor(person.email);
   const secondLive = await sessionFor(person.email);
@@ -213,7 +283,7 @@ test('email verification and password reset reject expired challenges without ap
   const verification = await migrator.identityChallenge.findFirstOrThrow({ where: { accountId: account.id, purpose: 'VERIFY_EMAIL' } });
   expect(verification.expiresAt - verification.createdAt).toBe(24 * hour);
   await migrator.identityChallenge.update({ where: { id: verification.id }, data: { expiresAt: new Date(Date.now() - 1) } });
-  expect((await request('/email/verify', { method: 'POST', body: { token } })).status).toBe(400);
+  expect((await request('/email/verify', { method: 'POST', body: { token, password } })).status).toBe(400);
   expect((await login(email)).status).toBe(401);
 
   const person = await volunteer();
@@ -324,6 +394,75 @@ test('pending email delivery survives app restart and retries with the same link
   expect(email).not.toBe(retryEmail);
 });
 
+test('an ambiguous delivery moves to review at expiry without another send', async () => {
+  const { worker, delivery } = mailServices();
+  while (await worker.deliverNext()) {}
+  const issuedAt = new Date();
+  const account = await pendingVolunteerFixture({ issuedAt });
+  const send = jest.spyOn(delivery, 'send').mockRejectedValueOnce(new Error('simulated timeout'));
+  try {
+    expect(await worker.deliverNext(issuedAt)).toBe(true);
+    const job = await migrator.identityMailJob.findFirstOrThrow({
+      where: { challenge: { accountId: account.id } }, include: { challenge: true },
+    });
+    expect(job).toMatchObject({ state: 'PENDING', attempts: 1 });
+    const expiresAt = job.challenge.expiresAt;
+    expect(await worker.deliverNext(expiresAt)).toBe(true);
+    expect(await migrator.identityMailJob.findUniqueOrThrow({ where: { id: job.id } })).toMatchObject({
+      state: 'REVIEW', attempts: 1, leaseUntil: null,
+    });
+    expect(await worker.deliverNext(new Date(expiresAt.getTime() + 1))).toBe(false);
+    expect(send).toHaveBeenCalledTimes(1);
+  } finally {
+    send.mockRestore();
+  }
+});
+
+test('identity API and worker errors log generic messages without sensitive data', async () => {
+  const { IdentityService } = require('../dist/identity/identity.service');
+  const identity = app.get(IdentityService);
+  const { worker } = mailServices();
+  const token = randomBytes(32).toString('base64url');
+  const link = `${origin}/identity/email/verify#token=${token}`;
+  const markers = [token, link, syntheticAddress(), randomBytes(32).toString('hex')];
+  const failure = new Error(markers.join(' '));
+  const profile = jest.spyOn(identity, 'profile').mockRejectedValueOnce(failure);
+  const workerTick = jest.spyOn(worker, 'tick').mockRejectedValueOnce(failure);
+  const error = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+  const warn = jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => {});
+
+  try {
+    const response = await request('/profile', { session: `${sessionCookie}=${token}` });
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ statusCode: 500, message: 'Internal server error' });
+
+    let tick;
+    const schedule = jest.spyOn(globalThis, 'setInterval').mockImplementationOnce((callback) => {
+      tick = callback;
+      return { unref() {} };
+    });
+    const environment = jest.replaceProperty(process, 'env', { ...process.env, NODE_ENV: 'development' });
+    try {
+      worker.onModuleInit();
+    } finally {
+      environment.restore();
+      schedule.mockRestore();
+    }
+    tick();
+    await worker.onModuleDestroy();
+
+    const output = inspect([error.mock.calls, warn.mock.calls], { depth: null });
+    expect(markers.every((marker) => !output.includes(marker))).toBe(true);
+    expect(error.mock.calls.some(([message]) => message === 'Unexpected identity API failure.')).toBe(true);
+    expect(warn.mock.calls.some(([message]) => message === 'Identity background processing failed and will retry.')).toBe(true);
+  } finally {
+    profile.mockRestore();
+    workerTick.mockRestore();
+    error.mockRestore();
+    warn.mockRestore();
+  }
+});
+
 test('login throttles after five failures and caps attempts from the same IP', async () => {
   await migrator.identityLoginBucket.deleteMany();
   const person = await volunteer();
@@ -342,8 +481,26 @@ test('OpenAPI documents the identity operations and session security', async () 
   expect(response.status).toBe(200);
   const document = await response.json();
   expect(document.paths['/identity/register'].post.requestBody).toBeDefined();
+  const registration = document.paths['/identity/register'].post.requestBody.content['application/json'].schema;
+  expect(registration.required).toEqual(['email']);
+  expect(registration.properties).not.toHaveProperty('password');
+  const verification = document.paths['/identity/email/verify'].post.requestBody.content['application/json'].schema;
+  expect(verification.required).toEqual(['token', 'password']);
+  expect(verification.properties.password.minLength).toBe(10);
   expect(document.paths['/identity/profile'].patch.security).toContainEqual({ session: [] });
   expect(document.paths['/identity/password/reset'].post.responses['204']).toBeDefined();
+});
+
+test('OpenAPI documents logout with optional session and required CSRF', async () => {
+  const response = await fetch(`${url}/openapi.json`);
+  expect(response.status).toBe(200);
+  const document = await response.json();
+  const logout = document.paths['/identity/logout'].post;
+  expect(logout.security).toEqual(expect.arrayContaining([{ session: [] }, {}]));
+  expect(logout.parameters).toContainEqual(expect.objectContaining({ name: 'X-CSRF-Token', in: 'header', required: true }));
+  expect(logout.responses['204'].headers['Set-Cookie']).toBeDefined();
+  expect(logout.responses['403']).toBeDefined();
+  expect(logout.responses['401']).toBeUndefined();
 });
 
 test('Resend adapter sends the transactional payload with the stable idempotency key', async () => {
