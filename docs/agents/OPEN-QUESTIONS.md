@@ -62,9 +62,10 @@
 - **Status:** open
 - **Blocks:** Deployment and release configuration.
 - **Who answers:** Project owner; partner organization or laboratory staff where applicable.
-- **Proposed answer:** Public HTTPS with a containerized backend and managed PostgreSQL permitted under D-009. Render and Neon are candidates. Validate suspension, restart, SSE and persistence before the pilot. Release process and provider selection remain open.
-- **Answer:** Pending.
-- **Recorded as:** None.
+- **Proposed answer:** Public HTTPS with a containerized backend and managed PostgreSQL permitted under D-009. Render and Neon are candidates for the application and database. Validate suspension, restart, SSE and persistence before the pilot.
+- **Confirmed choice:** 2026-11-26 — Cloudflare R2 Standard with the `eu` jurisdiction for production editorial images. Use S3-compatible storage in Docker for local development and testing. The dedicated delivery configures the account, buckets and credentials.
+- **Answer:** Pending for application hosting, the production database provider, versioning and releases.
+- **Recorded as:** [D-031](DECISIONS.md#d-031--administrarea-publicarea-și-stocarea-imaginilor), for image storage.
 
 ## Q-005 · What visual tokens and supported viewport sizes should the application use?
 - **Status:** answered
