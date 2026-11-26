@@ -69,9 +69,15 @@ Aceste praguri guvernează repartizările viitoare. Datele ediției 2025 rămân
 - Machetele HTML DS-003 (Evenimente disponibile), DS-004 (Detalii eveniment și înscriere) și DS-005 (Programul meu) au aprobare vizuală. Cele 12 variante implicite pentru mobil și desktop, în ambele teme, sunt publicate în Figma ca snapshoturi PNG verificate la dimensiunile native. Machetele din repository păstrează interacțiunile. [Registrul machetelor](../design/registry.yaml) · [Evidența verificării și publicării](../design/CODEX.md#figma--snapshoturi-png-publicate-2026-11-19)
 - D-018 stabilește caruselul mobil pentru colecțiile eligibile, cu excepțiile pentru informațiile prioritare. D-019 stabilește tokenul `section-background` pentru benzile cu carduri și tranzițiile decorative. Ambele decizii sunt aprobate. [D-018 și D-019](DECISIONS.md#d-018--carusele-pentru-colecții-de-carduri-pe-mobil)
 
+## Imagini ale platformei și ale evenimentelor
+
+- Administratorul poate înlocui imaginea principală a platformei din interfața web. Coordonatorul autorizat poate încărca și gestiona coperta și galeria foto ale evenimentului atribuit. Imaginile devin vizibile publicului autorizat după publicare explicită. Imaginile din machete sunt orientative.
+- API-ul gestionează autorizarea, validarea, optimizarea și limitele de utilizare. Fișierele se păstrează persistent conform [D-031](DECISIONS.md#d-031--administrarea-publicarea-și-stocarea-imaginilor).
+
 ## Ordinea livrării
 
 1. Corectarea surselor istorice și actualizarea scope-ului și a registrului.
 2. Design Graffino cu prioritate DS-004, DS-005 și DS-010. Tokens și mock-uri se aprobă înainte de implementarea ecranelor. Se verifică temele deschisă și închisă, contrastul, tastatura și viewport-urile.
 3. După autorizarea implementării: fundație și acces, apoi eligibilitate și planificare, înscrieri și joburi, prezență și ore, documente, mesaje și statistici.
-4. Verificare pe hosting, pilot și predare. Expeditorul email, selecția furnizorilor și eventualele dovezi suplimentare cerute la evaluare rămân în lucru.
+4. Administrarea imaginilor este o etapă separată, după API-ul de planificare și înainte de conectarea interfețelor DS-003, DS-004 și DS-008 la fluxul de imagini.
+5. Verificare pe hosting, pilot și predare. Expeditorul email, selecția furnizorilor și eventualele dovezi suplimentare cerute la evaluare rămân în lucru.

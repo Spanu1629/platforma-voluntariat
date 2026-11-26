@@ -18,6 +18,7 @@
 - D-011 · Temă luminoasă implicită în DS-005
 - D-018 · Carusele pentru colecții de carduri pe mobil
 - D-019 · Fundal pentru secțiunile care grupează carduri
+- D-031 · Administrarea, publicarea și stocarea imaginilor
 
 ### [Identitate si acces](decisions/identitate-si-acces.md)
 - D-020 · Crearea conturilor și continuitatea administrării
@@ -147,4 +148,16 @@
 - **Rule:** Folosește `section-background` pentru benzile care grupează carduri și pentru tranzițiile lor decorative. În light, folosește `#F4EADB`. În dark, folosește `var(--background)`. Folosește `surface` pe carduri și `surface-subtle` pe elementele secundare.
 - **Why:** Crește separarea vizuală între card și secțiune în tema luminoasă și păstrează paleta întunecată.
 - **Evidence:** Aprobarea în conversație a planului completat și a valorilor tokenului. [Paleta partajată](../design/DESIGN.md#color)
+- **Source:** user · confidence high
+
+## D-031 · Administrarea, publicarea și stocarea imaginilor
+
+- **Status:** approved
+- **Date:** 2026-11-26
+- **Confirmed:** 2026-11-26
+- **Rule:** Administratorul gestionează imaginea principală a platformei din interfața web. Coordonatorul autorizat gestionează coperta și galeria evenimentului atribuit. O imagine nouă devine vizibilă publicului autorizat după procesare și publicare explicită. Imaginile din machete sunt orientative.
+- **Storage:** Păstrează fișierele în stocare persistentă de obiecte și metadatele și asocierile în PostgreSQL. Folosește Cloudflare R2 Standard în producție, cu jurisdicția `eu` stabilită la crearea bucketului. Pentru dezvoltare și testare locală folosește o soluție compatibilă S3 în Docker. Păstrează interfața de stocare independentă de furnizor. Configurează contul, bucketurile, permisiunile și credențialele în etapa dedicată.
+- **Processing:** Validează server-side tipul real al imaginii și limitele de octeți și pixeli. Optimizează cu Sharp și elimină metadatele EXIF. Aplică limite pe imagine, galerie, volum total și frecvența operațiilor relevante, cu monitorizare și alerte de consum. Valorile se stabilesc în planul etapei dedicate. Stocarea imaginilor editoriale este separată de fotografia temporară a actului, reglementată de D-016.
+- **Why:** Echipa asociației poate actualiza conținutul din interfață. Stocarea persistă independent de procesul aplicației, iar limitele reduc consumul accidental.
+- **Evidence:** [Cerința de produs și ordinea de livrare](PROJECT-BRIEF.md#imagini-ale-platformei-și-ale-evenimentelor) · [Jurisdicții Cloudflare R2](https://developers.cloudflare.com/r2/reference/data-location/) · [Facturare Cloudflare R2](https://developers.cloudflare.com/r2/pricing/) · [Sharp](https://sharp.pixelplumbing.com/api-constructor/)
 - **Source:** user · confidence high
