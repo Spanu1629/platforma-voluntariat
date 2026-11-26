@@ -14,6 +14,7 @@
 - PATTERN-006 · Scroll nativ pentru listele de carduri pe mobil · candidate
 - PATTERN-007 · Job tranzacțional cu idempotency și termen de reluare · candidate
 - PATTERN-008 · Probă manuală cu furnizor extern în Compose · candidate
+- PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate · candidate
 
 ---
 
@@ -56,3 +57,8 @@
 - **Status:** candidate
 - **How:** Activează integrarea printr-un fișier Compose explicit, într-un proiect cu volum propriu. Transmite credențialele dintr-un fișier local ignorat de Git, doar serviciului care apelează furnizorul. Validează configurația cu valori fictive și folosește transportul simulat în suita automată.
 - **Example:** [Configurația probei locale Resend](../../compose.resend.local.yaml).
+
+## PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate
+- **Status:** candidate
+- **How:** Înregistrează în aceeași tranzacție cu modificarea eligibilității și auditul identificatorul subiectului și cauza reevaluării. Consumatorul poate reciti condițiile înainte de efectele asupra repartizărilor viitoare și poate trimite notificările prin joburile persistente. Păstrează datele personale în evidențele autorizate, fără a le copia în înregistrarea de reevaluare.
+- **Example:** [Invalidarea verificării din profil](../../backend/src/identity/identity.service.ts), [anularea instruirii](../../backend/src/eligibility/training.service.ts) și [schimbările din planificare](../../backend/src/planning/planning.service.ts).

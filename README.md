@@ -164,6 +164,21 @@ Pe 25 noiembrie 2026, la commitul `91d6418`, backendul a răspuns cu HTTP 200 pr
 - Înregistrarea fără parolă a returnat HTTP 202 și a creat contul fără hash. Linkul s-a deschis cu HTTP 200, confirmarea fără parolă a primit 400, iar stabilirea parolei inițiale a primit 204. Refolosirea a primit 400. Autentificarea și accesul la profilul în așteptarea aprobării au returnat 200.
 - Solicitarea resetării a returnat HTTP 202, deschiderea linkului 200, resetarea 204 și refolosirea 400. Parola inițială și sesiunea anterioară au fost respinse cu 401. Autentificarea cu parola nouă și accesul la profil au returnat 200, iar deconectarea 204.
 
+## Planificare și eligibilitate
+
+`GET /events` și `GET /events/{eventId}` citesc catalogul public. Administratorii
+și coordonatorii folosesc rutele `/planning` pentru ciorne, locații, ture, roluri,
+poziții și publicare, conform atribuțiilor. Voluntarii cu email verificat pot
+gestiona disponibilitatea proprie prin `GET` și `PUT /eligibility/availability`.
+Operațiile care modifică date folosesc aceeași origine și dovadă CSRF ca identitatea.
+Consultați schema generată la `GET /openapi.json`.
+
+Migrarea inițializează catalogul de roluri și politica de pauze în PostgreSQL.
+Serviciul de instruiri și evaluatorul sunt verificate cu date sintetice. Modulul
+de înscrieri va conecta stările reale de participare și va activa rutele de
+gestionare a instruirilor. Confirmarea repartizării va depinde de rezultatul
+verificării D-016. [Contractul backend](docs/agents/CONTRACTS.md#c-005--api-de-planificare-disponibilitate-și-integrarea-eligibilității)
+
 ## Verificarea backendului
 
 Rulează `bash backend/test/run-integration.sh` din rădăcina repository-ului. Suita creează un proiect Compose temporar, aplică migrarea pe un volum separat și folosește numai date sintetice. Aceeași comandă rulează în GitHub Actions. [Workflowul de integrare](.github/workflows/backend-ci.yml)

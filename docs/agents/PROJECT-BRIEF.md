@@ -11,6 +11,12 @@ Scope aprobat de responsabilul proiectului la 18.11.2026, cu clarificări organi
 - Turele de cel puțin 4 ore necesită minimum 30 de minute de pauză în interiorul turei. Pauza planificată se scade la verificarea repartizării. La pontaj se scade pauza efectuată. Cele două evidențe se păstrează separat.
 - Administratorii și coordonatorii creează ciorne de eveniment. Coordonatorul creator este atribuit automat. Evenimentul devine vizibil după publicare. Coordonatorul stabilește locațiile, turele, rolurile și capacitatea fiecărei combinații rol–tură. Schimbările esențiale ale unei ture cu repartizări confirmate, oferte sau persoane în așteptare cer anulare motivată, notificare și recreare. Capacitatea nu poate scădea sub totalul repartizărilor confirmate și al ofertelor active.
 
+### Clarificări pentru livrarea backend
+
+- Turele sunt limitate la o zi locală, cu final permis la miezul nopții următoare. Momentele se stochează în UTC, iar vârsta se calculează la data locală de început. O pauză obligatorie este un interval continuu. Politica de pauze este în PostgreSQL și se va administra prin DS-012. [D-032](decisions/eligibilitate-si-planificare.md)
+- Catalogul public include evenimentele publicate. Ciornele se pot salva incomplet. La publicare, fiecare tură validă are o locație și o poziție cu capacitate pozitivă. Imaginile sunt opționale. Catalogul de roluri, atribuirea coordonatorilor și confirmările pentru minori urmează [D-033](decisions/eligibilitate-si-planificare.md).
+- Voluntarii cu email verificat pot gestiona disponibilitatea înaintea aprobării. Instruirile se gestionează după existența unei legături active cu un eveniment atribuit și se verifică înainte de repartizare. Evaluarea preliminară folosește data nașterii declarată. Confirmarea repartizării cere un rezultat valid al verificării de identitate, conform [D-034 și D-035](decisions/eligibilitate-si-planificare.md).
+
 ### Vârste minime pe rol
 
 | Rol de voluntariat | Vârstă minimă | Condiții ale rolului |

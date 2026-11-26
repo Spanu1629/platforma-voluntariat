@@ -170,3 +170,83 @@ test('profile changes invalidate verified identity atomically while contact chan
   const audit = await testDb.db.identityAudit.findMany({ where: { targetId: volunteer.id } });
   expect(audit.map(({ action }) => action)).toContain('IDENTITY_VERIFICATION_INVALIDATED');
 });
+
+test('confirming a renewal links the records and preserves old confirmation history', async () => {
+  const { TrainingService } = require('../dist/eligibility/training.service');
+  const service = testDb.app.get(TrainingService);
+  const admin = await testDb.account('ADMIN');
+  const coordinator = await testDb.account('COORDINATOR');
+  const volunteer = await testDb.account('VOLUNTEER', { approvedAt: new Date() });
+  const { id } = await event(coordinator);
+  await link(volunteer.id, id, 'PROPOSAL_PENDING');
+  await permission(admin, coordinator, true);
+  const data = {
+    type: 'GENERAL', domain: 'Instruire generală sintetică', trainer: 'Formator sintetic',
+    completedOn: new Date('2026-11-10T00:00:00Z'), roleIds: [],
+  };
+  const original = await service.confirm(coordinator.raw, volunteer.id, data, readLink);
+  await service.requestRenewal(coordinator.raw, volunteer.id, original.id, readLink);
+  const replacement = await service.confirm(coordinator.raw, volunteer.id, {
+    ...data, completedOn: new Date('2026-11-11T00:00:00Z'), renewsRecordId: original.id,
+  }, readLink);
+  expect(await testDb.db.trainingRecord.findUnique({ where: { id: original.id } }))
+    .toMatchObject({ supersededById: replacement.id });
+  await service.cancel(coordinator.raw, volunteer.id, replacement.id, 'Motiv sintetic', readLink);
+  expect(await service.qualifications(volunteer.id)).toEqual({ general: false, roleIds: [] });
+  expect(await testDb.db.trainingOperation.count({ where: { recordId: original.id } })).toBe(2);
+});
+
+test('eligibility uses live profile, availability, requirements and a verified result before confirmation', async () => {
+  const { EligibilityService } = require('../dist/eligibility/eligibility.service');
+  const { PrismaService } = require('../dist/prisma.service');
+  const { TrainingService } = require('../dist/eligibility/training.service');
+  const evaluator = testDb.app.get(EligibilityService);
+  const appDb = testDb.app.get(PrismaService);
+  const training = testDb.app.get(TrainingService);
+  const admin = await testDb.account('ADMIN');
+  const coordinator = await testDb.account('COORDINATOR');
+  const volunteer = await testDb.account('VOLUNTEER', { approvedAt: new Date() });
+  await testDb.json('/identity/profile', { actor: volunteer, method: 'PATCH', body: {
+    firstName: 'Prenume sintetic', lastName: 'Nume sintetic', birthDate: '2012-02-14',
+  } });
+  await put(volunteer, path, { weekly, exceptions: [] });
+  const draft = await event(coordinator);
+  const href = `/planning/events/${draft.id}`;
+  await testDb.json(href, { actor: coordinator, method: 'PATCH', body: { title: 'Test', description: 'Descriere de test' } });
+  const location = await testDb.json(href + '/locations', { actor: coordinator, method: 'POST', body: { name: 'Loc test' } }, 201);
+  const shift = await testDb.json(href + '/shifts', { actor: coordinator, method: 'POST', body: {
+    locationId: location.id, startsAt: '2027-02-14T10:00:00+02:00', endsAt: '2027-02-14T13:00:00+02:00',
+  } }, 201);
+  const positionRoute = `${href}/shifts/${shift.id}/positions/creative-workshops`;
+  const position = await put(coordinator, positionRoute, { capacity: 1, tasks: 'Sarcini sintetice' });
+  expect((await testDb.request(href + '/publish', { actor: coordinator, method: 'POST' })).status).toBe(204);
+  const emptySchedule = async () => [];
+  const preliminary = () => appDb.$transaction((tx) => evaluator.evaluatePreliminary(tx, volunteer.id, position.id, emptySchedule));
+  const confirmation = () => appDb.$transaction((tx) => evaluator.requireForConfirmation(tx, volunteer.id, position.id, emptySchedule));
+  expect((await preliminary()).issues).toEqual(expect.arrayContaining([
+    'POSITION_NOT_CONFIRMED_FOR_MINORS', 'SUPERVISION_NOT_CONFIRMED', 'GENERAL_TRAINING_REQUIRED', 'SPECIALIZED_TRAINING_REQUIRED',
+  ]));
+  await put(coordinator, positionRoute + '/adequacy', { confirmed: true });
+  expect((await preliminary()).issues).not.toContain('POSITION_NOT_CONFIRMED_FOR_MINORS');
+  expect((await preliminary()).issues).toContain('SUPERVISION_NOT_CONFIRMED');
+  await put(coordinator, positionRoute + '/supervision', { confirmed: true });
+  await permission(admin, coordinator, true);
+  await link(volunteer.id, draft.id, 'REQUEST_OPEN');
+  const facts = { domain: 'Domeniu sintetic', trainer: 'Formator sintetic', completedOn: new Date('2026-11-10') };
+  await training.confirm(coordinator.raw, volunteer.id, { ...facts, type: 'GENERAL', roleIds: [] }, readLink);
+  await training.confirm(coordinator.raw, volunteer.id, {
+    ...facts, type: 'SPECIALIZED', roleIds: ['general-coordination'],
+  }, readLink);
+  expect((await preliminary()).issues).toEqual(['SPECIALIZED_TRAINING_REQUIRED']);
+  await training.confirm(coordinator.raw, volunteer.id, {
+    ...facts, type: 'SPECIALIZED', roleIds: ['creative-workshops'],
+  }, readLink);
+  expect(await preliminary()).toEqual({ issues: [], effectiveMinutes: 180 });
+  await expect(confirmation()).rejects.toMatchObject({
+    status: 409, response: { issues: ['IDENTITY_VERIFICATION_REQUIRED'] },
+  });
+  await testDb.db.volunteerIdentityVerification.create({ data: {
+    accountId: volunteer.id, result: 'VERIFIED', verifiedAt: new Date(), verifierId: coordinator.id,
+  } });
+  expect(await confirmation()).toEqual({ issues: [], effectiveMinutes: 180 });
+});

@@ -149,4 +149,72 @@ test('OpenAPI documents public and authenticated planning operations', async () 
   expect(paths['/planning/events'].post.parameters).toEqual(expect.arrayContaining([
     expect.objectContaining({ name: 'X-CSRF-Token', required: true }),
   ]));
+  expect(paths['/planning/events/{eventId}'].get.responses['200'].content['application/json'].schema.required)
+    .toContain('shifts');
+  expect(paths['/eligibility/availability'].put.responses['200'].content['application/json'].schema.required)
+    .toEqual(['weekly', 'exceptions']);
+});
+
+test('a coordinator can add a fully configured shift to an already published event atomically', async () => {
+  const coordinator = await testDb.account('COORDINATOR');
+  const { id, path, location } = await fullDraft(coordinator);
+  await status(coordinator, `${path}/publish`, 'POST', {}, 204);
+  await write(coordinator, `${path}/shifts`, 'POST', {
+    locationId: location.id, startsAt: stamp('16:00'), endsAt: stamp('18:00'),
+    positions: [{ roleId: otherRole, capacity: 2 }],
+  }, 201);
+  const result = await testDb.json(`${publishedEvents}/${id}`);
+  expect(result.shifts).toHaveLength(2);
+  expect(result.shifts[1].roles).toEqual([{ id: otherRole, name: 'Distribuire materiale și cadouri' }]);
+});
+
+test('event assignment can be prepared before a coordinator activates an account', async () => {
+  const admin = await testDb.account('ADMIN');
+  const coordinator = await testDb.account('COORDINATOR', { activatedAt: null, emailVerifiedAt: null });
+  const path = await draft(admin);
+  await status(admin, `${path}/coordinators/${coordinator.id}`, 'PUT', {}, 204);
+  await status(coordinator, path, 'GET', undefined, 401);
+  await testDb.db.identityAccount.update({
+    where: { id: coordinator.id }, data: { activatedAt: new Date(), emailVerifiedAt: new Date() },
+  });
+  await status(coordinator, path, 'GET', undefined, 200);
+});
+
+test('reservation counts supplied in the planning transaction guard capacity and essential shift edits', async () => {
+  const { PlanningService } = require('../dist/planning/planning.service');
+  const { IdentityService } = require('../dist/identity/identity.service');
+  const { PrismaService } = require('../dist/prisma.service');
+  const coordinator = await testDb.account('COORDINATOR');
+  const { id, position, shiftPath } = await fullDraft(coordinator);
+  const row = await write(coordinator, position, 'PUT', { capacity: 3 });
+  const shiftId = shiftPath.split('/').at(-1);
+  await testDb.db.$executeRaw`
+    CREATE TABLE "SyntheticPositionActivity" (
+      "positionId" uuid PRIMARY KEY, confirmed integer NOT NULL, offers integer NOT NULL, waiting integer NOT NULL
+    )
+  `;
+  await testDb.db.$executeRaw`GRANT SELECT ON "SyntheticPositionActivity" TO voluntrack_app`;
+  await testDb.db.$executeRaw`
+    INSERT INTO "SyntheticPositionActivity" VALUES (${row.id}::uuid, 1, 1, 1)
+  `;
+  const capacityUpdates = [];
+  const planning = new PlanningService(testDb.app.get(PrismaService), testDb.app.get(IdentityService), {
+    async counts(tx, positionId) {
+      const [result] = await tx.$queryRaw`
+        SELECT confirmed, offers AS "activeOffers", waiting
+        FROM "SyntheticPositionActivity" WHERE "positionId" = ${positionId}::uuid
+      `;
+      return result ?? { confirmed: 0, activeOffers: 0, waiting: 0 };
+    },
+    async capacityChanged(_tx, positionId, previous, current) {
+      capacityUpdates.push([positionId, previous, current]);
+    },
+  });
+  await expect(planning.savePosition(coordinator.raw, id, shiftId, role, { capacity: 0 }))
+    .rejects.toMatchObject({ status: 409 });
+  expect(await planning.savePosition(coordinator.raw, id, shiftId, role, { capacity: 2 }))
+    .toMatchObject({ capacity: 2 });
+  expect(capacityUpdates).toEqual([[row.id, 3, 2]]);
+  await expect(planning.saveShift(coordinator.raw, id, { endsAt: new Date(stamp('14:30')) }, shiftId))
+    .rejects.toMatchObject({ status: 409 });
 });
