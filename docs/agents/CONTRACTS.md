@@ -13,6 +13,7 @@
 - C-002 · API de identitate și acces · provided · _superseded-by C-004_
 - C-004 · API de identitate și acces · provided
 - C-005 · API de planificare, disponibilitate și integrarea eligibilității · provided
+- C-006 · API de participare, repartizare și listă de așteptare · provided
 - C-003 · Livrarea tranzacțională prin Resend · external
 
 ---
@@ -55,6 +56,16 @@
 - **Integration:** Serviciul de instruiri primește cititorul stărilor de participare din backend, în aceeași tranzacție cu autorizarea. Modulul de înscrieri furnizează programul organizațional și verifică eligibilitatea finală prin `requireForConfirmation` în tranzacția care rezervă locul. Adaptorul de participare furnizează starea reală, inclusiv rezervările și termenele legăturilor. Primește schimbarea de capacitate în tranzacția de editare. Serializează modificările concurente ale programului, rezervărilor și accesului. Rezultatul verificării vine din fluxul D-016. Evenimentele de reevaluare scrise atomic indică subiectul și cauza, pentru procesarea persistentă și notificări în modulul de înscrieri.
 - **Consumers:** [Teste HTTP de planificare](../../backend/test/planning.integration.test.js) și [teste de eligibilitate și instruiri](../../backend/test/eligibility.integration.test.js). Frontendul va consuma OpenAPI, iar înscrierile vor consuma serviciile interne.
 - **Evidence:** D-032–D-035 și planul complet de Eligibilitate și planificare aprobat la 26.11.2026.
+
+## C-006 · API de participare, repartizare și listă de așteptare
+- **Status:** approved
+- **Confirmed:** 2026-11-28
+- **Interface:** REST JSON sub `/participation` cu schema OpenAPI la `GET /openapi.json`. Voluntarul folosește `GET /participation/me`, iar coordonatorul atribuit poate citi solicitările din eveniment. Scrierile folosesc sesiunea și CSRF din C-004. Starea și rezervările respectă D-014, D-036 și D-037.
+- **Guarantee:** Voluntarul aprobat deschide și retrage propria solicitare, răspunde la propuneri sau oferte, poate reintra în FIFO și poate retrage repartizări în termen. Coordonatorul atribuit propune poziția, gestionează excepțiile și poate anula o tură viitoare cu motiv. Răspunsul public al catalogului rămâne în C-005.
+- **Updates:** `GET /participation/updates` livrează semnale SSE autentificate după commit. La conectare și reconectare clientul recitește starea prin REST. Termenele și starea rămân în PostgreSQL.
+- **Training:** Operațiile sub `/eligibility/volunteers/:volunteerId/trainings` aplică permisiunea distinctă și verifică o legătură de participare activă în aceeași tranzacție cu scrierea.
+- **Consumers:** [Teste HTTP și PostgreSQL](../../backend/test/participation.integration.test.js). Frontendul va consuma OpenAPI și va reîncărca starea după un semnal.
+- **Evidence:** Planul aprobat pentru Înscrieri, repartizare și listă de așteptare și D-036–D-037.
 
 ## Consumed
 No provider interfaces have been identified.

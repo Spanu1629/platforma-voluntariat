@@ -168,13 +168,23 @@ export class IdentityService {
     return result;
   }
 
-  async principal(tx: Prisma.TransactionClient, token: string | undefined) {
+  async sessionAccountId(tx: Prisma.TransactionClient, token: string | undefined) {
     if (!token || !SESSION_FORMAT.test(token)) throw new UnauthorizedException();
-    const key = digest(token);
-    const session = await tx.identitySession.findUnique({ where: { digest: key }, select: { accountId: true } });
-    if (!session) throw new UnauthorizedException();
-    await lockAccount(tx, session.accountId);
-    const account = await tx.identityAccount.findUniqueOrThrow({ where: { id: session.accountId } });
+    const session = await tx.identitySession.findUnique({
+      where: { digest: digest(token) }, select: { accountId: true, createdAt: true, lastSeenAt: true },
+    });
+    const now = Date.now();
+    if (!session || +session.createdAt <= now - SESSION_AGE || +session.lastSeenAt <= now - 24 * HOUR) {
+      throw new UnauthorizedException();
+    }
+    return session.accountId;
+  }
+
+  async principal(tx: Prisma.TransactionClient, token: string | undefined) {
+    const accountId = await this.sessionAccountId(tx, token);
+    const key = digest(token!);
+    await lockAccount(tx, accountId);
+    const account = await tx.identityAccount.findUniqueOrThrow({ where: { id: accountId } });
     if (!accountActive(account)) throw new UnauthorizedException();
     const now = new Date();
     const touched = await tx.identitySession.updateMany({

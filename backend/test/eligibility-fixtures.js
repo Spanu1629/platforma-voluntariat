@@ -43,7 +43,7 @@ function integration() {
     return { id: row.id, raw, cookie: `__Host-voluntrack-session=${raw}` };
   }
 
-  async function request(path, { method = 'GET', actor, body, csrf = true } = {}) {
+  async function request(path, { method = 'GET', actor, body, signal, csrf = true } = {}) {
     const jar = actor ? [actor.cookie] : [];
     const headers = { Origin: origin };
     if (method !== 'GET' && csrf) {
@@ -54,7 +54,7 @@ function integration() {
     }
     if (jar.length) headers.Cookie = jar.join('; ');
     if (body !== undefined) headers['Content-Type'] = 'application/json';
-    return fetch(url + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    return fetch(url + path, { method, headers, signal, body: body === undefined ? undefined : JSON.stringify(body) });
   }
 
   async function json(path, options, status = 200) {

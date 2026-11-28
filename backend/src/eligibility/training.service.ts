@@ -1,9 +1,10 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, type TrainingAction, type TrainingType } from '../generated/prisma/client';
+import type { Prisma, TrainingAction, TrainingType } from '../generated/prisma/client';
 import { uuid } from '../identity/identity-input';
 import { IdentityService } from '../identity/identity.service';
 import { audit, lockAccountInRole } from '../identity/identity-store';
 import { text } from '../planning/planning-input';
+import { lockEvent } from '../planning/planning-store';
 import { PrismaService } from '../prisma.service';
 import { localDate } from './eligibility-rules';
 
@@ -61,6 +62,7 @@ export class TrainingService {
         await tx.trainingRecord.update({ where: { id: previous.id }, data: { supersededById: record.id } });
       }
       await this.history(tx, record.id, eventId, actorId, now, 'CONFIRMED');
+      await tx.eligibilityReview.createMany({ data: { subjectId: id, reason: 'TRAINING_CHANGED' } });
       return record;
     });
   }
@@ -127,17 +129,19 @@ export class TrainingService {
       const now = new Date();
       const eventIds = [...new Set(links.filter((link) => activeParticipationLink(link, now)).map((link) => link.eventId))];
       if (!eventIds.length) throw new ForbiddenException();
-      const [assignment] = await tx.$queryRaw<{ eventId: string }[]>`
-        SELECT pc."eventId" FROM "PlanningCoordinator" pc
-        JOIN "PlanningEvent" event ON event.id = pc."eventId"
-        WHERE pc."eventId" IN (${Prisma.join(eventIds.map((eventId) => Prisma.sql`${eventId}::uuid`))})
-          AND event."organizationId" = ${actor.organizationId}
-          AND pc."accountId" = ${actor.id}::uuid
-          AND pc."revokedAt" IS NULL
-        ORDER BY pc."eventId" LIMIT 1 FOR SHARE OF pc
-      `;
-      if (!assignment) throw new ForbiddenException();
-      return operation(tx, { actorId: actor.id, eventId: assignment.eventId, organizationId: actor.organizationId, now });
+      const assigned = await tx.planningCoordinator.findMany({
+        where: { accountId: actor.id, revokedAt: null, eventId: { in: eventIds }, event: { organizationId: actor.organizationId } },
+        select: { eventId: true }, orderBy: { eventId: 'asc' },
+      });
+      for (const { eventId } of assigned) {
+        await lockEvent(tx, eventId, actor.organizationId);
+        const live = await readLinks(tx, id);
+        const checkedAt = new Date();
+        if (live.some((link) => link.eventId === eventId && activeParticipationLink(link, checkedAt))) {
+          return operation(tx, { actorId: actor.id, eventId, organizationId: actor.organizationId, now: checkedAt });
+        }
+      }
+      throw new ForbiddenException();
     });
   }
 }

@@ -57,6 +57,17 @@ node-postgres. The PostgreSQL integration tests check overlapping commands
 on each connection, including overlaps that do not emit a warning.
 [Backend checks](../../README.md#verificarea-backendului)
 
+Participation persists an event request and each proposed or confirmed placement.
+A position has an ordered queue and time-limited offers. The owning accounts
+are locked before events and positions. FIFO promotion re-reads eligibility and
+capacity after those locks, and a move replaces the source reservation in the
+same transaction as destination confirmation. When the queue changes before
+the transaction acquires the event lock, it retries with the current account set.
+The scheduler stores deadlines and acknowledges jobs in the transaction that
+applies their effects. A restart retries work whose transaction rolled back.
+API users re-read scoped REST state after reconnecting to the SSE stream.
+[Participation contract](CONTRACTS.md#c-006--api-de-participare-repartizare-și-listă-de-așteptare)
+
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
 | Module | Conceptual entities and responsibilities |

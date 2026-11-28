@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util';
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma, VolunteerAvailability } from '../generated/prisma/client';
 import { IdentityService } from '../identity/identity.service';
@@ -22,6 +23,7 @@ type EligibilityPosition = {
   startsAt: Date | null;
   endsAt: Date | null;
   publishedAt: Date | null;
+  canceledAt: Date | null;
   minimumAge: number;
   supervisionForMinors: boolean;
   specializedTraining: boolean;
@@ -48,9 +50,10 @@ export class EligibilityService {
       const actor = await this.identity.principal(tx, token);
       if (actor.role !== 'VOLUNTEER') throw new ForbiddenException();
       const where = { accountId: actor.id };
-      const row = changes
-        ? await tx.volunteerAvailability.upsert({ where, create: { ...where, ...changes }, update: changes })
-        : await tx.volunteerAvailability.findUnique({ where });
+      const previous = await tx.volunteerAvailability.findUnique({ where });
+      if (!changes || isDeepStrictEqual(changes, availabilityView(previous))) return availabilityView(previous);
+      const row = await tx.volunteerAvailability.upsert({ where, create: { ...where, ...changes }, update: changes });
+      await tx.eligibilityReview.createMany({ data: { subjectId: actor.id, reason: 'AVAILABILITY_CHANGED' } });
       return availabilityView(row);
     });
   }
@@ -83,7 +86,7 @@ export class EligibilityService {
     if (!account || account.role !== 'VOLUNTEER') throw new NotFoundException();
     const storedAvailability = await tx.volunteerAvailability.findUnique({ where: { accountId } });
     const [position] = await tx.$queryRaw<EligibilityPosition[]>`
-      SELECT p."shiftId", p."roleId", p.capacity, s."startsAt", s."endsAt", e."publishedAt",
+      SELECT p."shiftId", p."roleId", p.capacity, s."startsAt", s."endsAt", e."publishedAt", s."canceledAt",
              r."minimumAge", r."supervisionForMinors", r."specializedTraining",
              p."adequacyConfirmedAt" IS NOT NULL AS adequate,
              p."supervisionConfirmedAt" IS NOT NULL AS supervised
@@ -100,6 +103,7 @@ export class EligibilityService {
     if (!accountActive(account) || !account.approvedAt) issues.push('ACCOUNT_NOT_APPROVED');
     if (requireVerified && !await this.verifiedIdentity(account.id, tx)) issues.push('IDENTITY_VERIFICATION_REQUIRED');
     if (!publishedAt) issues.push('EVENT_NOT_PUBLISHED');
+    if (position.canceledAt) issues.push('SHIFT_CANCELED');
     if (position.capacity === 0) issues.push('POSITION_CLOSED');
 
     if (!startsAt || !endsAt) return { issues: [...issues, 'INVALID_SHIFT'] };

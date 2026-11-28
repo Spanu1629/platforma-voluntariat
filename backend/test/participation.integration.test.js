@@ -136,3 +136,143 @@ test('an expired offer never confirms and another worker can resume processing s
   expect((await read(b.proposal.id)).state).toBe('EXPIRED');
   expect((await read(c.proposal.id)).state).toBe('OFFERED');
 });
+
+test('revocation preserves issued proposals and canceling the last shift removes the event from the catalog', async () => {
+  const { coordinator, event, shift, position, volunteers: [volunteer] } = await setup(1);
+  const admin = await fixtures.account('ADMIN');
+  const { request, proposal } = await propose(event, coordinator, volunteer, position);
+  const revoke = await fixtures.request(`/planning/events/${event.id}/coordinators/${coordinator.id}`,
+    { actor: admin, method: 'DELETE' });
+  expect(revoke.status).toBe(204);
+  expect((await actorRequest(coordinator, `/events/${event.id}`, 'GET')).status).toBe(404);
+  expect((await (await respond(volunteer, proposal)).json()).state).toBe('CONFIRMED');
+  expect((await actorRequest(volunteer, `/requests/${request.id}`, 'DELETE')).status).toBe(204);
+  expect((await fixtures.db.participationPlacement.findUnique({ where: { id: proposal.id } })).state).toBe('CONFIRMED');
+
+  expect((await fixtures.request(`/planning/events/${event.id}/coordinators/${coordinator.id}`,
+    { actor: admin, method: 'PUT' })).status).toBe(204);
+  expect((await actorRequest(coordinator, `/events/${event.id}/shifts/${shift.id}/cancel`, 'POST',
+    { reason: 'Schimbarea locației' })).status).toBe(204);
+  expect((await fixtures.request(`/events/${event.id}`)).status).toBe(404);
+  expect((await fixtures.db.participationPlacement.findUnique({ where: { id: proposal.id } })).state).toBe('CANCELED');
+  expect(await fixtures.db.planningAudit.findFirst({ where: { targetId: shift.id, action: 'SHIFT_CANCELED' } }))
+    .toMatchObject({ reason: 'Schimbarea locației' });
+
+  const replacement = await fixtures.json(`/planning/events/${event.id}/shifts`, {
+    actor: coordinator, method: 'POST', body: {
+      startsAt: new Date(+nextDay + 3 * hour).toISOString(),
+      endsAt: new Date(+nextDay + 4 * hour).toISOString(), locationId: shift.locationId,
+      positions: [{ roleId: 'ticket-checking', capacity: 1 }],
+    },
+  }, 201);
+  expect((await fixtures.request(`/planning/events/${event.id}/publish`, { actor: coordinator, method: 'POST' })).status).toBe(204);
+  const published = await fixtures.json(`/events/${event.id}`);
+  expect(published.shifts.map(({ id }) => id)).toEqual([replacement.id]);
+});
+
+test('avoidable ineligibility holds an offer, while verified age ineligibility advances FIFO', async () => {
+  const { coordinator, event, position, volunteers: [first, second, third] } = await setup(3);
+  const a = await propose(event, coordinator, first, position);
+  const b = await propose(event, coordinator, second, position);
+  const c = await propose(event, coordinator, third, position);
+  await respond(first, a.proposal);
+  await respond(second, b.proposal);
+  await respond(third, c.proposal);
+  await actorRequest(first, `/placements/${a.proposal.id}/withdraw`, 'PUT', {});
+  const { ParticipationJobs } = require('../dist/participation/participation-jobs');
+  const jobs = fixtures.app.get(ParticipationJobs);
+  await jobs.tick();
+  const read = (id) => fixtures.db.participationPlacement.findUnique({ where: { id } });
+  expect((await read(b.proposal.id)).state).toBe('OFFERED');
+  const avail = await fixtures.db.volunteerAvailability.findUnique({ where: { accountId: second.id } });
+  await fixtures.json('/eligibility/availability', { actor: second, method: 'PUT', body: { weekly: [], exceptions: [] } });
+  expect((await respond(second, b.proposal)).status).toBe(409);
+  expect((await read(b.proposal.id)).state).toBe('OFFERED');
+  await fixtures.json('/eligibility/availability', {
+    actor: second, method: 'PUT', body: { weekly: avail.weekly, exceptions: avail.exceptions },
+  });
+  await fixtures.db.identityProfile.update({ where: { accountId: second.id }, data: { birthDate: new Date('2020-01-01') } });
+  expect((await respond(second, b.proposal)).status).toBe(409);
+  expect((await read(b.proposal.id)).state).toBe('CANCELED');
+  await jobs.tick();
+  expect((await read(c.proposal.id)).state).toBe('OFFERED');
+});
+
+test('different events serialize conflicting acceptances for the same volunteer', async () => {
+  const a = await setup(1);
+  const b = await setup(0);
+  const [volunteer] = a.volunteers;
+  const x = await propose(a.event, a.coordinator, volunteer, a.position);
+  const y = await propose(b.event, b.coordinator, volunteer, b.position);
+  const responses = await Promise.all([respond(volunteer, x.proposal), respond(volunteer, y.proposal)]);
+  expect(responses.map(({ status }) => status).sort()).toEqual([200, 409]);
+  const current = await fixtures.json('/participation/me', { actor: volunteer });
+  expect(current.flatMap(({ placements }) => placements).filter(({ state }) => state === 'CONFIRMED')).toHaveLength(1);
+});
+
+test('training routes use a real active participation link and require coordinator permission', async () => {
+  const { coordinator, event, volunteers: [volunteer] } = await setup(1);
+  const admin = await fixtures.account('ADMIN');
+  const path = `/eligibility/volunteers/${volunteer.id}/trainings`;
+  const body = { type: 'GENERAL', domain: 'Sintetic', trainer: 'Formator', completedOn: '2020-01-01', roleIds: [] };
+  const confirm = () => fixtures.request(path, { actor: coordinator, method: 'POST', body });
+  const request = await create(volunteer, `/events/${event.id}/requests`);
+  expect((await confirm()).status).toBe(403);
+  expect((await fixtures.request(`/eligibility/training-permissions/${coordinator.id}`, {
+    actor: admin, method: 'PUT', body: { granted: true },
+  })).status).toBe(204);
+  expect((await confirm()).status).toBe(201);
+  expect((await actorRequest(volunteer, `/requests/${request.id}`, 'DELETE')).status).toBe(204);
+  expect((await confirm()).status).toBe(403);
+});
+
+test('SSE exposes committed notifications and REST recovers the scoped state on reconnect', async () => {
+  const { coordinator, event, volunteers: [volunteer] } = await setup(1);
+  const controller = new AbortController();
+  const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(7000)]);
+  const response = await fixtures.request('/participation/updates', { actor: coordinator, signal });
+  try {
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('text/event-stream');
+    const reader = response.body.getReader();
+    const decode = new TextDecoder();
+    let events = '';
+    const readUntil = async (marker) => {
+      while (!events.includes(marker)) {
+        const { done, value } = await reader.read();
+        if (done) throw new Error('SSE closed before delivering the expected event.');
+        events += decode.decode(value, { stream: true });
+      }
+    };
+    await readUntil('event: ready');
+    const request = await create(volunteer, `/events/${event.id}/requests`);
+    await readUntil(request.id);
+    expect(events).toContain('PARTICIPATION_REQUEST_OPENED');
+    const state = await fixtures.json(`/participation/events/${event.id}`, { actor: coordinator });
+    expect(state.map(({ id }) => id)).toContain(request.id);
+    const notices = await fixtures.json('/participation/notifications', { actor: coordinator });
+    expect(notices).toEqual(expect.arrayContaining([expect.objectContaining({ subjectId: request.id })]));
+  } finally {
+    controller.abort();
+  }
+});
+
+test('a move cannot replace a placement after its original shift has ended', async () => {
+  const { coordinator, event, shift, position, volunteers: [volunteer] } = await setup(1);
+  const source = await propose(event, coordinator, volunteer, position);
+  expect((await respond(volunteer, source.proposal)).status).toBe(200);
+  const later = await fixtures.db.planningShift.create({ data: {
+    eventId: event.id, locationId: shift.locationId, startsAt: new Date(+nextDay + 4 * hour),
+    endsAt: new Date(+nextDay + 5 * hour),
+  } });
+  const destination = await fixtures.db.planningPosition.create({
+    data: { shiftId: later.id, roleId: 'ticket-checking', capacity: 1 },
+  });
+  const move = await create(coordinator, `/requests/${source.request.id}/proposals`,
+    { positionId: destination.id, replacesId: source.proposal.id });
+  await fixtures.db.planningShift.update({ where: { id: shift.id }, data: {
+    startsAt: new Date(Date.now() - 2 * hour), endsAt: new Date(Date.now() - hour),
+  } });
+  expect((await respond(volunteer, move)).status).toBe(409);
+  expect((await fixtures.db.participationPlacement.findUnique({ where: { id: source.proposal.id } })).state).toBe('CONFIRMED');
+});
