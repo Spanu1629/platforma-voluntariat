@@ -12,6 +12,7 @@
 - C-001 · Readiness-ul backendului · provided
 - C-002 · API de identitate și acces · provided · _superseded-by C-004_
 - C-004 · API de identitate și acces · provided
+- C-005 · API de planificare, disponibilitate și integrarea eligibilității · provided
 - C-003 · Livrarea tranzacțională prin Resend · external
 
 ---
@@ -44,6 +45,16 @@
 - **Logout:** `POST /identity/logout` necesită aceeași dovadă CSRF. Sesiunea este opțională. Dacă sesiunea indicată există, backendul o revocă, iar răspunsul HTTP 204 expiră cookie-ul de sesiune, inclusiv când sesiunea lipsește, a expirat sau a fost deja revocată. Originea sau dovada CSRF invalidă primește HTTP 403.
 - **Consumers:** [Teste HTTP sintetice](../../backend/test/identity.integration.test.js) și [proba manuală locală](../../README.md#testare-locală-cu-resend). Clientul de produs va folosi schema OpenAPI.
 - **Evidence:** [Planul de identitate](plans/identitate-si-acces.md), D-020–D-030 și aprobarea remedierilor din [PR #3](https://github.com/Spanu1629/platforma-voluntariat/pull/3).
+
+## C-005 · API de planificare, disponibilitate și integrarea eligibilității
+- **Status:** approved
+- **Confirmed:** 2026-11-26
+- **Interface:** REST JSON cu OpenAPI la `GET /openapi.json`. `GET /events` și `GET /events/:eventId` afișează catalogul și detaliul public. `/planning/events` și `/planning/roles` acoperă administrarea autentificată a evenimentelor și catalogul rolurilor, cu publicare, atribuiri, locații, ture și poziții.
+- **Availability:** `GET /eligibility/availability` citește disponibilitatea proprie. `PUT /eligibility/availability` înlocuiește atomic `weekly` și `exceptions`. Ziua săptămânii este 1–7, luni–duminică. Intervalele au capăt exclusiv, în minute locale de la 0 la 1440. O excepție cu lista goală marchează ziua ca indisponibilă. O dată absentă folosește recurența săptămânală.
+- **Access:** Citirile publice expun titlul, descrierea, locațiile turelor, momentele UTC și rolurile cu capacitate pozitivă. Operațiile private folosesc sesiunea și protecția CSRF din C-004, autorizate în organizație și pe eveniment. `PUT /eligibility/training-permissions/:coordinatorId` permite administratorului să acorde sau să retragă permisiunea distinctă.
+- **Integration:** Serviciul de instruiri primește cititorul stărilor de participare din backend, în aceeași tranzacție cu autorizarea. Modulul de înscrieri furnizează programul organizațional și verifică eligibilitatea finală prin `requireForConfirmation` în tranzacția care rezervă locul. Adaptorul de participare furnizează starea reală, inclusiv rezervările și termenele legăturilor. Primește schimbarea de capacitate în tranzacția de editare. Serializează modificările concurente ale programului, rezervărilor și accesului. Rezultatul verificării vine din fluxul D-016. Evenimentele de reevaluare scrise atomic indică subiectul și cauza, pentru procesarea persistentă și notificări în modulul de înscrieri.
+- **Consumers:** [Teste HTTP de planificare](../../backend/test/planning.integration.test.js) și [teste de eligibilitate și instruiri](../../backend/test/eligibility.integration.test.js). Frontendul va consuma OpenAPI, iar înscrierile vor consuma serviciile interne.
+- **Evidence:** D-032–D-035 și planul complet de Eligibilitate și planificare aprobat la 26.11.2026.
 
 ## Consumed
 No provider interfaces have been identified.

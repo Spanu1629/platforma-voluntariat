@@ -20,6 +20,12 @@
 - D-019 · Fundal pentru secțiunile care grupează carduri
 - D-031 · Administrarea, publicarea și stocarea imaginilor
 
+### [Eligibilitate si planificare](decisions/eligibilitate-si-planificare.md)
+- D-032 · Ziua locală și politica de pauze planificate
+- D-033 · Planificare, acces la evenimente și poziții
+- D-034 · Acces, reînnoire și anulare pentru instruiri
+- D-035 · Rezultatul verificării de identitate la confirmare
+
 ### [Identitate si acces](decisions/identitate-si-acces.md)
 - D-020 · Crearea conturilor și continuitatea administrării
 - D-021 · Aprobare de cont, delegare și audit

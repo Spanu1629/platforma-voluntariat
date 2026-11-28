@@ -58,6 +58,7 @@ test('deploy applies the exact historical and identity migrations', async () => 
   expect(migrations).toEqual([
     { migration_name: '20261119000000_historical_baseline' },
     { migration_name: '20261120000000_identity_access' },
+    { migration_name: '20261126000000_eligibility_planning' },
   ]);
 });
 
@@ -166,4 +167,55 @@ test('identity migration preserves all historical relations when applied to an e
     await client.query('DROP SCHEMA IF EXISTS identity_upgrade_fixture CASCADE');
     await client.end();
   }
+});
+
+test('eligibility planning upgrades a database that already contains historical and identity rows', async () => {
+  const { readFileSync } = require('node:fs');
+  const { Client } = require('pg');
+  const { randomUUID } = require('node:crypto');
+  const accountId = randomUUID();
+  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  try {
+    await client.query('CREATE SCHEMA planning_upgrade_fixture');
+    await client.query('SET search_path = planning_upgrade_fixture');
+    for (const migration of ['20261119000000_historical_baseline', '20261120000000_identity_access']) {
+      await client.query(readFileSync(`prisma/migrations/${migration}/migration.sql`, 'utf8'));
+    }
+    await client.query('INSERT INTO "HistoricalEvent" SELECT * FROM public."HistoricalEvent"');
+    await client.query(`
+      INSERT INTO "IdentityAccount" (id, "organizationId", email, role, locale)
+      VALUES ($1, 'voluntrack', 'upgrade-fixture@example.invalid', 'VOLUNTEER', 'ro')
+    `, [accountId]);
+    await client.query(readFileSync('prisma/migrations/20261126000000_eligibility_planning/migration.sql', 'utf8'));
+    expect((await client.query('SELECT * FROM "HistoricalEvent" ORDER BY id')).rows)
+      .toEqual((await client.query('SELECT * FROM public."HistoricalEvent" ORDER BY id')).rows);
+    expect((await client.query('SELECT id FROM "IdentityAccount"')).rows).toEqual([{ id: accountId }]);
+    expect((await client.query('SELECT id FROM "PlanningEvent"')).rows).toEqual([]);
+    expect((await client.query('SELECT count(*)::int AS total FROM "PlanningRole"')).rows).toEqual([{ total: 8 }]);
+    expect((await client.query('SELECT * FROM "PlanningPolicy"')).rows).toEqual([{
+      organizationId: 'voluntrack', breakThresholdMinutes: 240, minimumBreakMinutes: 30,
+    }]);
+  } finally {
+    await client.query('ROLLBACK');
+    await client.query('DROP SCHEMA IF EXISTS planning_upgrade_fixture CASCADE');
+    await client.end();
+  }
+});
+
+test('application privileges protect role policy, identity results and planning audit', async () => {
+  const [privileges] = await application.$queryRaw`
+    SELECT
+      has_table_privilege(current_user, '"PlanningRole"', 'SELECT') AS reads_roles,
+      has_table_privilege(current_user, '"PlanningRole"', 'INSERT, UPDATE, DELETE') AS edits_roles,
+      has_table_privilege(current_user, '"PlanningPolicy"', 'INSERT, UPDATE, DELETE') AS edits_policy,
+      has_table_privilege(current_user, '"VolunteerIdentityVerification"', 'INSERT') AS creates_verification,
+      has_column_privilege(current_user, '"VolunteerIdentityVerification"', 'result', 'UPDATE') AS edits_result,
+      has_column_privilege(current_user, '"VolunteerIdentityVerification"', 'invalidatedAt', 'UPDATE') AS invalidates,
+      has_table_privilege(current_user, '"PlanningAudit"', 'SELECT, UPDATE, DELETE') AS accesses_audit
+  `;
+  expect(privileges).toEqual({
+    reads_roles: true, edits_roles: false, edits_policy: false, creates_verification: false,
+    edits_result: false, invalidates: true, accesses_audit: false,
+  });
 });

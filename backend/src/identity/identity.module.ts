@@ -9,6 +9,7 @@ import { IdentitySettings } from './identity-settings';
 @Module({
   imports: [PrismaModule],
   controllers: [IdentityController],
+  exports: [IdentityService, IdentitySettings, IdentityCsrf, IdentityExceptionFilter],
   providers: [
     IdentitySettings, IdentityService, IdentityCsrf, IdentityExceptionFilter,
     IdentityMailWorker, SimulatedIdentityDelivery,

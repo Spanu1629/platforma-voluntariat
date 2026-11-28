@@ -14,6 +14,9 @@
 - PATTERN-006 · Scroll nativ pentru listele de carduri pe mobil · candidate
 - PATTERN-007 · Job tranzacțional cu idempotency și termen de reluare · candidate
 - PATTERN-008 · Probă manuală cu furnizor extern în Compose · candidate
+- PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate · candidate
+- PATTERN-010 · Citiri relaționale secvențiale în tranzacții Prisma · candidate
+- PATTERN-011 · Blocarea contului în organizație înaintea evenimentului · candidate
 
 ---
 
@@ -56,3 +59,18 @@
 - **Status:** candidate
 - **How:** Activează integrarea printr-un fișier Compose explicit, într-un proiect cu volum propriu. Transmite credențialele dintr-un fișier local ignorat de Git, doar serviciului care apelează furnizorul. Validează configurația cu valori fictive și folosește transportul simulat în suita automată.
 - **Example:** [Configurația probei locale Resend](../../compose.resend.local.yaml).
+
+## PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate
+- **Status:** candidate
+- **How:** Înregistrează în aceeași tranzacție cu modificarea eligibilității și auditul identificatorul subiectului și cauza reevaluării. Consumatorul poate reciti condițiile înainte de efectele asupra repartizărilor viitoare și poate trimite notificările prin joburile persistente. Păstrează datele personale în evidențele autorizate, fără a le copia în înregistrarea de reevaluare.
+- **Example:** [Invalidarea verificării din profil](../../backend/src/identity/identity.service.ts), [anularea instruirii](../../backend/src/eligibility/training.service.ts) și [schimbările din planificare](../../backend/src/planning/planning.service.ts).
+
+## PATTERN-010 · Citiri relaționale secvențiale în tranzacții Prisma
+- **Status:** candidate
+- **How:** Așteaptă pe rând citirile care folosesc aceeași conexiune tranzacțională. Pentru o colecție de părinți, citește fiecare tip de relație în lot și grupează rezultatele după cheia părintelui. Testează atât suprapunerea comenzilor pe conexiune, cât și numărul de comenzi pentru mai mulți părinți.
+- **Example:** [Citirea planului și verificarea publicării](../../backend/src/planning/planning.service.ts), [testele de integrare](../../backend/test/planning.integration.test.js).
+
+## PATTERN-011 · Blocarea contului în organizație înaintea evenimentului
+- **Status:** candidate
+- **How:** Când două operații au nevoie de aceleași blocări pe cont și eveniment, ia blocările în aceeași ordine. Folosește filtrul de organizație și rol în interogarea care blochează contul țintă. În testul PostgreSQL, ține blocarea contului și verifică dacă operația care așteaptă încă lasă disponibilă blocarea evenimentului.
+- **Example:** [Atribuirea coordonatorului](../../backend/src/planning/planning.service.ts) și [testul ordinii de blocare](../../backend/test/planning.integration.test.js).

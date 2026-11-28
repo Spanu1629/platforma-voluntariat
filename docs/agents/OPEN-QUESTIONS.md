@@ -24,6 +24,7 @@
 - Q-013 · Cum se generează și se eliberează documentele de voluntariat? · _answered_
 - Q-014 · Cum se leagă lista de așteptare FIFO de repartizarea decisă de coordonator? · _answered_
 - Q-015 · Cum se încarcă, verifică și șterge fotografia actului? · _answered_
+- Q-020 · Cum validăm compatibilitatea cu AWS RDS și pg 9?
 
 ### [Identitate si acces](questions/identitate-si-acces.md)
 - Q-016 · Cum se activează și se administrează conturile privilegiate? · _answered_
@@ -144,3 +145,10 @@
 - **Answer:** 2026-11-19 — Încărcarea în VolunTrack este aprobată pentru verificarea identității și vârstei. Fotografia se transmite privat prin HTTPS și este accesibilă exclusiv coordonatorului autorizat pentru verificare. După aprobare sau respingere se șterge imediat, iar încărcările abandonate expiră automat. Rămân rezultatul, data și coordonatorul responsabil. Fotografia este exclusă din backupuri, loguri, exporturi, notificări și rapoarte. Accesul și operațiunile sunt auditate fără conținutul actului.
 - **Recorded as:** [D-016](decisions/reguli-organizatorice.md#d-016--verificarea-identității-și-evidența-documentelor) · [Politica de prelucrare și evaluarea temeiului propus](../privacy/GDPR.md) · [Verificări obligatorii înainte de activarea cu date reale](../privacy/GDPR.md#verificări-obligatorii-înainte-de-activarea-cu-date-reale).
 - **Confirmed:** 2026-11-19
+
+## Q-020 · Cum validăm compatibilitatea cu AWS RDS și pg 9?
+- **Status:** open
+- **Blocks:** Validarea pe un RDS de staging și adoptarea unei versiuni publicate de pg 9 cu suport Prisma.
+- **Who answers:** Responsabilul proiectului confirmă disponibilitatea mediului de staging și momentul validării.
+- **Proposed answer:** Pe RDS, verifică readiness, starea migrărilor și citirile tranzacționale cu rolurile distincte, CA AWS și `sslmode=verify-full`. Verifică respingerea unui CA greșit. Pentru pg 9, repetă suita PostgreSQL cu versiuni Prisma compatibile când sunt disponibile.
+- **Answer:** Pending. Validările sunt amânate până la disponibilitatea mediului și a versiunilor.

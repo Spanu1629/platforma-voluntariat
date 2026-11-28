@@ -168,7 +168,7 @@ export class IdentityService {
     return result;
   }
 
-  private async principal(tx: Prisma.TransactionClient, token: string | undefined) {
+  async principal(tx: Prisma.TransactionClient, token: string | undefined) {
     if (!token || !SESSION_FORMAT.test(token)) throw new UnauthorizedException();
     const key = digest(token);
     const session = await tx.identitySession.findUnique({ where: { digest: key }, select: { accountId: true } });
@@ -198,9 +198,26 @@ export class IdentityService {
       const account = await this.principal(tx, token);
       const where = { accountId: account.id };
       if (changes && account.role !== 'VOLUNTEER') throw new ForbiddenException();
+      const previous = await tx.identityProfile.findUnique({ where });
       const row = changes
         ? await tx.identityProfile.upsert({ where, create: { ...where, ...changes }, update: changes })
-        : await tx.identityProfile.findUnique({ where });
+        : previous;
+      if (changes && (row?.firstName !== (previous?.firstName ?? null) ||
+        row?.lastName !== (previous?.lastName ?? null) ||
+        (row?.birthDate?.getTime() ?? null) !== (previous?.birthDate?.getTime() ?? null))) {
+        const now = new Date();
+        await audit(tx, account.id, account.id, 'IDENTITY_PROFILE_FIELDS_CHANGED', now);
+        const invalidated = await tx.volunteerIdentityVerification.updateMany({
+          where: { accountId: account.id, result: 'VERIFIED', invalidatedAt: null },
+          data: { invalidatedAt: now },
+        });
+        if (invalidated.count) {
+          await audit(tx, account.id, account.id, 'IDENTITY_VERIFICATION_INVALIDATED', now);
+          await tx.eligibilityReview.createMany({ data: {
+            subjectId: account.id, reason: 'IDENTITY_INVALIDATED',
+          } });
+        }
+      }
       return { ...identityView(account), firstName: row?.firstName ?? null, lastName: row?.lastName ?? null,
         birthDate: row?.birthDate?.toISOString().slice(0, 10) ?? null, phone: row?.phone ?? null,
         locality: row?.locality ?? null };
@@ -288,6 +305,9 @@ export class IdentityService {
         await audit(tx, actor.id, id, change.disabled ? 'STAFF_DISABLED' : 'STAFF_ENABLED', now);
       }
       if (roleChanged && target.canApprove) await audit(tx, actor.id, id, 'DELEGATION_REVOKED', now);
+      if (roleChanged && (await tx.trainingPermission.deleteMany({ where: { accountId: id } })).count) {
+        await audit(tx, actor.id, id, 'TRAINING_PERMISSION_REVOKED', now);
+      }
     });
   }
 

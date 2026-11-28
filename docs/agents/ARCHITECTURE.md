@@ -26,6 +26,37 @@ Automated tests use an in-process simulated transport. Staging and production
 have their own configuration and credentials. Real staging verification remains
 a release criterion under Q-011. [Delivery contract](CONTRACTS.md#c-003--livrarea-tranzacțională-prin-resend) · [Local setup](../../README.md#testare-locală-cu-resend)
 
+The planning module persists events, locations, shifts, planned breaks, role
+positions and active or revoked coordinator assignments. PostgreSQL constraints
+keep each location in its shift's event and each role unique per shift. Event
+mutations and publication lock the event row before checking the current
+assignment and publication requirements. Coordinator assignment locks the
+target account in the event organization's scope before locking the event.
+Public reads use a dedicated field
+projection. The migration initializes the eight approved roles and the
+organization's break policy. [Planning contract](CONTRACTS.md#c-005--api-de-planificare-disponibilitate-și-integrarea-eligibilității)
+
+Eligibility stores weekly availability and entire-date exceptions. It evaluates
+the volunteer's schedule using Bucharest calendar dates and UTC shift and break
+instants. Training history retains confirmations, renewal requests and
+cancellations. The training service checks the current permission and an active
+participation link before writing. Profile edits invalidate an existing identity
+verification in the same transaction as the edit and audit. Changes that can
+affect future assignments leave a durable review record. Participation will
+supply the live relationships, reservations, notifications and transactional
+confirmation. The dedicated D-016 delivery will supply verified identity
+results. [Eligibility decisions](decisions/eligibilitate-si-planificare.md)
+
+Planning detail, shift edits, publication checks and eligibility evaluation
+await relation reads sequentially on the existing transaction connection.
+Planning fetches breaks and positions for the selected shifts in batches and
+groups them by shift ID. Eligibility reads the position, role, shift and
+event with a parameterized PostgreSQL join scoped to the volunteer's
+organization. These reads avoid relying on the deprecated queue in
+node-postgres. The PostgreSQL integration tests check overlapping commands
+on each connection, including overlaps that do not emit a warning.
+[Backend checks](../../README.md#verificarea-backendului)
+
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
 | Module | Conceptual entities and responsibilities |

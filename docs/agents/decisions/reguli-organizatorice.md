@@ -12,6 +12,7 @@
 ## D-013 · Evidența instruirilor finalizate
 - **Status:** approved
 - **Date:** 2026-11-19
+- **Confirmed:** 2026-11-26
 - **Rule:** Asociația desfășoară instruirile în afara aplicației, prin voluntari cu experiență. Instruirea generală inițială este obligatorie pentru fiecare voluntar. Pentru coordonare, amenajare/logistică și ateliere creative se cere și instruire specializată, asociabilă cu mai multe roluri. Voluntarul poate avea mai multe instruiri generale și specializate. Coordonatorul autorizat confirmă instruirile în profil. Fiecare înregistrare include tipul, domeniul, rolurile relevante, data, persoana care a instruit și coordonatorul care a confirmat. Instruirile nu expiră automat. Coordonatorul poate cere reînnoirea când se schimbă regulile organizației. Auditează corecțiile și anulările și verifică instruirile necesare înaintea activării repartizării.
 - **Why:** Repartizarea depinde de instruirea efectuată în cadrul organizației.
 - **Evidence:** Clarificarea finală privind instruirile, aprobată de responsabilul proiectului la 19.11.2026. [Evidența instruirilor](../PROJECT-BRIEF.md#evidența-instruirilor)

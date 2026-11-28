@@ -27,7 +27,7 @@ export async function createApplication(options?: NestApplicationOptions) {
   const app = await NestFactory.create(AppModule, options);
   const proxies = trustedProxies();
   if (proxies.length) app.getHttpAdapter().getInstance().set('trust proxy', proxies);
-  app.use('/identity', (_request: Request, response: Response, next: NextFunction) => {
+  app.use(['/identity', '/planning', '/eligibility'], (_request: Request, response: Response, next: NextFunction) => {
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('Referrer-Policy', 'no-referrer');
     next();
