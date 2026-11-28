@@ -207,6 +207,39 @@ test('a coordinator can add a fully configured shift to an already published eve
   expect(result.shifts[1].roles).toEqual([{ id: otherRole, name: 'Distribuire materiale și cadouri' }]);
 });
 
+test('assigning a coordinator waits for the account before locking the event', async () => {
+  const admin = await testDb.account('ADMIN');
+  const coordinator = await testDb.account('COORDINATOR');
+  const path = await draft(admin);
+  const eventId = path.split('/').at(-1);
+  let assignment;
+  try {
+    await testDb.db.$transaction(async (tx) => {
+      const [{ pid }] = await tx.$queryRaw`SELECT pg_backend_pid() AS pid`;
+      await tx.$queryRaw`SELECT id FROM "IdentityAccount" WHERE id = ${coordinator.id}::uuid FOR UPDATE`;
+      assignment = testDb.request(`${path}/coordinators/${coordinator.id}`, { actor: admin, method: 'PUT' });
+
+      // Wait for the assignment transaction to encounter the held row lock.
+      const deadline = Date.now() + 800;
+      let blocked;
+      do {
+        [{ blocked }] = await tx.$queryRaw`
+          SELECT EXISTS (
+            SELECT FROM pg_stat_activity WHERE ${pid}::integer = ANY (pg_blocking_pids(pid))
+          ) AS blocked
+        `;
+        if (!blocked) await new Promise((resolve) => setTimeout(resolve, 10));
+      } while (!blocked && Date.now() < deadline);
+      expect(blocked).toBe(true);
+
+      await tx.$queryRaw`SELECT id FROM "PlanningEvent" WHERE id = ${eventId}::uuid FOR UPDATE NOWAIT`;
+    });
+  } finally {
+    if (assignment) await assignment;
+  }
+  expect((await assignment).status).toBe(204);
+});
+
 test('event assignment can be prepared before a coordinator activates an account', async () => {
   const admin = await testDb.account('ADMIN');
   const coordinator = await testDb.account('COORDINATOR', { activatedAt: null, emailVerifiedAt: null });

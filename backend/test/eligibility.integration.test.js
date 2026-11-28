@@ -78,6 +78,18 @@ test('policy defaults and alternate policies are read from PostgreSQL by plannin
   }
 });
 
+test('training permission rejects accounts of another organization without waiting for their row lock', async () => {
+  const admin = await testDb.account('ADMIN');
+  const outsider = await testDb.account('COORDINATOR', { organizationId: 'synthetic-outsider' });
+  await testDb.db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM "IdentityAccount" WHERE id = ${outsider.id}::uuid FOR UPDATE`;
+    const response = await testDb.request(`/eligibility/training-permissions/${outsider.id}`, {
+      actor: admin, method: 'PUT', body: { granted: true },
+    });
+    expect(response.status).toBe(404);
+  });
+});
+
 test('the training service enforces live relationships and records confirmation, renewal and cross-event cancellation', async () => {
   const { TrainingService } = require('../dist/eligibility/training.service');
   const service = testDb.app.get(TrainingService);
