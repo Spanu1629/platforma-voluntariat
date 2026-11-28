@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, ForbiddenException, Inject, Inj
 import { Prisma, type IdentityAccount, type PlanningEvent, type PlanningPosition, type PlanningShift } from '../generated/prisma/client';
 import { ORGANIZATION } from '../identity/identity-input';
 import { IdentityService } from '../identity/identity.service';
+import { lockAccountInRole } from '../identity/identity-store';
 import { PrismaService } from '../prisma.service';
 import { localDate, shiftTiming, type Span } from '../eligibility/eligibility-rules';
 import { auditPlanning, breakPolicy, lockEvent } from './planning-store';
@@ -164,14 +165,20 @@ export class PlanningService {
   }
 
   async assign(token: string | undefined, eventId: string, accountId: string, granted: boolean): Promise<void> {
-    await this.withEvent(token, eventId, async (tx, actor) => {
-      if (actor.role !== 'ADMIN') throw new ForbiddenException();
-      const target = await tx.identityAccount.findFirst({
-        where: { id: accountId, organizationId: actor.organizationId, role: 'COORDINATOR' },
-      });
+    await this.db.$transaction(async (tx) => {
+      const actor = await this.identity.principal(tx, token);
+      this.requireStaff(actor);
+      if (actor.role !== 'ADMIN') {
+        await this.authorizeEvent(tx, eventId, actor);
+        throw new ForbiddenException();
+      }
+
+      // Planning requests lock the actor's account before taking an event lock.
+      const isCoordinator = await lockAccountInRole(tx, accountId, actor.organizationId, 'COORDINATOR');
+      await lockEvent(tx, eventId, actor.organizationId);
       const where = { eventId_accountId: { eventId, accountId } };
       const assignment = await tx.planningCoordinator.findUnique({ where });
-      if (!target && (granted || !assignment)) throw new NotFoundException();
+      if (!isCoordinator && (granted || !assignment)) throw new NotFoundException();
       if (granted && assignment?.revokedAt !== null) {
         await tx.planningCoordinator.upsert({
           where, create: { eventId, accountId }, update: { revokedAt: null },
@@ -339,12 +346,17 @@ export class PlanningService {
     return this.db.$transaction(async (tx) => {
       const actor = await this.identity.principal(tx, token);
       this.requireStaff(actor);
-      const event = await lockEvent(tx, id, actor.organizationId);
-      if (actor.role === 'COORDINATOR' && !await tx.planningCoordinator.findFirst({
-        where: { eventId: id, accountId: actor.id, revokedAt: null }, select: { eventId: true },
-      })) throw new NotFoundException();
+      const event = await this.authorizeEvent(tx, id, actor);
       return operate(tx, actor, event);
     });
+  }
+
+  private async authorizeEvent(tx: Prisma.TransactionClient, id: string, actor: IdentityAccount): Promise<PlanningEvent> {
+    const event = await lockEvent(tx, id, actor.organizationId);
+    if (actor.role === 'COORDINATOR' && !await tx.planningCoordinator.findFirst({
+      where: { eventId: id, accountId: actor.id, revokedAt: null }, select: { eventId: true },
+    })) throw new NotFoundException();
+    return event;
   }
 
   private async requirePublishable(tx: Prisma.TransactionClient, event: PlanningEvent): Promise<void> {

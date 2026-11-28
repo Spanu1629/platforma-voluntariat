@@ -16,6 +16,7 @@
 - PATTERN-008 · Probă manuală cu furnizor extern în Compose · candidate
 - PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate · candidate
 - PATTERN-010 · Citiri relaționale secvențiale în tranzacții Prisma · candidate
+- PATTERN-011 · Blocarea contului în organizație înaintea evenimentului · candidate
 
 ---
 
@@ -68,3 +69,8 @@
 - **Status:** candidate
 - **How:** Așteaptă pe rând citirile care folosesc aceeași conexiune tranzacțională. Pentru o colecție de părinți, citește fiecare tip de relație în lot și grupează rezultatele după cheia părintelui. Testează atât suprapunerea comenzilor pe conexiune, cât și numărul de comenzi pentru mai mulți părinți.
 - **Example:** [Citirea planului și verificarea publicării](../../backend/src/planning/planning.service.ts), [testele de integrare](../../backend/test/planning.integration.test.js).
+
+## PATTERN-011 · Blocarea contului în organizație înaintea evenimentului
+- **Status:** candidate
+- **How:** Când două operații au nevoie de aceleași blocări pe cont și eveniment, ia blocările în aceeași ordine. Folosește filtrul de organizație și rol în interogarea care blochează contul țintă. În testul PostgreSQL, ține blocarea contului și verifică dacă operația care așteaptă încă lasă disponibilă blocarea evenimentului.
+- **Example:** [Atribuirea coordonatorului](../../backend/src/planning/planning.service.ts) și [testul ordinii de blocare](../../backend/test/planning.integration.test.js).

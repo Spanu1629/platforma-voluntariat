@@ -1,4 +1,4 @@
-import { Prisma, type IdentityAccount, type IdentityChallengePurpose } from '../generated/prisma/client';
+import { Prisma, type IdentityAccount, type IdentityChallengePurpose, type IdentityRole } from '../generated/prisma/client';
 import { HOUR, MINUTE } from './identity-input';
 
 export function accountActive(account: IdentityAccount): boolean {
@@ -12,6 +12,17 @@ export async function lockAdministration(tx: Prisma.TransactionClient): Promise<
 
 export async function lockAccount(tx: Prisma.TransactionClient, id: string): Promise<void> {
   await tx.$queryRaw`SELECT 1::int AS locked FROM "IdentityAccount" WHERE id = ${id}::uuid FOR UPDATE`;
+}
+
+export async function lockAccountInRole(
+  tx: Prisma.TransactionClient, id: string, organizationId: string, role: IdentityRole,
+): Promise<boolean> {
+  const rows = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM "IdentityAccount"
+    WHERE id = ${id}::uuid AND "organizationId" = ${organizationId} AND role = ${role}::"IdentityRole"
+    FOR UPDATE
+  `;
+  return rows.length > 0;
 }
 
 export async function enqueueChallenge(

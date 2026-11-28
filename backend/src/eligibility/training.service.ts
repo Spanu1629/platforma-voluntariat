@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { Prisma, type TrainingAction, type TrainingType } from '../generated/prisma/client';
 import { uuid } from '../identity/identity-input';
 import { IdentityService } from '../identity/identity.service';
-import { audit, lockAccount } from '../identity/identity-store';
+import { audit, lockAccountInRole } from '../identity/identity-store';
 import { text } from '../planning/planning-input';
 import { PrismaService } from '../prisma.service';
 import { localDate } from './eligibility-rules';
@@ -27,11 +27,7 @@ export class TrainingService {
     await this.db.$transaction(async (tx) => {
       const actor = await this.identity.principal(tx, token);
       if (actor.role !== 'ADMIN') throw new ForbiddenException();
-      await lockAccount(tx, id);
-      const target = await tx.identityAccount.findFirst({
-        where: { id, role: 'COORDINATOR', organizationId: actor.organizationId },
-      });
-      if (!target) throw new NotFoundException();
+      if (!await lockAccountInRole(tx, id, actor.organizationId, 'COORDINATOR')) throw new NotFoundException();
       const result = granted
         ? await tx.trainingPermission.createMany({ data: { accountId: id }, skipDuplicates: true })
         : await tx.trainingPermission.deleteMany({ where: { accountId: id } });
@@ -126,12 +122,8 @@ export class TrainingService {
       const actor = await this.identity.principal(tx, token);
       if (actor.role !== 'COORDINATOR' ||
         !await tx.trainingPermission.findUnique({ where: { accountId: actor.id } })) throw new ForbiddenException();
-      await lockAccount(tx, id);
-      const volunteer = await tx.identityAccount.findFirst({
-        where: { id, role: 'VOLUNTEER', organizationId: actor.organizationId }, select: { id: true },
-      });
-      if (!volunteer) throw new NotFoundException();
-      const links = await readLinks(tx, volunteer.id);
+      if (!await lockAccountInRole(tx, id, actor.organizationId, 'VOLUNTEER')) throw new NotFoundException();
+      const links = await readLinks(tx, id);
       const now = new Date();
       const eventIds = [...new Set(links.filter((link) => activeParticipationLink(link, now)).map((link) => link.eventId))];
       if (!eventIds.length) throw new ForbiddenException();

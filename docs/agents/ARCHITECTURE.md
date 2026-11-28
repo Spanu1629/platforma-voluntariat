@@ -30,7 +30,9 @@ The planning module persists events, locations, shifts, planned breaks, role
 positions and active or revoked coordinator assignments. PostgreSQL constraints
 keep each location in its shift's event and each role unique per shift. Event
 mutations and publication lock the event row before checking the current
-assignment and publication requirements. Public reads use a dedicated field
+assignment and publication requirements. Coordinator assignment locks the
+target account in the event organization's scope before locking the event.
+Public reads use a dedicated field
 projection. The migration initializes the eight approved roles and the
 organization's break policy. [Planning contract](CONTRACTS.md#c-005--api-de-planificare-disponibilitate-și-integrarea-eligibilității)
 
