@@ -39,6 +39,10 @@
 - D-029 · Probă manuală locală cu expeditorul de test Resend
 - D-030 · Stabilirea parolei inițiale la verificarea adresei
 
+### [Inscrieri repartizare si lista de asteptare](decisions/inscrieri-repartizare-si-lista-de-asteptare.md)
+- D-036 · Ciclul solicitării, propunerilor și publicării
+- D-037 · Eligibilitate FIFO, oferte și schimbarea repartizării
+
 ### [Reguli organizatorice](decisions/reguli-organizatorice.md)
 - D-012 · Eligibilitatea de vârstă și programul voluntarilor
 - D-013 · Evidența instruirilor finalizate

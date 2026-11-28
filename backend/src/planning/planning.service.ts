@@ -11,6 +11,7 @@ import type { eventInput, locationInput, positionInput, shiftInput } from './pla
 const publicEvent = {
   id: true, title: true, description: true,
   shifts: {
+    where: { canceledAt: null },
     orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
     select: {
       id: true, startsAt: true, endsAt: true,
@@ -37,7 +38,7 @@ function positionView(row: PlanningPosition) {
   };
 }
 
-function shiftView(shift: PlanningShift, breaks: Span[]) {
+function shiftView({ canceledAt: _canceledAt, ...shift }: PlanningShift, breaks: Span[]) {
   return { ...shift, breaks: breaks.map(({ startsAt, endsAt }) => ({ startsAt, endsAt })) };
 }
 
@@ -63,6 +64,7 @@ function hasParticipation(activity: { confirmed: number; activeOffers: number; w
 export const PLANNING_PARTICIPATION = Symbol('PLANNING_PARTICIPATION');
 export interface PlanningParticipation {
   counts(tx: Prisma.TransactionClient, positionId: string): Promise<{ confirmed: number; activeOffers: number; waiting: number }>;
+  eventChanged?(tx: Prisma.TransactionClient, eventId: string): Promise<void>;
   capacityChanged(tx: Prisma.TransactionClient, positionId: string, previous: number, current: number): Promise<void>;
 }
 
@@ -108,7 +110,7 @@ export class PlanningService {
         where: { eventId }, select: { accountId: true, revokedAt: true }, orderBy: { accountId: 'asc' },
       });
       const shifts = await tx.planningShift.findMany({
-        where: { eventId }, orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+        where: { eventId, canceledAt: null }, orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
       });
       if (!shifts.length) return { ...event, locations, coordinators, shifts: [] };
 
@@ -161,6 +163,7 @@ export class PlanningService {
       if (event.publishedAt) return;
       await tx.planningEvent.update({ where: { id: eventId }, data: { publishedAt: new Date() } });
       await auditPlanning(tx, eventId, actor.id, eventId, 'EVENT_PUBLISHED');
+      await this.participation?.eventChanged?.(tx, eventId);
     });
   }
 
@@ -225,7 +228,7 @@ export class PlanningService {
       if (values.locationId && !await tx.planningLocation.findFirst({ where: { eventId, id: values.locationId } })) {
         throw new NotFoundException();
       }
-      const previous = id && await tx.planningShift.findFirst({ where: { id, eventId } });
+      const previous = id && await tx.planningShift.findFirst({ where: { id, eventId, canceledAt: null } });
       if (id && !previous) throw new NotFoundException();
       const startsAt = values.startsAt === undefined ? (previous ? previous.startsAt : null) : values.startsAt;
       const endsAt = values.endsAt === undefined ? (previous ? previous.endsAt : null) : values.endsAt;
@@ -263,6 +266,7 @@ export class PlanningService {
         await tx.eligibilityReview.createMany({ data: { subjectId: shift.id, reason: 'SHIFT_DATE_CHANGED' } });
       }
       await auditPlanning(tx, eventId, actor.id, shift.id, previous ? 'SHIFT_EDITED' : 'SHIFT_ADDED');
+      await this.participation?.eventChanged?.(tx, eventId);
       return shiftView(shift, plannedBreaks);
     });
   }
@@ -271,7 +275,7 @@ export class PlanningService {
     token: string | undefined, eventId: string, shiftId: string, roleId: string, data: ReturnType<typeof positionInput>,
   ) {
     return this.withEvent(token, eventId, async (tx, actor, event) => {
-      if (!await tx.planningShift.findFirst({ where: { id: shiftId, eventId } }) ||
+      if (!await tx.planningShift.findFirst({ where: { id: shiftId, eventId, canceledAt: null } }) ||
         !await tx.planningRole.findFirst({ where: { id: roleId, organizationId: event.organizationId } })) {
         throw new NotFoundException();
       }
@@ -312,7 +316,7 @@ export class PlanningService {
   ) {
     return this.withEvent(token, eventId, async (tx, actor) => {
       if (actor.role !== 'COORDINATOR') throw new ForbiddenException();
-      const previous = await tx.planningPosition.findFirst({ where: { shiftId, roleId, shift: { eventId } } });
+      const previous = await tx.planningPosition.findFirst({ where: { shiftId, roleId, shift: { eventId, canceledAt: null } } });
       if (!previous) throw new NotFoundException();
       const existing = confirmation === 'adequacy' ? previous.adequacyConfirmedAt : previous.supervisionConfirmedAt;
       if (Boolean(existing) === confirmed) return positionView(previous);
@@ -326,9 +330,13 @@ export class PlanningService {
         ? (confirmed ? 'POSITION_ADEQUACY_CONFIRMED' : 'POSITION_ADEQUACY_WITHDRAWN')
         : (confirmed ? 'POSITION_SUPERVISION_CONFIRMED' : 'POSITION_SUPERVISION_WITHDRAWN');
       await auditPlanning(tx, eventId, actor.id, row.id, action);
-      if (!confirmed) {
+      if (!confirmed || await tx.participationPlacement.count({
+        where: { positionId: row.id, state: { in: ['CONFIRMED', 'OFFERED', 'QUEUED'] } },
+      })) {
         await tx.eligibilityReview.createMany({ data: {
-          subjectId: row.id, reason: confirmation === 'adequacy' ? 'POSITION_TASKS_CHANGED' : 'SUPERVISION_WITHDRAWN',
+          subjectId: row.id,
+          reason: confirmed ? 'POSITION_REQUIREMENTS_RESTORED'
+            : confirmation === 'adequacy' ? 'POSITION_TASKS_CHANGED' : 'SUPERVISION_WITHDRAWN',
         } });
       }
       return positionView(row);
@@ -363,7 +371,7 @@ export class PlanningService {
     if (!event.title?.trim() || !event.description?.trim()) {
       throw new ConflictException('A title and description are required.');
     }
-    const shifts = await tx.planningShift.findMany({ where: { eventId: event.id } });
+    const shifts = await tx.planningShift.findMany({ where: { eventId: event.id, canceledAt: null } });
     if (!shifts.length) throw new ConflictException('At least one shift is required.');
 
     const where = { shiftId: { in: shifts.map(({ id }) => id) } };

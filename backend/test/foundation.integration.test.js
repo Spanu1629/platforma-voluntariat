@@ -59,6 +59,7 @@ test('deploy applies the exact historical and identity migrations', async () => 
     { migration_name: '20261119000000_historical_baseline' },
     { migration_name: '20261120000000_identity_access' },
     { migration_name: '20261126000000_eligibility_planning' },
+    { migration_name: '20261128000000_participation_waitlist' },
   ]);
 });
 

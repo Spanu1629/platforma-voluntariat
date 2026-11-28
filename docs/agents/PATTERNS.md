@@ -17,6 +17,7 @@
 - PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate · candidate
 - PATTERN-010 · Citiri relaționale secvențiale în tranzacții Prisma · candidate
 - PATTERN-011 · Blocarea contului în organizație înaintea evenimentului · candidate
+- PATTERN-012 · Job PostgreSQL confirmat în tranzacția efectelor · candidate
 
 ---
 
@@ -74,3 +75,8 @@
 - **Status:** candidate
 - **How:** Când două operații au nevoie de aceleași blocări pe cont și eveniment, ia blocările în aceeași ordine. Folosește filtrul de organizație și rol în interogarea care blochează contul țintă. În testul PostgreSQL, ține blocarea contului și verifică dacă operația care așteaptă încă lasă disponibilă blocarea evenimentului.
 - **Example:** [Atribuirea coordonatorului](../../backend/src/planning/planning.service.ts) și [testul ordinii de blocare](../../backend/test/planning.integration.test.js).
+
+## PATTERN-012 · Job PostgreSQL confirmat în tranzacția efectelor
+- **Status:** candidate
+- **How:** Recitește scadența sub aceeași blocare care serializează schimbarea de stare. Aplică efectele și confirmă sau reprogramează jobul în aceeași tranzacție. La întrerupere, workerul poate prelua jobul rămas scadent.
+- **Example:** [Joburile de participare](../../backend/src/participation/participation-jobs.ts) și [testele PostgreSQL](../../backend/test/participation.integration.test.js).

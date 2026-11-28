@@ -179,6 +179,18 @@ de înscrieri va conecta stările reale de participare și va activa rutele de
 gestionare a instruirilor. Confirmarea repartizării va depinde de rezultatul
 verificării D-016. [Contractul backend](docs/agents/CONTRACTS.md#c-005--api-de-planificare-disponibilitate-și-integrarea-eligibilității)
 
+## Înscrieri și listă de așteptare
+
+API-ul autentificat `/participation` gestionează solicitările pe eveniment,
+propunerile de rol și tură, repartizările, retragerile și ofertele FIFO.
+`GET /participation/me` recitește starea voluntarului, iar
+`GET /participation/events/{eventId}` citește solicitările unui eveniment
+pentru coordonatorul atribuit. Notificările se citesc prin
+`GET /participation/notifications`, iar fluxul `GET /participation/updates`
+semnalează modificările confirmate. Joburile PostgreSQL reiau lucrul după
+restart. Confirmările cu date reale depind de verificarea D-016.
+[Contractul de participare](docs/agents/CONTRACTS.md#c-006--api-de-participare-repartizare-și-listă-de-așteptare)
+
 ## Verificarea backendului
 
 Rulează `bash backend/test/run-integration.sh` din rădăcina repository-ului. Suita creează un proiect Compose temporar, aplică migrarea pe un volum separat și folosește numai date sintetice. Aceeași comandă rulează în GitHub Actions. [Workflowul de integrare](.github/workflows/backend-ci.yml)

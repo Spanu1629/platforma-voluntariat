@@ -81,6 +81,7 @@ model IdentityAccount {
   trainingPermit   TrainingPermission?
   trainings        TrainingRecord[]
   verification     VolunteerIdentityVerification?
+  participationRequests ParticipationRequest[]
 
   @@index([organizationId, role])
 }
@@ -158,6 +159,7 @@ model PlanningEvent {
   coordinators   PlanningCoordinator[]
   locations      PlanningLocation[]
   shifts         PlanningShift[]
+  participationRequests ParticipationRequest[]
 
   @@index([organizationId, publishedAt])
 }
@@ -192,6 +194,7 @@ model PlanningShift {
   endsAt     DateTime?           @db.Timestamptz(3)
   event      PlanningEvent       @relation(fields: [eventId], references: [id])
   location   PlanningLocation?   @relation(fields: [eventId, locationId], references: [eventId, id], onDelete: Restrict)
+  canceledAt DateTime? @db.Timestamptz(3)
   breaks     PlanningBreak[]
   positions  PlanningPosition[]
 
@@ -233,6 +236,7 @@ model PlanningPosition {
   supervisionConfirmedBy String?      @db.Uuid
   shift                  PlanningShift @relation(fields: [shiftId], references: [id])
   role                   PlanningRole  @relation(fields: [roleId], references: [id])
+  placements             ParticipationPlacement[]
 
   @@unique([shiftId, roleId])
 }
@@ -241,14 +245,16 @@ model PlanningPolicy {
   organizationId        String @id
   breakThresholdMinutes Int
   minimumBreakMinutes   Int
+  offerDurationMinutes  Int @default(720)
 }
 
 model PlanningAudit {
   id         String   @id @default(uuid()) @db.Uuid
   eventId    String   @db.Uuid
-  actorId    String   @db.Uuid
+  actorId    String?  @db.Uuid
   targetId   String   @db.Uuid
   action     String
+  reason     String?
   occurredAt DateTime @default(now()) @db.Timestamptz(3)
 
   @@index([eventId, occurredAt])
@@ -340,6 +346,9 @@ enum EligibilityReviewReason {
   SHIFT_DATE_CHANGED
   POSITION_TASKS_CHANGED
   SUPERVISION_WITHDRAWN
+  AVAILABILITY_CHANGED
+  TRAINING_CHANGED
+  POSITION_REQUIREMENTS_RESTORED
 }
 
 model EligibilityReview {
@@ -348,6 +357,81 @@ model EligibilityReview {
   reason     EligibilityReviewReason
   createdAt  DateTime                @default(now()) @db.Timestamptz(3)
 
+  processedAt DateTime? @db.Timestamptz(3)
+
   @@index([createdAt])
   @@index([subjectId])
+  @@index([processedAt, createdAt])
+}
+
+enum PlacementState {
+  PROPOSED
+  QUEUED
+  SUSPENDED
+  OFFERED
+  CONFIRMED
+  DECLINED
+  EXPIRED
+  WITHDRAWN
+  CANCELED
+  REPLACED
+}
+
+enum ParticipationJobKind {
+  POSITION
+  EVENT
+}
+
+model ParticipationRequest {
+  id String @id @default(uuid()) @db.Uuid
+  eventId String @db.Uuid
+  accountId String @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  closedAt DateTime? @db.Timestamptz(3)
+  event PlanningEvent @relation(fields: [eventId], references: [id])
+  account IdentityAccount @relation(fields: [accountId], references: [id])
+  placements ParticipationPlacement[]
+
+  @@index([eventId, closedAt])
+  @@index([accountId, closedAt])
+}
+
+model ParticipationPlacement {
+  id String @id @default(uuid()) @db.Uuid
+  requestId String @db.Uuid
+  positionId String @db.Uuid
+  proposedBy String @db.Uuid
+  replacesId String? @db.Uuid
+  state PlacementState @default(PROPOSED)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  queueOrder BigInt?
+  expiresAt DateTime? @db.Timestamptz(3)
+  reviewIssues String[] @default([])
+  request ParticipationRequest @relation(fields: [requestId], references: [id])
+  position PlanningPosition @relation(fields: [positionId], references: [id])
+  replaces ParticipationPlacement? @relation("Replacement", fields: [replacesId], references: [id])
+  replacements ParticipationPlacement[] @relation("Replacement")
+
+  @@index([positionId, state, queueOrder])
+  @@index([requestId, state])
+}
+
+model ParticipationJob {
+  kind ParticipationJobKind
+  targetId String @db.Uuid
+  dueAt DateTime @db.Timestamptz(3)
+
+  @@id([kind, targetId])
+  @@index([dueAt])
+}
+
+model ParticipationNotice {
+  id BigInt @id @default(autoincrement())
+  accountId String @db.Uuid
+  eventId String @db.Uuid
+  subjectId String @db.Uuid
+  kind String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([accountId, id])
 }
