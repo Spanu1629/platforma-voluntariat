@@ -183,6 +183,11 @@ verificării D-016. [Contractul backend](docs/agents/CONTRACTS.md#c-005--api-de-
 
 Rulează `bash backend/test/run-integration.sh` din rădăcina repository-ului. Suita creează un proiect Compose temporar, aplică migrarea pe un volum separat și folosește numai date sintetice. Aceeași comandă rulează în GitHub Actions. [Workflowul de integrare](.github/workflows/backend-ci.yml)
 
+Testele de planificare și eligibilitate urmăresc comenzile PostgreSQL active
+pe fiecare conexiune tranzacțională. Ele verifică serializarea citirilor și
+un număr constant de comenzi la citirea planului cu mai multe ture.
+[Verificări cu AWS RDS și pg 9](docs/agents/OPEN-QUESTIONS.md#q-020--cum-validăm-compatibilitatea-cu-aws-rds-și-pg-9)
+
 Cu Node.js 24 LTS activ, rulează din `backend/`:
 
 ```bash

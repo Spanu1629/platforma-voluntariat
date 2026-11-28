@@ -7,15 +7,6 @@ import { localDate, shiftTiming, type Span } from '../eligibility/eligibility-ru
 import { auditPlanning, breakPolicy, lockEvent } from './planning-store';
 import type { eventInput, locationInput, positionInput, shiftInput } from './planning-input';
 
-const eventPlan = {
-  locations: { orderBy: { name: 'asc' } },
-  coordinators: { select: { accountId: true, revokedAt: true }, orderBy: { accountId: 'asc' } },
-  shifts: {
-    orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
-    include: { breaks: { orderBy: { startsAt: 'asc' } }, positions: { orderBy: { roleId: 'asc' } } },
-  },
-} satisfies Prisma.PlanningEventInclude;
-
 const publicEvent = {
   id: true, title: true, description: true,
   shifts: {
@@ -47,6 +38,16 @@ function positionView(row: PlanningPosition) {
 
 function shiftView(shift: PlanningShift, breaks: Span[]) {
   return { ...shift, breaks: breaks.map(({ startsAt, endsAt }) => ({ startsAt, endsAt })) };
+}
+
+function groupByShift<Row extends { shiftId: string }>(rows: Row[]): Map<string, Row[]> {
+  const grouped = new Map<string, Row[]>();
+  for (const row of rows) {
+    const group = grouped.get(row.shiftId);
+    if (group) group.push(row);
+    else grouped.set(row.shiftId, [row]);
+  }
+  return grouped;
 }
 
 function sameInstant(left: Date | null, right: Date | null): boolean {
@@ -100,10 +101,22 @@ export class PlanningService {
   }
 
   async staffEvent(token: string | undefined, eventId: string) {
-    return this.withEvent(token, eventId, async (tx) => {
-      const { shifts, ...event } = await tx.planningEvent.findUniqueOrThrow({ where: { id: eventId }, include: eventPlan });
-      return { ...event, shifts: shifts.map(({ breaks, positions, ...shift }) => ({
-        ...shiftView(shift, breaks), positions: positions.map(positionView),
+    return this.withEvent(token, eventId, async (tx, _actor, event) => {
+      const locations = await tx.planningLocation.findMany({ where: { eventId }, orderBy: { name: 'asc' } });
+      const coordinators = await tx.planningCoordinator.findMany({
+        where: { eventId }, select: { accountId: true, revokedAt: true }, orderBy: { accountId: 'asc' },
+      });
+      const shifts = await tx.planningShift.findMany({
+        where: { eventId }, orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+      });
+      if (!shifts.length) return { ...event, locations, coordinators, shifts: [] };
+
+      const where = { shiftId: { in: shifts.map(({ id }) => id) } };
+      const breaks = groupByShift(await tx.planningBreak.findMany({ where, orderBy: { startsAt: 'asc' } }));
+      const positions = groupByShift(await tx.planningPosition.findMany({ where, orderBy: { roleId: 'asc' } }));
+      return { ...event, locations, coordinators, shifts: shifts.map((shift) => ({
+        ...shiftView(shift, breaks.get(shift.id) ?? []),
+        positions: (positions.get(shift.id) ?? []).map(positionView),
       })) };
     });
   }
@@ -205,13 +218,13 @@ export class PlanningService {
       if (values.locationId && !await tx.planningLocation.findFirst({ where: { eventId, id: values.locationId } })) {
         throw new NotFoundException();
       }
-      const previous = id && await tx.planningShift.findFirst({
-        where: { id, eventId }, include: { breaks: true, positions: { select: { id: true } } },
-      });
+      const previous = id && await tx.planningShift.findFirst({ where: { id, eventId } });
       if (id && !previous) throw new NotFoundException();
       const startsAt = values.startsAt === undefined ? (previous ? previous.startsAt : null) : values.startsAt;
       const endsAt = values.endsAt === undefined ? (previous ? previous.endsAt : null) : values.endsAt;
-      const plannedBreaks = breaks ?? (previous ? previous.breaks : []);
+      const plannedBreaks = breaks ?? (previous
+        ? await tx.planningBreak.findMany({ where: { shiftId: previous.id } })
+        : []);
       if (startsAt && endsAt && !shiftTiming({ startsAt, endsAt, breaks: plannedBreaks }, await breakPolicy(tx, event.organizationId)).valid) {
         throw new ConflictException('Invalid shift timing or planned break.');
       }
@@ -220,7 +233,10 @@ export class PlanningService {
         !sameInstant(previous.startsAt, startsAt) || !sameInstant(previous.endsAt, endsAt) ||
         (values.locationId !== undefined && values.locationId !== previous.locationId) || breaks !== undefined
       )) {
-        for (const position of previous.positions) {
+        const existingPositions = await tx.planningPosition.findMany({
+          where: { shiftId: previous.id }, select: { id: true },
+        });
+        for (const position of existingPositions) {
           const counts = await this.participation.counts(tx, position.id);
           if (hasParticipation(counts)) throw new ConflictException('Cancel and recreate the shift.');
         }
@@ -335,14 +351,19 @@ export class PlanningService {
     if (!event.title?.trim() || !event.description?.trim()) {
       throw new ConflictException('A title and description are required.');
     }
-    const shifts = await tx.planningShift.findMany({
-      where: { eventId: event.id },
-      include: { breaks: true, positions: { where: { capacity: { gt: 0 } }, select: { id: true } } },
-    });
+    const shifts = await tx.planningShift.findMany({ where: { eventId: event.id } });
     if (!shifts.length) throw new ConflictException('At least one shift is required.');
+
+    const where = { shiftId: { in: shifts.map(({ id }) => id) } };
+    const breaksByShift = groupByShift(await tx.planningBreak.findMany({ where }));
+    const openPositions = await tx.planningPosition.findMany({
+      where: { ...where, capacity: { gt: 0 } }, select: { shiftId: true },
+    });
+    const openShifts = new Set(openPositions.map(({ shiftId }) => shiftId));
     const policy = await breakPolicy(tx, event.organizationId);
-    for (const { startsAt, endsAt, locationId, breaks, positions } of shifts) {
-      if (!startsAt || !endsAt || !locationId || !positions.length || !shiftTiming({ startsAt, endsAt, breaks }, policy).valid) {
+    for (const { id, startsAt, endsAt, locationId } of shifts) {
+      const breaks = breaksByShift.get(id) ?? [];
+      if (!startsAt || !endsAt || !locationId || !openShifts.has(id) || !shiftTiming({ startsAt, endsAt, breaks }, policy).valid) {
         throw new ConflictException('Each shift needs valid timing, a location and a position with positive capacity.');
       }
     }

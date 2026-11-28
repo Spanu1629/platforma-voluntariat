@@ -15,6 +15,20 @@ type ScheduleReader = (
   tx: Prisma.TransactionClient, accountId: string, organizationId: string,
 ) => Promise<ScheduledShift[]>;
 
+type EligibilityPosition = {
+  shiftId: string;
+  roleId: string;
+  capacity: number;
+  startsAt: Date | null;
+  endsAt: Date | null;
+  publishedAt: Date | null;
+  minimumAge: number;
+  supervisionForMinors: boolean;
+  specializedTraining: boolean;
+  adequate: boolean;
+  supervised: boolean;
+};
+
 function availabilityView(row: VolunteerAvailability | null): Availability {
   if (!row) return { weekly: [], exceptions: [] };
   // These fields are written only after availabilityInput validates the canonical shape.
@@ -64,28 +78,37 @@ export class EligibilityService {
   ) {
     await lockAccount(tx, accountId);
     const account = await tx.identityAccount.findUnique({
-      where: { id: accountId }, include: { profile: true, availability: true },
+      where: { id: accountId }, include: { profile: { select: { birthDate: true } } },
     });
     if (!account || account.role !== 'VOLUNTEER') throw new NotFoundException();
-    const position = await tx.planningPosition.findFirst({
-      where: { id: positionId, shift: { event: { organizationId: account.organizationId } } },
-      include: { role: true, shift: { include: { breaks: true, event: { select: { publishedAt: true } } } } },
-    });
+    const storedAvailability = await tx.volunteerAvailability.findUnique({ where: { accountId } });
+    const [position] = await tx.$queryRaw<EligibilityPosition[]>`
+      SELECT p."shiftId", p."roleId", p.capacity, s."startsAt", s."endsAt", e."publishedAt",
+             r."minimumAge", r."supervisionForMinors", r."specializedTraining",
+             p."adequacyConfirmedAt" IS NOT NULL AS adequate,
+             p."supervisionConfirmedAt" IS NOT NULL AS supervised
+      FROM "PlanningPosition" p
+      JOIN "PlanningShift" s ON s.id = p."shiftId"
+      JOIN "PlanningEvent" e ON e.id = s."eventId"
+      JOIN "PlanningRole" r ON r.id = p."roleId"
+      WHERE p.id = ${positionId}::uuid AND e."organizationId" = ${account.organizationId}
+    `;
     if (!position) throw new NotFoundException();
+    const breaks = await tx.planningBreak.findMany({ where: { shiftId: position.shiftId } });
+    const { startsAt, endsAt, publishedAt } = position;
     const issues: string[] = [];
     if (!accountActive(account) || !account.approvedAt) issues.push('ACCOUNT_NOT_APPROVED');
     if (requireVerified && !await this.verifiedIdentity(account.id, tx)) issues.push('IDENTITY_VERIFICATION_REQUIRED');
-    if (!position.shift.event.publishedAt) issues.push('EVENT_NOT_PUBLISHED');
+    if (!publishedAt) issues.push('EVENT_NOT_PUBLISHED');
     if (position.capacity === 0) issues.push('POSITION_CLOSED');
 
-    const { startsAt, endsAt, breaks } = position.shift;
     if (!startsAt || !endsAt) return { issues: [...issues, 'INVALID_SHIFT'] };
     const shift = { startsAt, endsAt, breaks };
     const timing = shiftTiming(shift, await breakPolicy(tx, account.organizationId));
     if (!timing.valid) return { issues: [...issues, 'INVALID_SHIFT'] };
     const day = localDate(startsAt);
     const weekday = new Date(day + 'T00:00:00Z').getUTCDay() || 7;
-    const availability = availabilityView(account.availability);
+    const availability = availabilityView(storedAvailability);
     const weekly = availability.weekly.find((value) => value.weekday === weekday)?.intervals ?? [];
     const exception = availability.exceptions.find((value) => value.date === day)?.intervals;
     if (!coversShift(shift, weekly, exception)) issues.push('AVAILABILITY_REQUIRED');
@@ -93,9 +116,7 @@ export class EligibilityService {
     if (!account.profile?.birthDate) issues.push('BIRTH_DATE_REQUIRED');
     else {
       const age = ageAtShift(account.profile.birthDate, startsAt);
-      issues.push(...ageIssues(age, {
-        ...position.role, adequate: position.adequacyConfirmedAt !== null, supervised: position.supervisionConfirmedAt !== null,
-      }));
+      issues.push(...ageIssues(age, position));
       issues.push(...scheduleIssues(
         { startsAt, endsAt, effectiveMinutes: timing.effectiveMinutes },
         await schedule(tx, account.id, account.organizationId), age >= 18,
@@ -104,7 +125,7 @@ export class EligibilityService {
 
     const training = await this.training.qualifications(accountId, tx, new Date(day + 'T00:00:00Z'));
     if (!training.general) issues.push('GENERAL_TRAINING_REQUIRED');
-    if (position.role.specializedTraining && !training.roleIds.includes(position.roleId)) {
+    if (position.specializedTraining && !training.roleIds.includes(position.roleId)) {
       issues.push('SPECIALIZED_TRAINING_REQUIRED');
     }
     return { issues, effectiveMinutes: timing.effectiveMinutes };

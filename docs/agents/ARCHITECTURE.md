@@ -45,6 +45,16 @@ supply the live relationships, reservations, notifications and transactional
 confirmation. The dedicated D-016 delivery will supply verified identity
 results. [Eligibility decisions](decisions/eligibilitate-si-planificare.md)
 
+Planning detail, shift edits, publication checks and eligibility evaluation
+await relation reads sequentially on the existing transaction connection.
+Planning fetches breaks and positions for the selected shifts in batches and
+groups them by shift ID. Eligibility reads the position, role, shift and
+event with a parameterized PostgreSQL join scoped to the volunteer's
+organization. These reads avoid relying on the deprecated queue in
+node-postgres. The PostgreSQL integration tests check overlapping commands
+on each connection, including overlaps that do not emit a warning.
+[Backend checks](../../README.md#verificarea-backendului)
+
 The approved direction is a separate React frontend (TypeScript, Vite, Tailwind) and a NestJS modular monolith (TypeScript) with REST/OpenAPI, SSE and PostgreSQL through Prisma. Docker Compose serves local development. Jest and PostgreSQL integration tests run in GitHub Actions. D-003 and D-005 through D-009 describe the approved technical and design constraints. D-012 through D-017 record the organizational clarifications. [Scope and acceptance criteria](PROJECT-BRIEF.md)
 
 | Module | Conceptual entities and responsibilities |

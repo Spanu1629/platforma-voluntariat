@@ -253,4 +253,8 @@ test('eligibility uses live profile, availability, requirements and a verified r
     expect(await confirmation()).toEqual({ issues: [], effectiveMinutes: 180 });
   });
   expect(transactions.map(({ overlaps }) => overlaps)).toEqual([0, 0]);
+
+  const outsider = await testDb.account('VOLUNTEER', { organizationId: 'synthetic-outsider', approvedAt: new Date() });
+  await expect(appDb.$transaction((tx) => evaluator.evaluatePreliminary(tx, outsider.id, position.id, emptySchedule)))
+    .rejects.toMatchObject({ status: 404 });
 });

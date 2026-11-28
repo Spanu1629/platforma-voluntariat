@@ -15,6 +15,7 @@
 - PATTERN-007 · Job tranzacțional cu idempotency și termen de reluare · candidate
 - PATTERN-008 · Probă manuală cu furnizor extern în Compose · candidate
 - PATTERN-009 · Reevaluare înregistrată odată cu schimbarea condițiilor de eligibilitate · candidate
+- PATTERN-010 · Citiri relaționale secvențiale în tranzacții Prisma · candidate
 
 ---
 
@@ -62,3 +63,8 @@
 - **Status:** candidate
 - **How:** Înregistrează în aceeași tranzacție cu modificarea eligibilității și auditul identificatorul subiectului și cauza reevaluării. Consumatorul poate reciti condițiile înainte de efectele asupra repartizărilor viitoare și poate trimite notificările prin joburile persistente. Păstrează datele personale în evidențele autorizate, fără a le copia în înregistrarea de reevaluare.
 - **Example:** [Invalidarea verificării din profil](../../backend/src/identity/identity.service.ts), [anularea instruirii](../../backend/src/eligibility/training.service.ts) și [schimbările din planificare](../../backend/src/planning/planning.service.ts).
+
+## PATTERN-010 · Citiri relaționale secvențiale în tranzacții Prisma
+- **Status:** candidate
+- **How:** Așteaptă pe rând citirile care folosesc aceeași conexiune tranzacțională. Pentru o colecție de părinți, citește fiecare tip de relație în lot și grupează rezultatele după cheia părintelui. Testează atât suprapunerea comenzilor pe conexiune, cât și numărul de comenzi pentru mai mulți părinți.
+- **Example:** [Citirea planului și verificarea publicării](../../backend/src/planning/planning.service.ts), [testele de integrare](../../backend/test/planning.integration.test.js).
