@@ -1,4 +1,4 @@
-const { integration } = require('./eligibility-fixtures');
+const { integration, observeTransactionQueries } = require('./eligibility-fixtures');
 
 jest.setTimeout(30000);
 const testDb = integration();
@@ -64,6 +64,45 @@ test('only administrators manage assignments and revocation removes access witho
     orderBy: { occurredAt: 'asc' },
   });
   expect(rows.map((row) => row.action)).toEqual(['COORDINATOR_ASSIGNED', 'COORDINATOR_REVOKED']);
+});
+
+test('staff event detail loads ordered relations in batches on one transaction connection', async () => {
+  const coordinator = await testDb.account('COORDINATOR');
+  const { path, shiftPath, location } = await fullDraft(coordinator);
+  const read = () => observeTransactionQueries(() => testDb.json(path, { actor: coordinator }));
+  const single = await read();
+
+  const earlierLocation = await write(coordinator, `${path}/locations`, 'POST', { name: 'Alt loc' }, 201);
+  const earlier = await write(coordinator, `${path}/shifts`, 'POST', {
+    locationId: earlierLocation.id, startsAt: stamp('08:00'), endsAt: stamp('09:00'),
+  }, 201);
+  await write(coordinator, `${shiftPath}/positions/${otherRole}`, 'PUT', { capacity: 2 });
+  const multiple = await read();
+
+  expect(multiple.result.locations.map(({ id }) => id)).toEqual([earlierLocation.id, location.id]);
+  expect(multiple.result.coordinators).toEqual([{ accountId: coordinator.id, revokedAt: null }]);
+  expect(multiple.result.shifts).toEqual([
+    expect.objectContaining({ id: earlier.id, breaks: [], positions: [] }),
+    expect.objectContaining({
+      id: shiftPath.split('/').at(-1),
+      breaks: [{ startsAt: new Date(stamp('12:00')).toISOString(), endsAt: new Date(stamp('12:30')).toISOString() }],
+      positions: [expect.objectContaining({ roleId: role }), expect.objectContaining({ roleId: otherRole })],
+    }),
+  ]);
+  expect(single.transactions).toHaveLength(1);
+  expect(multiple.transactions).toHaveLength(1);
+  expect(multiple.transactions[0].queries).toBe(single.transactions[0].queries);
+  expect(multiple.transactions[0].overlaps).toBe(0);
+});
+
+test('shift edits and publication read relations sequentially within their transactions', async () => {
+  const admin = await testDb.account('ADMIN');
+  const { path, shiftPath } = await fullDraft(admin);
+  const { transactions } = await observeTransactionQueries(async () => {
+    await status(admin, shiftPath, 'PATCH', { endsAt: stamp('14:30') }, 200);
+    await status(admin, `${path}/publish`, 'POST', {}, 204);
+  });
+  expect(transactions.map(({ overlaps }) => overlaps)).toEqual([0, 0]);
 });
 
 test('publication validates all shifts, drafts stay private, and public output uses a restricted projection', async () => {

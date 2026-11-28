@@ -1,5 +1,5 @@
 const { randomUUID } = require('node:crypto');
-const { integration } = require('./eligibility-fixtures');
+const { integration, observeTransactionQueries } = require('./eligibility-fixtures');
 
 jest.setTimeout(30000);
 const testDb = integration();
@@ -248,5 +248,9 @@ test('eligibility uses live profile, availability, requirements and a verified r
   await testDb.db.volunteerIdentityVerification.create({ data: {
     accountId: volunteer.id, result: 'VERIFIED', verifiedAt: new Date(), verifierId: coordinator.id,
   } });
-  expect(await confirmation()).toEqual({ issues: [], effectiveMinutes: 180 });
+  const { transactions } = await observeTransactionQueries(async () => {
+    await preliminary();
+    expect(await confirmation()).toEqual({ issues: [], effectiveMinutes: 180 });
+  });
+  expect(transactions.map(({ overlaps }) => overlaps)).toEqual([0, 0]);
 });

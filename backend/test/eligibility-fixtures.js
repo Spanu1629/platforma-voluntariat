@@ -1,5 +1,6 @@
 const { createHash, randomBytes, randomUUID } = require('node:crypto');
 const { PrismaPg } = require('@prisma/adapter-pg');
+const { Client } = require('pg');
 const { PrismaClient } = require('../dist/generated/prisma/client');
 const { createApplication } = require('../dist/main');
 
@@ -65,4 +66,36 @@ function integration() {
   return { get db() { return db; }, get app() { return app; }, account, request, json };
 }
 
-module.exports = { integration };
+async function observeTransactionQueries(action) {
+  const query = Client.prototype.query;
+  const transactions = [];
+  const activeTransactions = new WeakMap();
+  const spy = jest.spyOn(Client.prototype, 'query').mockImplementation(function (config, ...args) {
+    const sql = config?.text;
+    // Prisma's transaction adapter uses the promise form on a single pg.Client.
+    if (!sql || typeof args.at(-1) === 'function') return query.call(this, config, ...args);
+    if (sql === 'BEGIN') {
+      const transaction = { queries: 0, overlaps: 0, inFlight: 0 };
+      activeTransactions.set(this, transaction);
+      transactions.push(transaction);
+    }
+    const transaction = activeTransactions.get(this);
+    if (!transaction) return query.call(this, config, ...args);
+
+    transaction.queries++;
+    if (transaction.inFlight) transaction.overlaps++;
+    transaction.inFlight++;
+    return query.call(this, config, ...args).finally(() => {
+      transaction.inFlight--;
+      if (sql === 'COMMIT' || sql === 'ROLLBACK') activeTransactions.delete(this);
+    });
+  });
+  try {
+    const result = await action();
+    return { result, transactions };
+  } finally {
+    spy.mockRestore();
+  }
+}
+
+module.exports = { integration, observeTransactionQueries };
